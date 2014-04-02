@@ -1,9 +1,19 @@
-
+'''
+Use elementtree to pick out certain parts of an OPI file.
+'''
 import xml.etree.ElementTree as et
 from collections import defaultdict
 
-OPI_FILE = '/home/hgs15624/code/converter/vacuum/diamondVacuumOverview.opi'
-OUT_FILE = '/tmp/new2.opi'
+OPI_FILE = '/home/hgs15624/code/converter/opi/vacuum/diamondVacuumOverview.opi'
+
+
+def new_name(old_name):
+    parts = old_name.split('.')
+    return '%s2.%s' % (''.join(parts[:-1]), parts[-1])
+
+OUT_FILE = new_name(OPI_FILE)
+print OPI_FILE
+print OUT_FILE
 
 LINK = 'org.csstudio.opibuilder.widgets.linkingContainer'
 
@@ -19,9 +29,9 @@ changed = 0
 lcs = 0
 nodes = 0
 
-def remove_lcs(node):
+def remove_rules(node):
     '''
-    remove any linking container children of the node
+    remove any rule from linking containers which are any children of the node
     '''
     global removed, nodes
     nodes += 1
@@ -33,16 +43,15 @@ def remove_lcs(node):
                 type = child.attrib['typeId']
                 if  type == LINK:
                     rules = child.findall('rules')
-                    print len(rules)
                     for rule in rules:
                         rs = rule.findall('rule')
                         for r in rs:
                             rule.remove(r)
                     removed += 1
                 else:
-                    remove_lcs(child)
+                    remove_rules(child)
             else:
-                remove_lcs(child)
+                remove_rules(child)
 
 def change_sym(node):
     '''
@@ -95,11 +104,10 @@ for child in root.findall('widget'):
             for child3 in child2:
                 change_symbol(child3)
 '''
-remove_lcs(root)
+remove_rules(root)
 #change_sym(root)
 
 tree.write(OUT_FILE)
 
 print "removed %d linking containers" % removed
 print "total nodes %d" % nodes
-print types
