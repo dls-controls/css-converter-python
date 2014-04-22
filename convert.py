@@ -27,6 +27,10 @@ import shutil
 import stat
 import ConfigParser
 
+import logging as log
+LOG_FORMAT = '%(levelname)s:  %(message)s'
+LOG_LEVEL = log.INFO
+log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
 
@@ -60,7 +64,7 @@ def update_edm(filename):
         os.chmod(tmp_edm, 0o777)
         return tmp_edm
     else:
-        print "update finished with code", x
+        log.warn('EDM update failed with code %s' % x)
 
 
 def convert(filename, destination):
@@ -75,7 +79,7 @@ def convert(filename, destination):
         log.warn('Conversion failed with code %d' % x)
         new_edl = update_edm(filename)
         if new_edl is not None:
-            print 'Updated to new-style edl', new_edl
+            log.warn('Updated to new-style edl %s' % new_edl)
             command = CONVERT_CMD + [new_edl, destination]
             x = subprocess.call(command, stdout=NULL_FILE, stderr=NULL_FILE)
     return x == 0
@@ -83,36 +87,36 @@ def convert(filename, destination):
 
 def start(datadirs, outdir, force):
     for dir in datadirs:
-        print 'Starting directory', dir
+        log.info('Starting directory %s' % dir)
         files = os.listdir(dir)
         files = [os.path.join(dir, file) for file in files]
 
         for file in files:
-            print 'Trying %s...' % file
+            log.debug('Trying %s...' % file)
             if file.endswith(EDL_EXT):
                 # change extension
                 name = os.path.basename(file)
                 opifile = name[:-len(EDL_EXT)] + OPI_EXT
                 destination = os.path.join(outdir, opifile)
                 if not force and os.path.isfile(destination):
-                    print 'Skipping existing file %s' % destination
+                    log.info('Skipping existing file %s' % destination)
                 else:
                     if convert(file, destination):
-                        print 'Successfully converted %s' % destination
+                        log.info('Successfully converted %s' % destination)
                     else:
-                        print 'Conversion unsuccessful.'
+                        log.warn('Conversion of %s unsuccessful.' % file)
             elif file.split('.')[-1] in COPY_EXTS:
                 name = os.path.basename(file)
                 destination = os.path.join(outdir, name)
                 if not force and os.path.isfile(destination):
-                    print 'Skipping existing file %s' % destination
+                    log.info('Skipping existing file %s' % destination)
                 else:
                     if subprocess.call(['cp', file, destination]):
-                        print 'Successfully copied %s' % destination
+                        log.info('Successfully copied %s' % destination)
                     else:
-                        print 'Copying unsuccessful.'
+                        log.warn('Copying file %s unsuccessful.' % file)
             else:
-                print 'Not doing anything with %s' % file
+                log.info('Not doing anything with %s' % file)
 
 def get_datadirs(root, edmdatafiles):
     # Assemble the directories to convert.
@@ -127,7 +131,7 @@ def get_datadirs(root, edmdatafiles):
 if __name__ == "__main__":
     # Parse configuration
     if len(sys.argv) == 1 or not os.path.isfile(sys.argv[1]):
-        print 'Please specify a configuration file.'
+        log.error('Please specify a configuration file.')
         sys.exit()
     force = '-f' in sys.argv
     cp = ConfigParser.ConfigParser()
@@ -136,18 +140,18 @@ if __name__ == "__main__":
     try:
         root = cp.get('edm', 'root')
     except ConfigParser.NoOptionError:
-        print "No root option found."
+        log.warn("No root option found.")
         root = None
 
     try:
         datafiles = cp.get('edm', 'edmdatafiles')
     except ConfigParser.NoOptionError:
-        print "No data files option found."
+        log.warn("No data files option found.")
         datafiles = None
 
     outdir = cp.get('opi', 'outdir')
     if not os.path.isdir(outdir):
-        print 'Directory %s does not exist' % outdir
+        log.error('Directory %s does not exist' % outdir)
         sys.exit()
 
     datadirs = get_datadirs(root, datafiles)
