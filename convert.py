@@ -21,47 +21,27 @@ Steps:
 '''
 
 import os
+import sys
+import subprocess
 import shutil
 import stat
-
-EDMDATAFILES = None
-# MPS
-#EDMDATAFILES = '.:/dls_sw/prod/R3.14.11/support/devIocStats/Rx-y/data:/dls_sw/prod/R3.14.11/ioc/BR/MP/Rx-y/data:/dls_sw/prod/R3.14.11/ioc/SR/MP/Rx-y/data'
-#ROOT = '/dls_sw/prod/R3.14.11/support/MPS/Rx-y/data'
-
-# Master Oscillator
-#ROOT = "/dls_sw/prod/R3.14.11/ioc/CS/CS-RF-IOC-02/Rx-y/data"
-#EDMDATAFILES = "/dls_sw/prod/R3.14.11/support/devIocStats/Rx-y/data"
-
-# Diagnostics overview
-#EDMDATAFILES = "/dls_sw/prod/R3.14.12.3/ioc/Libera/2.05.15/opi:/dls_sw/prod/R3.14.12.3/ioc/TMBF/2.3/opi:/dls_sw/prod/R3.14.11/ioc/IsaPBPM/1-1/opi:.:/dls_sw/prod/R3.14.12.3/support/motor/6-7-1dls8/data:/dls_sw/prod/R3.14.12.3/support/vxStats/1-14-1/data:/dls_sw/prod/R3.14.12.3/support/enzLoCuM4/2-29/data:/dls_sw/prod/R3.14.12.3/support/pmacUtil/4-20/data:/dls_sw/prod/R3.14.12.3/support/vacuumValve/4-22/data:/dls_sw/prod/R3.14.12.3/support/TimingTemplates/6-6-3/data:/dls_sw/prod/R3.14.12.3/support/4chTimer/3-2/data"
-
-# Vacuum
-ROOT = None
-EDMDATAFILES = "/dls_sw/prod/R3.14.11/support/digitelMpc/4-27/data:/dls_sw/prod/R3.14.11/support/HostLink/3-0/data:/dls_sw/prod/R3.14.11/support/insertionDevice/4-13/data:/dls_sw/prod/R3.14.11/support/mks937a/2-69/data:/dls_sw/prod/R3.14.11/support/mks937b/2-8/data:/dls_sw/prod/R3.14.11/support/rackFan/2-4-1/data:/dls_sw/prod/R3.14.11/support/rga/4-4/data:/dls_sw/prod/R3.14.11/support/vacuum/3-38/data:/dls_sw/prod/R3.14.11/support/vacuumSpace/3-22/data:/dls_sw/prod/R3.14.11/support/dlsPLC/1-8/data:/dls_sw/prod/R3.14.11/support/vxStats/1-14/data:/dls_sw/prod/R3.14.11/support/devIocStats/3-1-5dls4/data"
-# BL04I
-#ROOT = None
-#EDMDATAFILES = "/dls_sw/prod/R3.14.11/ioc/BL02I/BL/2-16/data"
-
-OUTDIR = './opi/vacuum'
+import ConfigParser
 
 
+
+
+NULL_FILE = open(os.devnull, 'w')
 TMPDIR = './tmp'
 
 OPI_EXT = 'opi'
 EDL_EXT = 'edl'
 
-COPY_EXTS = ['png']
+# Filetypes to copy across unchanged
+COPY_EXTS = ['png', 'sh']
 
-CONVERT_CMD = 'java -jar conv.jar %s %s'
-UPDATE_CMD = 'edm -convert %s'
-
-# Assemble the directories to convert.
-datadirs = []
-if ROOT is not None:
-    datadirs.append(ROOT)
-if EDMDATAFILES is not None:
-    datadirs.extend(EDMDATAFILES.split(':'))
+# Commands in lists for subprocess
+CONVERT_CMD = ['java', '-jar', 'conv.jar']
+UPDATE_CMD = ['edm', '-convert']
 
 
 def update_edm(filename):
@@ -70,14 +50,13 @@ def update_edm(filename):
     new format using EDM. Return location of converted file.
     '''
     tmp_edm = os.path.join(TMPDIR, os.path.basename(filename))
-    print "moving file to ", tmp_edm
     if os.path.exists(tmp_edm):
+        # make sure we have write permissions on the destination
         os.chmod(tmp_edm, stat.S_IWUSR)
     shutil.copyfile(filename, tmp_edm)
-    #    print "successful copy"
-    x = os.system(UPDATE_CMD % tmp_edm)
+    cmd = UPDATE_CMD + [tmp_edm]
+    x = subprocess.call(cmd, stdout=NULL_FILE, stderr=NULL_FILE)
     if not x:
-        print "new file is %s" % tmp_edm
         os.chmod(tmp_edm, 0o777)
         return tmp_edm
     else:
@@ -90,46 +69,88 @@ def convert(filename, destination):
     using edm before converting again.
     '''
     # first try
-    x = os.system('java -jar conv.jar %s %s' % (filename, destination))
+    command = CONVERT_CMD + [filename, destination]
+    x = subprocess.call(command, stdout=NULL_FILE, stderr=NULL_FILE)
     if x != 0: # conversion failed
-        print 'conversion failed with code %d' % x
+        log.warn('Conversion failed with code %d' % x)
         new_edl = update_edm(filename)
         if new_edl is not None:
-            print 'converted to new edl', new_edl
-            command = CONVERT_CMD % (new_edl, destination)
-            print command
-            x = os.system(command)
+            print 'Updated to new-style edl', new_edl
+            command = CONVERT_CMD + [new_edl, destination]
+            x = subprocess.call(command, stdout=NULL_FILE, stderr=NULL_FILE)
     return x == 0
 
 
-for dir in datadirs:
-    print dir
-    files = os.listdir(dir)
-    print files
-    files = [os.path.join(dir, file) for file in files]
+def start(datadirs, outdir, force):
+    for dir in datadirs:
+        print 'Starting directory', dir
+        files = os.listdir(dir)
+        files = [os.path.join(dir, file) for file in files]
 
-    for file in files:
-        print file
-        if file.endswith(EDL_EXT):
-            # change extension
-            name = os.path.basename(file)
-            opifile = name[:-len(EDL_EXT)] + OPI_EXT
-            print opifile
-            destination = os.path.join(OUTDIR, opifile)
-            if os.path.isfile(destination):
-                print "skipping converted file %s" % destination
-            else:
-                print "the destination is", destination
-                if convert(file, destination):
-                    print "successful"
+        for file in files:
+            print 'Trying %s...' % file
+            if file.endswith(EDL_EXT):
+                # change extension
+                name = os.path.basename(file)
+                opifile = name[:-len(EDL_EXT)] + OPI_EXT
+                destination = os.path.join(outdir, opifile)
+                if not force and os.path.isfile(destination):
+                    print 'Skipping existing file %s' % destination
                 else:
-                    print "unsuccessful"
-        elif file.split('.')[-1] in COPY_EXTS:
-            name = os.path.basename(file)
-            destination = os.path.join(OUTDIR, name)
-            os.system('cp %s %s' % (file, destination))
-        else:
-            print "Not doing anything with %s" % file
+                    if convert(file, destination):
+                        print 'Successfully converted %s' % destination
+                    else:
+                        print 'Conversion unsuccessful.'
+            elif file.split('.')[-1] in COPY_EXTS:
+                name = os.path.basename(file)
+                destination = os.path.join(outdir, name)
+                if not force and os.path.isfile(destination):
+                    print 'Skipping existing file %s' % destination
+                else:
+                    if subprocess.call(['cp', file, destination]):
+                        print 'Successfully copied %s' % destination
+                    else:
+                        print 'Copying unsuccessful.'
+            else:
+                print 'Not doing anything with %s' % file
 
+def get_datadirs(root, edmdatafiles):
+    # Assemble the directories to convert.
+    datadirs = []
+    if root is not None:
+        datadirs.append(root)
+    if edmdatafiles is not None:
+        datadirs.extend(edmdatafiles.split(':'))
 
+    return datadirs
+
+if __name__ == "__main__":
+    # Parse configuration
+    if len(sys.argv) == 1 or not os.path.isfile(sys.argv[1]):
+        print 'Please specify a configuration file.'
+        sys.exit()
+    force = '-f' in sys.argv
+    cp = ConfigParser.ConfigParser()
+    cp.read(sys.argv[1])
+
+    try:
+        root = cp.get('edm', 'root')
+    except ConfigParser.NoOptionError:
+        print "No root option found."
+        root = None
+
+    try:
+        datafiles = cp.get('edm', 'edmdatafiles')
+    except ConfigParser.NoOptionError:
+        print "No data files option found."
+        datafiles = None
+
+    outdir = cp.get('opi', 'outdir')
+    if not os.path.isdir(outdir):
+        print 'Directory %s does not exist' % outdir
+        sys.exit()
+
+    datadirs = get_datadirs(root, datafiles)
+
+    start(datadirs, outdir, force)
 
