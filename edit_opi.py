@@ -8,6 +8,9 @@ OPI_FILE = '/home/hgs15624/code/converter/opi/vacuum/diamondVacuumOverview.opi'
 
 
 def new_name(old_name):
+    '''
+    Append a 2 to the name of the file.
+    '''
     parts = old_name.split('.')
     return '%s2.%s' % (''.join(parts[:-1]), parts[-1])
 
@@ -17,7 +20,7 @@ print OUT_FILE
 
 LINK = 'org.csstudio.opibuilder.widgets.linkingContainer'
 
-new_symbol = '/home/hgs15624/.css-workspaces/w1/CSS/symbol.opi'
+NEW_SYMBOL = '/home/hgs15624/.css-workspaces/w1/CSS/symbol.opi'
 
 tree = et.parse(OPI_FILE)
 
@@ -55,7 +58,7 @@ def remove_rules(node):
 
 def change_sym(node):
     '''
-    remove any linking container children of the node
+    Replace symbol files using the specified one.
     '''
     global changed
     if len(node) == 0:
@@ -67,7 +70,7 @@ def change_sym(node):
                 if  type == LINK:
                     opis = child.findall('opi_file')
                     for opi in opis:
-                        opi.text = new_symbol
+                        opi.text = NEW_SYMBOL
                         changed += 1
                 else:
                     change_sym(child)
@@ -88,7 +91,7 @@ def change_symbol(node):
             for c in child.findall('opi_file'):
                 changed += 1
 #                print c.text, changed
-                c.text = new_symbol
+                c.text = NEW_SYMBOL
 
 '''
 for child in root.findall('widget'):
@@ -109,5 +112,5 @@ remove_rules(root)
 
 tree.write(OUT_FILE)
 
-print "removed %d linking containers" % removed
+print "removed %d rules from linking containers" % removed
 print "total nodes %d" % nodes
