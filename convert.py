@@ -131,7 +131,7 @@ def get_datadirs(root, edmdatafiles):
 if __name__ == "__main__":
     # Parse configuration
     if len(sys.argv) == 1 or not os.path.isfile(sys.argv[1]):
-        log.error('Please specify a configuration file.')
+        print 'Usage: %s conf/<config-file>' % sys.argv[0]
         sys.exit()
     force = '-f' in sys.argv
     cp = ConfigParser.ConfigParser()
