@@ -136,7 +136,7 @@ def start(datadirs, outdir, force):
         parse_dir(directory, outdir, force)
 
 
-def datadirs_from_string(root, edmdatafiles):
+def datadirs_from_string(edmdatafiles):
     # Assemble the directories to convert.
     return edmdatafiles.split(':')
 
