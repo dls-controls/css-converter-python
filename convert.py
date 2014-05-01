@@ -1,3 +1,4 @@
+#!/usr/bin/env dls-python
 '''
 Simple python script to find and convert EDM .edl files into CSS
 .opi files. It uses conv.jar, built from the latest version
