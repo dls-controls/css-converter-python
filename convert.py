@@ -26,12 +26,12 @@ import subprocess
 import shutil
 import stat
 import ConfigParser
+import argparse
 
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
 LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
-
 
 
 NULL_FILE = open(os.devnull, 'w')
@@ -128,20 +128,46 @@ def get_datadirs(root, edmdatafiles):
 
     return datadirs
 
-if __name__ == "__main__":
+def datadirs_from_string(root, edmdatafiles):
+    # Assemble the directories to convert.
+    return edmdatafiles.split(':')
+
+def datadirs_from_file(filename):
+    paths = []
+    for line in open(filename):
+        if not (line.startswith('#') or line.isspace()):
+            paths.append(line.strip())
+    return paths
+
+def set_up_options():
+    parser = argparse.ArgumentParser(description='''
+    Convert whole areas of EDM screens into CSS's OPI format.
+    Configuration files for each area are found in the conf/
+    directory.  The output location is not automatically 
+    created to avoid unwanted files...
+    ''')
+    parser.add_argument('-f', dest='force',
+        help='overwrite existing OPI files')
+    parser.add_argument('config', metavar='<config-file>',
+        help='config file specifying EDM paths and output dir')
+    args = parser.parse_args()
+    return args
+
+if __name__ == '__main__':
     # Parse configuration
-    if len(sys.argv) == 1 or not os.path.isfile(sys.argv[1]):
-        print 'Usage: %s conf/<config-file>' % sys.argv[0]
-        sys.exit()
-    force = '-f' in sys.argv
+    args = set_up_options()
+
     cp = ConfigParser.ConfigParser()
-    cp.read(sys.argv[1])
+    cp.read(args.config)
 
     try:
-        root = cp.get('edm', 'root')
-    except ConfigParser.NoOptionError:
-        log.warn("No root option found.")
-        root = None
+        outdir = cp.get('opi', 'outdir')
+        if not os.path.isdir(outdir):
+            log.error('Please create directory %s for output files.' % outdir)
+            sys.exit()
+    except ConfigParser.NoSectionError:
+        log.error('Please ensure %s is a valid config file' % args.config)
+        sys.exit()
 
     try:
         datafiles = cp.get('edm', 'edmdatafiles')
