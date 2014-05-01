@@ -85,48 +85,56 @@ def convert(filename, destination):
     return x == 0
 
 
-def start(datadirs, outdir, force):
-    for dir in datadirs:
-        log.info('Starting directory %s' % dir)
-        files = os.listdir(dir)
-        files = [os.path.join(dir, file) for file in files]
+def parse_dir(directory, outdir, force):
+    log.info('Starting directory %s' % directory)
+    files = os.listdir(directory)
+    files = [os.path.join(directory, file) for file in files]
+    edm_dir = any(file.endswith(EDL_EXT) for file in files)
+    if edm_dir and not os.path.exists(outdir):
+        log.info('Making new output directory %s' % outdir)
+        os.mkdir(outdir)
 
-        for file in files:
-            log.debug('Trying %s...' % file)
-            if file.endswith(EDL_EXT):
-                # change extension
-                name = os.path.basename(file)
-                opifile = name[:-len(EDL_EXT)] + OPI_EXT
-                destination = os.path.join(outdir, opifile)
-                if not force and os.path.isfile(destination):
-                    log.info('Skipping existing file %s' % destination)
-                else:
-                    if convert(file, destination):
-                        log.info('Successfully converted %s' % destination)
-                    else:
-                        log.warn('Conversion of %s unsuccessful.' % file)
-            elif file.split('.')[-1] in COPY_EXTS:
-                name = os.path.basename(file)
-                destination = os.path.join(outdir, name)
-                if not force and os.path.isfile(destination):
-                    log.info('Skipping existing file %s' % destination)
-                else:
-                    if subprocess.call(['cp', file, destination]):
-                        log.info('Successfully copied %s' % destination)
-                    else:
-                        log.warn('Copying file %s unsuccessful.' % file)
+    for file in files:
+        log.debug('Trying %s...' % file)
+        if file.endswith(EDL_EXT):
+            # change extension
+            name = os.path.basename(file)
+            opifile = name[:-len(EDL_EXT)] + OPI_EXT
+            destination = os.path.join(outdir, opifile)
+            if not force and os.path.isfile(destination):
+                log.info('Skipping existing file %s' % destination)
             else:
-                log.info('Not doing anything with %s' % file)
+                if convert(file, destination):
+                    log.info('Successfully converted %s' % destination)
+                else:
+                    log.warn('Conversion of %s unsuccessful.' % file)
+        elif file.split('.')[-1] in COPY_EXTS:
+            name = os.path.basename(file)
+            destination = os.path.join(outdir, name)
+            if not force and os.path.isfile(destination):
+                log.info('Skipping existing file %s' % destination)
+            else:
+                if subprocess.call(['cp', file, destination]):
+                    log.info('Successfully copied %s' % destination)
+                else:
+                    log.warn('Copying file %s unsuccessful.' % file)
+        else:
+            log.info('Not doing anything with %s' % file)
 
-def get_datadirs(root, edmdatafiles):
-    # Assemble the directories to convert.
-    datadirs = []
-    if root is not None:
-        datadirs.append(root)
-    if edmdatafiles is not None:
-        datadirs.extend(edmdatafiles.split(':'))
+def start(datadirs, outdir, force):
+    '''
+    Given the EDM datafiles list, parse the directory and any subdirectories
+    for edm files.  Create output in a similar directory structure.
+    '''
+    for directory in datadirs:
+        entries = os.listdir(directory)
+        for entry in entries:
+            full_path = os.path.join(directory, entry)
+            if os.path.isdir(full_path):
+                parse_dir(full_path, os.path.join(outdir, entry), force)
 
-    return datadirs
+        parse_dir(directory, outdir, force)
+
 
 def datadirs_from_string(root, edmdatafiles):
     # Assemble the directories to convert.
@@ -171,16 +179,15 @@ if __name__ == '__main__':
 
     try:
         datafiles = cp.get('edm', 'edmdatafiles')
+        datadirs = datadirs_from_string(datafiles)
     except ConfigParser.NoOptionError:
-        log.warn("No data files option found.")
-        datafiles = None
+        try:
+            datafilepath = cp.get('edm', 'edmpathfile')
+            datadirs = datadirs_from_file(datafilepath)
+        except ConfigParser.NoOptionError:
+            log.error('No data files option found in %s.' % args.config)
+            log.error('Use either edmdatafiles or edmpathfile options.')
+            sys.exit()
 
-    outdir = cp.get('opi', 'outdir')
-    if not os.path.isdir(outdir):
-        log.error('Directory %s does not exist' % outdir)
-        sys.exit()
-
-    datadirs = get_datadirs(root, datafiles)
-
-    start(datadirs, outdir, force)
+    start(datadirs, outdir, args.force)
 
