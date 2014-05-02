@@ -171,8 +171,12 @@ if __name__ == '__main__':
 
     try:
         outdir = cp.get('opi', 'outdir')
+        tmpdir = cp.get('opi', 'tmpdir')
         if not os.path.isdir(outdir):
             log.error('Please create directory %s for output files.' % outdir)
+            sys.exit()
+        if not os.path.isdir(tmpdir):
+            log.error('Please create directory %s for output files.' % tmpdir)
             sys.exit()
     except ConfigParser.NoSectionError:
         log.error('Please ensure %s is a valid config file' % args.config)
