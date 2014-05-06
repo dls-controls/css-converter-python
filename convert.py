@@ -42,7 +42,7 @@ OPI_EXT = 'opi'
 EDL_EXT = 'edl'
 
 # Filetypes to copy across unchanged
-COPY_EXTS = ['png', 'sh']
+COPY_EXTS = ['png', 'sh', 'py']
 
 # Commands in lists for subprocess
 CONVERT_CMD = ['java', '-jar', 'conv.jar']
@@ -115,7 +115,7 @@ def parse_dir(directory, outdir, force):
             if not force and os.path.isfile(destination):
                 log.info('Skipping existing file %s' % destination)
             else:
-                if subprocess.call(['cp', file, destination]):
+                if not subprocess.call(['cp', file, destination]):
                     log.info('Successfully copied %s' % destination)
                 else:
                     log.warn('Copying file %s unsuccessful.' % file)
