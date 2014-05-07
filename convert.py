@@ -155,7 +155,7 @@ def set_up_options():
     directory.  The output location is not automatically 
     created to avoid unwanted files...
     ''')
-    parser.add_argument('-f', dest='force',
+    parser.add_argument('-f', action='store_true', dest='force',
         help='overwrite existing OPI files')
     parser.add_argument('config', metavar='<config-file>',
         help='config file specifying EDM paths and output dir')
