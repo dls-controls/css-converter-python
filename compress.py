@@ -4,8 +4,27 @@ GROUP_HEADER = 'object activeGroupClass'
 GROUP_START = 'beginGroup'
 GROUP_END = 'endGroup'
 
-groups = []
-current_group = []
+
+def find_groups(filename):
+    groups = []
+    current_group = []
+    with open(filename) as f:
+
+        in_group = False
+
+        for line in f:
+            if line.strip() == GROUP_HEADER:
+                in_group = True
+            elif line.strip() == GROUP_END:
+                in_group = False
+                groups.append(current_group)
+                current_group = []
+
+            if in_group:
+                current_group.append(line)
+
+    return groups
+
 
 def locate_group(group):
     for line in group:
@@ -63,6 +82,7 @@ def move_group(group, x_move, y_move):
             new_group.append(line)
     return new_group
 
+
 def new_name(filename):
     '''
     Just append a 2.
@@ -70,12 +90,10 @@ def new_name(filename):
     parts = filename.split('.')
     return '.'.join(parts[:-1]) + '2' + '.' + parts[-1]
 
-if __name__ == '__main__':
-    if not len(sys.argv) == 2:
-        print "Usage: %s <symbol-file>" % sys.argv[0]
 
-    filename = sys.argv[1]
-    new_filename = new_name(filename)
+def find_groups(filename):
+    groups = []
+    current_group = []
     with open(filename) as f:
 
         in_group = False
@@ -91,16 +109,26 @@ if __name__ == '__main__':
             if in_group:
                 current_group.append(line)
 
+    return groups
 
+
+if __name__ == '__main__':
+    if not len(sys.argv) == 2:
+        print "Usage: %s <symbol-file>" % sys.argv[0]
+
+    filename = sys.argv[1]
+    new_filename = new_name(filename)
+    groups = find_groups(filename)
 
     print 'Found %s symbols.' % len(groups)
     x, y, width, height = locate_group(groups[0])
 
+    # We'll later resize to the exact size
     total_height = height
     total_width = width * len(groups)
 
+    # Move each group's top left to width*i, 0
     start_x = 0
-
     moved_groups = []
 
     for group in groups:
@@ -109,7 +137,6 @@ if __name__ == '__main__':
         assert h == height
         moved_groups.append(move_group(group, start_x - x, 0 - y))
         start_x += width
-
 
     # Create new file by passing through every line
     i = 0
@@ -122,10 +149,12 @@ if __name__ == '__main__':
         new_file = []
 
         for line in f:
+            # Replace first instance of height with revised version
             if not changed_height and line.split()[0] == 'h':
                 new_file.append('h %s\n' % total_height)
                 changed_height = True
                 continue
+            # Replace first instance of width with revised version
             if not changed_width and line.split()[0] == 'w':
                 new_file.append('w %s\n' % total_width)
                 changed_width = True
@@ -149,5 +178,4 @@ if __name__ == '__main__':
             f.write(line)
 
     print 'Wrote new EDM symbol to %s' % new_filename
-
 
