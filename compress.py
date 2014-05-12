@@ -83,12 +83,12 @@ def move_group(group, x_move, y_move):
     return new_group
 
 
-def new_name(filename):
+def new_name(filename, width):
     '''
-    Just append a 2.
+    Just append the pixel width of each symbol.
     '''
     parts = filename.split('.')
-    return '.'.join(parts[:-1]) + '2' + '.' + parts[-1]
+    return '.'.join(parts[:-1]) + '-' + str(width) + '.' + parts[-1]
 
 
 def find_groups(filename):
@@ -117,7 +117,6 @@ if __name__ == '__main__':
         print "Usage: %s <symbol-file>" % sys.argv[0]
 
     filename = sys.argv[1]
-    new_filename = new_name(filename)
     groups = find_groups(filename)
 
     print 'Found %s symbols.' % len(groups)
@@ -172,6 +171,7 @@ if __name__ == '__main__':
 
     print 'New file length: %s' % len(new_file)
 
+    new_filename = new_name(filename, width)
     # Write out the new file
     with open(new_filename, 'w') as f:
         for line in new_file:
