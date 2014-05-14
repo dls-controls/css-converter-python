@@ -1,5 +1,7 @@
 Invalid = 255, 255, 255
 Disconnected = 255, 255, 255
+Minor = 255, 240, 0
+Major = 224, 0, 0
 
 Canvas = 200, 200, 200
 Title = 158, 158, 158
