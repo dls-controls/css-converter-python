@@ -42,11 +42,14 @@ OPI_EXT = 'opi'
 EDL_EXT = 'edl'
 
 # Filetypes to copy across unchanged
+# Now copy everything
 COPY_EXTS = ['png', 'sh', 'py']
 
 # Commands in lists for subprocess
 CONVERT_CMD = ['java', '-jar', 'conv.jar']
 UPDATE_CMD = ['edm', '-convert']
+SYMB_SCRIPT = os.path.join(os.getcwd(), 'auto-symb.sh')
+COMPRESS_CMD = [SYMB_SCRIPT]
 
 
 def update_edm(filename):
@@ -73,16 +76,36 @@ def convert(filename, destination):
     Try to convert .edl file.  If it fails, try updating .edl file
     using edm before converting again.
     '''
-    # first try
-    command = CONVERT_CMD + [filename, destination]
-    x = subprocess.call(command, stdout=NULL_FILE, stderr=NULL_FILE)
-    if x != 0: # conversion failed
-        log.warn('Conversion failed with code %d' % x)
-        new_edl = update_edm(filename)
-        if new_edl is not None:
-            log.warn('Updated to new-style edl %s' % new_edl)
-            command = CONVERT_CMD + [new_edl, destination]
-            x = subprocess.call(command, stdout=NULL_FILE, stderr=NULL_FILE)
+    # preprocess symbol files - Matt's symbol widget requires pngs
+    # instead of the OPIs from the converter.
+    if filename.endswith('symbol.edl'):
+        # compress.py returns an edited .edl file
+        command = COMPRESS_CMD + [filename]
+        out = subprocess.check_output(" ".join(command), shell=True)
+        # copy png to right location
+        relfilename = out.strip()
+        filename = os.path.basename(relfilename)
+        source = os.path.join(os.getcwd(), relfilename)
+        destdir = os.path.dirname(destination)
+
+        print filename
+        try:
+            shutil.copyfile(source, os.path.join(destdir, filename))
+            x = 0
+        except Exception, e:
+            print "Failed copying file", e
+            x = 1
+    # first try converting opi
+    else:
+        command = CONVERT_CMD + [filename, destination]
+        x = subprocess.call(command, stdout=NULL_FILE, stderr=NULL_FILE)
+        if x != 0: # conversion failed
+            log.warn('Conversion failed with code %d' % x)
+            new_edl = update_edm(filename)
+            if new_edl is not None:
+                log.warn('Updated to new-style edl %s' % new_edl)
+                command = CONVERT_CMD + [new_edl, destination]
+                x = subprocess.call(command, stdout=NULL_FILE, stderr=NULL_FILE)
     return x == 0
 
 
@@ -109,7 +132,9 @@ def parse_dir(directory, outdir, force):
                     log.info('Successfully converted %s' % destination)
                 else:
                     log.warn('Conversion of %s unsuccessful.' % file)
-        elif file.split('.')[-1] in COPY_EXTS:
+        elif not os.path.isdir(file):
+            # copy all other files
+            print "trying to copy ", file
             name = os.path.basename(file)
             destination = os.path.join(outdir, name)
             if not force and os.path.isfile(destination):
