@@ -134,7 +134,6 @@ def parse_dir(directory, outdir, force):
                     log.warn('Conversion of %s unsuccessful.' % file)
         elif not os.path.isdir(file):
             # copy all other files
-            print "trying to copy ", file
             name = os.path.basename(file)
             destination = os.path.join(outdir, name)
             if not force and os.path.isfile(destination):
@@ -155,9 +154,11 @@ def start(datadirs, outdir, force):
     for directory in datadirs:
         entries = os.listdir(directory)
         for entry in entries:
-            full_path = os.path.join(directory, entry)
-            if os.path.isdir(full_path):
-                parse_dir(full_path, os.path.join(outdir, entry), force)
+            # ignore hidden directories
+            if not entry.startswith('.'):
+                full_path = os.path.join(directory, entry)
+                if os.path.isdir(full_path):
+                    parse_dir(full_path, os.path.join(outdir, entry), force)
 
         parse_dir(directory, outdir, force)
 
