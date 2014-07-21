@@ -144,7 +144,7 @@ def parse_dir(directory, outdir, force):
                 else:
                     log.warn('Copying file %s unsuccessful.' % file)
         else:
-            log.info('Not doing anything with %s' % file)
+            log.info('Ignoring %s' % file)
 
 def start(datadirs, outdir, force):
     '''
@@ -173,6 +173,31 @@ def datadirs_from_file(filename):
         if not (line.startswith('#') or line.isspace()):
             paths.append(line.strip())
     return paths
+
+def update_version(filepath):
+    '''
+    If the filepath contains '/*/', assume it refers to a version number.
+    Check the directory for the latest version and use that.
+    '''
+    try:
+        if '/*/' in filepath:
+            parts = filepath.split('/*/')
+            versions = os.listdir(parts[0])
+            m1 = 0
+            m2 = 0
+            for version in versions:
+                [a, b] =  [int(i) for i in  version.split('-')]
+                if a > m1:
+                    m1 = a
+                    m2 = b
+                elif a == m1 and b > m2:
+                    m2 = b
+            return "%s/%d-%d/%s" % (parts[0], m1, m2, parts[1])
+    except Exception, e:
+        print "Version update failed on %s: %s" % (filepath, e)
+        return filepath
+
+    return filepath
 
 def set_up_options():
     parser = argparse.ArgumentParser(description='''
@@ -219,6 +244,8 @@ if __name__ == '__main__':
             log.error('No data files option found in %s.' % args.config)
             log.error('Use either edmdatafiles or edmpathfile options.')
             sys.exit()
+
+    datadirs = [update_version(dd) for dd in datadirs]
 
     start(datadirs, outdir, args.force)
 
