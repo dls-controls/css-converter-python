@@ -31,6 +31,11 @@ with open(path_file) as f:
 LINK = 'org.csstudio.opibuilder.widgets.linkingContainer'
 GROUP = 'org.csstudio.opibuilder.widgets.groupingContainer'
 RECTANGLE = 'org.csstudio.opibuilder.widgets.Rectangle'
+BOOL_BUTTON = 'org.csstudio.opibuilder.widgets.BoolButton'
+ACTION_BUTTON = 'org.csstudio.opibuilder.widgets.ActionButton'
+
+REL_NAME = 'EDM related display'
+SHELL_NAME = 'EDM shell command'
 
 
 # invisible components are all rectangles, since buttons
@@ -40,17 +45,13 @@ def invisible_related(node):
         return False
     if not node.attrib['typeId'] == RECTANGLE:
         return False
-    print "inv rel", node.attrib['typeId']
-    trans = False
+    trans = True
     rel = False
     for child in node:
         if child.tag == 'transparent':
             trans = child.text == 'true'
         if child.tag == 'name':
-            print child.text
-            rel = child.text == 'EDM related display'
-    if rel:
-        print "returning true for", node
+            rel = (child.text == REL_NAME or child.text == SHELL_NAME)
     return rel and trans
 
 
@@ -66,9 +67,7 @@ def for_raising(node):
         for child in node:
             if child.tag == 'widget':
                 if not invisible_related(child):
-                    print "returning false from fr"
                     return False
-        print "returning true from fr"
         return True
     elif type == RECTANGLE:
         return invisible_related(node)
@@ -81,7 +80,7 @@ def find_groups(node):
     '''
     removed = []
     if len(node) == 0:
-        return [] 
+        return []
     else:
         for child in node:
             if child.tag == 'widget':
@@ -94,27 +93,33 @@ def find_groups(node):
             else:
                 removed.extend(find_groups(child))
 
-    print "returning ", removed
     return removed
 
-# parse the files
-tree = et.parse(OPI_FILE)
-root = tree.getroot()
 
-clickables = find_groups(root)
-print "There are %s clickables." % len(clickables)
-# simply put all the invisible clickable elements at the bottom
-# of the XML, where they are rendered last
-root.extend(clickables)
+def fix_file(path):
+    tree = et.parse(path)
+    root = tree.getroot()
 
-print "\n\nthe clickables are:"
+    clickables = find_groups(root)
+    print "There are %s clickables." % len(clickables)
+    # simply put all the invisible clickable elements at the bottom
+    # of the XML, where they are rendered last
+    root.extend(clickables)
 
-for clicker in clickables:
-    for child in clicker:
-        if child.tag == 'name':
-            print child.text
+    print "\n\nthe clickables are:"
+
+    for clicker in clickables:
+        for child in clicker:
+            if child.tag == 'name':
+                print child.text
 
 
-# write the new tree out to the same file
-tree.write(OPI_FILE, encoding='utf-8', xml_declaration=True)
+    # write the new tree out to the same file
+    tree.write(path, encoding='utf-8', xml_declaration=True)
+
+
+for file in lines:
+    print "starting file ", file
+    fix_file(file)
+
 
