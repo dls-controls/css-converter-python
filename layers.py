@@ -1,3 +1,4 @@
+#!/usr/bin/env dls-python
 '''
 Ordering of elements in BOY screens are determined only by their 
 position in the xml file.
@@ -7,30 +8,24 @@ Use elementtree to move:
  - grouping container containing only invisible related displays
 to the bottom of an opi file, meaning that they are rendered
 at the top.
+
+Run this script after transforming all the relevant areas.
 '''
 
 import xml.etree.ElementTree as et
 import sys
 
 try:
-    OPI_FILE = sys.argv[1]
+    path_file = sys.argv[1]
 except IndexError:
-    print "Usage: ", sys.argv[0], "<opi-file>"
+    print "Usage: ", sys.argv[0], "<path-file>"
     sys.exit()
 
+with open(path_file) as f:
+    lines = f.readlines()
+    lines = [line.strip() for line in lines if not line.startswith('#')]
+    lines = [line.strip() for line in lines if not line == '']
 
-
-def new_name(old_name):
-    '''
-    Append a 2 to the name of the file.
-    '''
-    parts = old_name.split('.')
-    return '%s2.%s' % (''.join(parts[:-1]), parts[-1])
-
-
-OUT_FILE = new_name(OPI_FILE)
-print OPI_FILE
-print OUT_FILE
 
 # BOY type IDs
 LINK = 'org.csstudio.opibuilder.widgets.linkingContainer'
