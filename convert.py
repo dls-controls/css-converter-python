@@ -113,8 +113,7 @@ def parse_dir(directory, outdir, force):
     log.info('Starting directory %s' % directory)
     files = os.listdir(directory)
     files = [os.path.join(directory, file) for file in files]
-    edm_dir = any(file.endswith(EDL_EXT) for file in files)
-    if edm_dir and not os.path.exists(outdir):
+    if not os.path.exists(outdir):
         log.info('Making new output directory %s' % outdir)
         os.mkdir(outdir)
 
