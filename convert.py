@@ -100,7 +100,7 @@ def convert(filename, destination):
         command = CONVERT_CMD + [filename, destination]
         x = subprocess.call(command, stdout=NULL_FILE, stderr=NULL_FILE)
         if x != 0: # conversion failed
-            log.warn('Conversion failed with code %d' % x)
+            log.warn('Conversion failed with code %d; will try updating' % x)
             new_edl = update_edm(filename)
             if new_edl is not None:
                 log.warn('Updated to new-style edl %s' % new_edl)
@@ -138,6 +138,9 @@ def parse_dir(directory, outdir, force):
             if not force and os.path.isfile(destination):
                 log.info('Skipping existing file %s' % destination)
             else:
+                # make sure we have write permissions on the destination
+                if os.path.isfile(destination):
+                    os.chmod(destination, stat.S_IWUSR)
                 if not subprocess.call(['cp', file, destination]):
                     log.info('Successfully copied %s' % destination)
                 else:
@@ -223,11 +226,17 @@ if __name__ == '__main__':
         outdir = cp.get('opi', 'outdir')
         tmpdir = cp.get('opi', 'tmpdir')
         if not os.path.isdir(outdir):
-            log.error('Please create directory %s for output files.' % outdir)
-            sys.exit()
+            if args.force:
+                os.makedirs(outdir)
+            else:
+                log.error('Please create directory %s for output files.' % outdir)
+                sys.exit()
         if not os.path.isdir(tmpdir):
-            log.error('Please create directory %s for output files.' % tmpdir)
-            sys.exit()
+            if args.force:
+                os.makedirs(tmpdir)
+            else:
+                log.error('Please create directory %s for temporary files.' % tmpdir)
+                sys.exit()
     except ConfigParser.NoSectionError:
         log.error('Please ensure %s is a valid config file' % args.config)
         sys.exit()
