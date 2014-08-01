@@ -28,22 +28,22 @@ SHELL_NAME = 'EDM shell command'
 
 
 def clickable_widget(node):
-    for child in node:
-        if child.tag == 'actions':
-            if node.attrib['typeId'] in [ACTION_BUTTON, BOOL_BUTTON]:
-                return True
-            else:
-                try:
-                    return child.attrib['hook'] == 'true'
-                except:
-                    return True
+    anode = node.find('actions')
+    if anode is not None:
+        if node.attrib['typeId'] in [ACTION_BUTTON, BOOL_BUTTON]:
+            return True
+        else:
+            return anode.attrib['hook'] == 'true'
     return False
 
 
 def find_clickables(node, x, y):
     '''
-    Find all nodes which accept a mouse click
+    Recursively find all nodes which accept a mouse click
     '''
+    # If this widget is a grouping container, any child
+    # widgets need to specify coordinates plus coordinates
+    # of the grouping container.
     if node.tag == 'widget' and node.attrib['typeId'] == GROUP:
         x += int(node.find('x').text)
         y += int(node.find('y').text)
@@ -73,6 +73,8 @@ def create_new_clicker(node, x, y):
     rect.attrib['typeId'] = RECTANGLE
     v = et.SubElement(rect, 'transparent')
     v.text = 'true'
+    n = et.SubElement(rect, 'name')
+    n.text = 'Duplicate EDM widget'
 
     atag = node.find('actions')
     new_atag = copy.deepcopy(atag)
@@ -95,6 +97,7 @@ def create_new_clicker(node, x, y):
     rect.append(heighttag)
 
     return rect
+
 
 def parse(path):
     tree = et.parse(path)
