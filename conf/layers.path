@@ -1,8 +1,8 @@
 
 # OPI files whose layers need rearranging
-/home/hgs15624/code/converter/opi/diag/shared/overview.opi
-/home/hgs15624/code/converter/opi/diag/shared/fan_overview.opi
-/home/hgs15624/code/converter/opi/vacuum/diamondVacuumOverview.opi
-/home/hgs15624/code/converter/opi/psc/pscL2.opi
-/home/hgs15624/code/converter/opi/psc/pscAllOn.opi
+./project/opi/diag/shared/overview.opi
+./project/opi/diag/shared/fan_overview.opi
+./project/opi/vacuum/diamondVacuumOverview.opi
+./project/opi/psc/pscL2.opi
+./project/opi/psc/pscAllOn.opi
 

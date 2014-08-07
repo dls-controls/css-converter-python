@@ -1,7 +1,6 @@
 
 # datafile directories
 edl/
-opi/
-opi_old/
+project/opi
 tmp/
 symbols/
