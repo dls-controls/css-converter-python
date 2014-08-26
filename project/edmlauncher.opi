@@ -82,6 +82,7 @@
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>24</y>
     <tooltip>$(pv_name)
@@ -124,10 +125,11 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>249</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/diag/shared/overview.opi</path>
+        <path>shared/overview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
           <opi.dir>/converter/opi/diag</opi.dir>
@@ -174,6 +176,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>198</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -224,6 +227,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>144</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -275,6 +279,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>36</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -325,6 +330,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>90</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -430,6 +436,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>24</y>
     <tooltip>$(pv_name)
@@ -472,6 +479,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>249</y>
     <actions hook="false" hook_all="false">
       <action type="EXECUTE_CMD">
@@ -520,6 +528,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>144</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -570,6 +579,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>36</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -619,6 +629,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>90</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -709,6 +720,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>198</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -774,6 +786,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>24</y>
     <tooltip>$(pv_name)
@@ -816,6 +829,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>36</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -906,6 +920,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>90</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -956,6 +971,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>143</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1006,6 +1022,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>198</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1056,6 +1073,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>249</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1121,6 +1139,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>330</y>
     <tooltip>$(pv_name)
@@ -1163,13 +1182,13 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>504</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/diag/linac/overview.opi</path>
+        <path>https://webopi.sns.gov/share/opi/Bad.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/diag</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1213,10 +1232,11 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>450</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/psc/LI-PC.opi</path>
+        <path>/home/hgs15624/code/converter/project/opi/diag/shared/overview4.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
           <opi.dir>/converter/opi/linac</opi.dir>
@@ -1263,13 +1283,14 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>342</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/vacuum/linacVacuum.opi</path>
+        <path>opi/vacuum/linacVacuum.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/vacuum</opi.dir>
+          <opi.dir>/converter</opi.dir>
           <dom>LI</dom>
         </macros>
         <description></description>
@@ -1314,6 +1335,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>396</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1420,6 +1442,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>330</y>
     <tooltip>$(pv_name)
@@ -1462,6 +1485,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>504</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1512,6 +1536,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>450</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1562,6 +1587,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>342</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1613,6 +1639,7 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
     <y>396</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1667,5 +1694,93 @@ $(pv_value)</tooltip>
     <wrap_words>false</wrap_words>
     <tooltip></tooltip>
     <x>264</x>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.edm.symbolwidget" version="1.0.0">
+    <border_alarm_sensitive>true</border_alarm_sensitive>
+    <sub_image_width>10.0</sub_image_width>
+    <visible>true</visible>
+    <wuid>4c619e0a:147fe22eabf:-5448</wuid>
+    <scripts />
+    <height>50</height>
+    <name>Edm Symbol Widget</name>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <pv_name></pv_name>
+    <background_color>
+      <color red="0" green="0" blue="255" />
+    </background_color>
+    <foreground_color>
+      <color red="255" green="0" blue="0" />
+    </foreground_color>
+    <widget_type>Edm Symbol Widget</widget_type>
+    <enabled>true</enabled>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+    </font>
+    <width>50</width>
+    <border_style>0</border_style>
+    <rules />
+    <pv_value />
+    <symbol_number>0</symbol_number>
+    <border_width>1</border_width>
+    <image_file></image_file>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
+    <actions hook="false" hook_all="false" />
+    <y>362</y>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <x>716</x>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.edm.symbolwidget" version="1.0.0">
+    <border_alarm_sensitive>true</border_alarm_sensitive>
+    <sub_image_width>10.0</sub_image_width>
+    <visible>true</visible>
+    <wuid>4c619e0a:147fe22eabf:-542e</wuid>
+    <scripts />
+    <height>50</height>
+    <name>Edm Symbol Widget_1</name>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <pv_name></pv_name>
+    <background_color>
+      <color red="0" green="0" blue="255" />
+    </background_color>
+    <foreground_color>
+      <color red="255" green="0" blue="0" />
+    </foreground_color>
+    <widget_type>Edm Symbol Widget</widget_type>
+    <enabled>true</enabled>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+    </font>
+    <width>50</width>
+    <border_style>0</border_style>
+    <rules />
+    <pv_value />
+    <symbol_number>0</symbol_number>
+    <border_width>1</border_width>
+    <image_file></image_file>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <alarm_pulsing>false</alarm_pulsing>
+    <actions hook="false" hook_all="false" />
+    <y>431</y>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <x>566</x>
   </widget>
 </display>
