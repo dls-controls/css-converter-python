@@ -41,16 +41,18 @@ TMPDIR = './tmp'
 OPI_EXT = 'opi'
 EDL_EXT = 'edl'
 
-# Filetypes to copy across unchanged
-# Now copy everything
-COPY_EXTS = ['png', 'sh', 'py']
-
 # Commands in lists for subprocess
 CONVERT_CMD = ['java', '-jar', 'conv.jar']
 UPDATE_CMD = ['edm', '-convert']
 SYMB_SCRIPT = os.path.join(os.getcwd(), 'auto-symb.sh')
 COMPRESS_CMD = [SYMB_SCRIPT]
 
+
+def make_read_only(filename):
+    os.chmod(filename, 0o444)
+
+def make_writeable(filename):
+    os.chmod(filename, 0o777)
 
 def update_edm(filename):
     '''
@@ -60,12 +62,12 @@ def update_edm(filename):
     tmp_edm = os.path.join(TMPDIR, os.path.basename(filename))
     if os.path.exists(tmp_edm):
         # make sure we have write permissions on the destination
-        os.chmod(tmp_edm, stat.S_IWUSR)
+        make_writeable(tmp_edm)
     shutil.copyfile(filename, tmp_edm)
     cmd = UPDATE_CMD + [tmp_edm]
     x = subprocess.call(cmd, stdout=NULL_FILE, stderr=NULL_FILE)
     if not x:
-        os.chmod(tmp_edm, 0o777)
+        make_writeable(tmp_edm)
         return tmp_edm
     else:
         log.warn('EDM update failed with code %s' % x)
@@ -76,21 +78,25 @@ def convert(filename, destination):
     Try to convert .edl file.  If it fails, try updating .edl file
     using edm before converting again.
     '''
+    make_writeable(destination)
     # preprocess symbol files - Matt's symbol widget requires pngs
     # instead of the OPIs from the converter.
-    if filename.endswith('symbol.edl'):
+    if filename.endswith('symbol.edl'): # we need a better way of
+                                        # determining a symbol file.
         # compress.py returns an edited .edl file
         command = COMPRESS_CMD + [filename]
-        out = subprocess.check_output(" ".join(command), shell=True)
+        out = subprocess.check_output(" ".join(command), shell=False)
         # copy png to right location
         relfilename = out.strip()
         filename = os.path.basename(relfilename)
         source = os.path.join(os.getcwd(), relfilename)
         destdir = os.path.dirname(destination)
+        absfilename = os.path.join(destdir, filename)
 
         print filename
         try:
-            shutil.copyfile(source, os.path.join(destdir, filename))
+            shutil.copyfile(source, absfilename)
+            make_read_only(absfilename)
             x = 0
         except Exception, e:
             print "Failed copying file", e
@@ -98,14 +104,17 @@ def convert(filename, destination):
     # first try converting opi
     else:
         command = CONVERT_CMD + [filename, destination]
-        x = subprocess.call(command, stdout=NULL_FILE, stderr=NULL_FILE)
+        x = subprocess.call(command)
+        make_read_only(destination)
         if x != 0: # conversion failed
             log.warn('Conversion failed with code %d; will try updating' % x)
             new_edl = update_edm(filename)
             if new_edl is not None:
                 log.warn('Updated to new-style edl %s' % new_edl)
                 command = CONVERT_CMD + [new_edl, destination]
-                x = subprocess.call(command, stdout=NULL_FILE, stderr=NULL_FILE)
+                x = subprocess.call(command)
+                print "convert return code: %s" % x
+                make_read_only(destination)
     return x == 0
 
 
@@ -140,8 +149,9 @@ def parse_dir(directory, outdir, force):
             else:
                 # make sure we have write permissions on the destination
                 if os.path.isfile(destination):
-                    os.chmod(destination, stat.S_IWUSR)
+                    make_writeable(destination)
                 if not subprocess.call(['cp', file, destination]):
+                    make_read_only(destination)
                     log.info('Successfully copied %s' % destination)
                 else:
                     log.warn('Copying file %s unsuccessful.' % file)
