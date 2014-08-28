@@ -74,6 +74,33 @@ def update_edm(filename):
     else:
         log.warn('EDM update failed with code %s' % x)
 
+def is_symbol(filename, symbols):
+    if filename.endswith('symbol.edl'):
+        return True
+    if os.path.basename(filename) in symbols:
+        return True
+    return False
+
+def convert_symbol(symbol_file, destination):
+    make_writeable(destination)
+    # compress.py returns an edited .edl file
+    command = COMPRESS_CMD + [symbol_file]
+    out = subprocess.check_output(" ".join(command), shell=True)
+    # copy png to right location
+    relfilename = out.strip()
+    filename = os.path.basename(relfilename)
+    source = os.path.join(os.getcwd(), relfilename)
+    destdir = os.path.dirname(destination)
+    absfilename = os.path.join(destdir, filename)
+
+    try:
+        make_writeable(absfilename)
+        shutil.copyfile(source, absfilename)
+        make_read_only(absfilename)
+    except Exception as e:
+        log.warn("Failed copying file" + str(e))
+        raise e
+
 
 def convert(filename, destination):
     '''
@@ -83,44 +110,23 @@ def convert(filename, destination):
     make_writeable(destination)
     # preprocess symbol files - Matt's symbol widget requires pngs
     # instead of the OPIs from the converter.
-    if filename.endswith('symbol.edl'): # we need a better way of
-                                        # determining a symbol file.
-        # compress.py returns an edited .edl file
-        command = COMPRESS_CMD + [filename]
-        out = subprocess.check_output(" ".join(command), shell=False)
-        # copy png to right location
-        relfilename = out.strip()
-        filename = os.path.basename(relfilename)
-        source = os.path.join(os.getcwd(), relfilename)
-        destdir = os.path.dirname(destination)
-        absfilename = os.path.join(destdir, filename)
-
-        print filename
-        try:
-            shutil.copyfile(source, absfilename)
-            make_read_only(absfilename)
-            x = 0
-        except Exception, e:
-            print "Failed copying file", e
-            x = 1
     # first try converting opi
-    else:
-        command = CONVERT_CMD + [filename, destination]
-        x = subprocess.call(command)
-        make_read_only(destination)
-        if x != 0: # conversion failed
-            log.warn('Conversion failed with code %d; will try updating' % x)
-            new_edl = update_edm(filename)
-            if new_edl is not None:
-                log.warn('Updated to new-style edl %s' % new_edl)
-                command = CONVERT_CMD + [new_edl, destination]
-                x = subprocess.call(command)
-                print "convert return code: %s" % x
-                make_read_only(destination)
+    command = CONVERT_CMD + [filename, destination]
+    x = subprocess.call(command)
+    make_read_only(destination)
+    if x != 0: # conversion failed
+        log.warn('Conversion failed with code %d; will try updating' % x)
+        new_edl = update_edm(filename)
+        if new_edl is not None:
+            log.warn('Updated to new-style edl %s' % new_edl)
+            command = CONVERT_CMD + [new_edl, destination]
+            x = subprocess.call(command)
+            log.info("Conversion return code: %s" % x)
+            make_read_only(destination)
     return x == 0
 
 
-def parse_dir(directory, outdir, force):
+def parse_dir(directory, symbols, outdir, force):
     log.info('Starting directory %s' % directory)
     files = os.listdir(directory)
     files = [os.path.join(directory, file) for file in files]
@@ -138,11 +144,17 @@ def parse_dir(directory, outdir, force):
             if not force and os.path.isfile(destination):
                 log.info('Skipping existing file %s' % destination)
             else:
-                if convert(file, destination):
-                    log.info('Successfully converted %s' % destination)
-                else:
+                try:
+                    if is_symbol(file, symbols):
+                        convert_symbol(file, destination)
+                        log.info('Successfully converted symbol file %s' % destination)
+                    else:
+                        convert(file, destination)
+                        log.info('Successfully converted %s' % destination)
+                except Exception as e:
                     log.warn('Conversion of %s unsuccessful.' % file)
-        elif not os.path.isdir(file):
+                    log.warn(str(e))
+        elif not os.path.isdir(file) and not file.endswith('~'):
             # copy all other files
             name = os.path.basename(file)
             destination = os.path.join(outdir, name)
@@ -160,7 +172,7 @@ def parse_dir(directory, outdir, force):
         else:
             log.info('Ignoring %s' % file)
 
-def start(datadirs, outdir, force):
+def start(datadirs, symbols, outdir, force):
     '''
     Given the EDM datafiles list, parse the directory and any subdirectories
     for edm files.  Create output in a similar directory structure.
@@ -172,9 +184,9 @@ def start(datadirs, outdir, force):
             if not entry.startswith('.'):
                 full_path = os.path.join(directory, entry)
                 if os.path.isdir(full_path):
-                    parse_dir(full_path, os.path.join(outdir, entry), force)
+                    parse_dir(full_path, symbols, os.path.join(outdir, entry), force)
 
-        parse_dir(directory, outdir, force)
+        parse_dir(directory, symbols, outdir, force)
 
 
 def datadirs_from_string(edmdatafiles):
@@ -208,7 +220,7 @@ def update_version(filepath):
                     m2 = b
             return "%s/%d-%d/%s" % (parts[0], m1, m2, parts[1])
     except Exception, e:
-        print "Version update failed on %s: %s" % (filepath, e)
+        log.warn("Version update failed on %s: %s" % (filepath, e))
         return filepath
 
     return filepath
@@ -265,7 +277,13 @@ if __name__ == '__main__':
             log.error('Use either edmdatafiles or edmpathfile options.')
             sys.exit()
 
+    try:
+        symbols = cp.get('edm', 'symbols')
+        symbols = symbols.split(':')
+    except:
+        pass
+
     datadirs = [update_version(dd) for dd in datadirs]
 
-    start(datadirs, outdir, args.force)
+    start(datadirs, symbols, outdir, args.force)
 
