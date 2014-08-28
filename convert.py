@@ -49,10 +49,12 @@ COMPRESS_CMD = [SYMB_SCRIPT]
 
 
 def make_read_only(filename):
-    os.chmod(filename, 0o444)
+    if os.path.exists(filename):
+        os.chmod(filename, 0o444)
 
 def make_writeable(filename):
-    os.chmod(filename, 0o777)
+    if os.path.exists(filename):
+        os.chmod(filename, 0o777)
 
 def update_edm(filename):
     '''
