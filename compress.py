@@ -115,6 +115,7 @@ def find_groups(filename):
 if __name__ == '__main__':
     if not len(sys.argv) == 2:
         print "Usage: %s <symbol-file>" % sys.argv[0]
+        sys.exit()
 
     filename = sys.argv[1]
     groups = find_groups(filename)
@@ -131,7 +132,7 @@ if __name__ == '__main__':
     moved_groups = []
 
     for group in groups:
-        x, y, h, w = locate_group(group)
+        x, y, w, h = locate_group(group)
         assert w == width
         assert h == height
         moved_groups.append(move_group(group, start_x - x, 0 - y))
