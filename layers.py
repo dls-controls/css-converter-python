@@ -8,13 +8,16 @@ area which has the same click action.  Keep track of x and y
 position of any parent grouping containers, so that the 
 new Rectangle ends up in the correct place.
 
-Run this script after transforming all the relevant areas.
+Run this script after transforming all the relevant areas.  Note 
+that since the widgets it makes are clickable, running this 
+script again will make yet more widgets!
 '''
 
 import xml.etree.ElementTree as et
 import sys
 import copy
 
+from convert import make_writeable, make_read_only
 
 # BOY type IDs
 LINK = 'org.csstudio.opibuilder.widgets.linkingContainer'
@@ -113,7 +116,9 @@ def parse(path):
     root.extend(newcs)
 
     # write the new tree out to the same file
+    make_writeable(file)
     tree.write(file, encoding='utf-8', xml_declaration=True)
+    make_read_only(file)
 
 
 if __name__ == '__main__':
