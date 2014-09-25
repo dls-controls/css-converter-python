@@ -32,7 +32,7 @@ import -window ${window_handle:40} $symdir/$nbase.png
 kill -9 $(pgrep -P $pid); kill -9 $pid
 
 # Replace bright pink with transparent and crop empty border
-convert $symdir/$nbase.png -transparent \#ff00ff -trim +repage $symdir/$nbase.png
+convert $symdir/$nbase.png -transparent \#ff00ff $symdir/$nbase.png
 
 
 echo $symdir/$nbase.png

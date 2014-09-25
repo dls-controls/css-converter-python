@@ -44,6 +44,7 @@ def locate_group(group):
             break
 
     return x, y, w, h
+    return x, y, w+1, h+1  # Account for border width
 
 def move_group(group, x_move, y_move):
     new_group = []
