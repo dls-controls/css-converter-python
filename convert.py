@@ -36,7 +36,8 @@ log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
 NULL_FILE = open(os.devnull, 'w')
-TMPDIR = './tmp'
+TMP_DIR = './tmp'
+SYMBOLS_DIR = './tmp/symbols'
 
 OPI_EXT = 'opi'
 EDL_EXT = 'edl'
@@ -61,7 +62,7 @@ def update_edm(filename):
     Copy EDM file to temporary location.  Attempt to convert to
     new format using EDM. Return location of converted file.
     '''
-    tmp_edm = os.path.join(TMPDIR, os.path.basename(filename))
+    tmp_edm = os.path.join(TMP_DIR, os.path.basename(filename))
     if os.path.exists(tmp_edm):
         # make sure we have write permissions on the destination
         make_writeable(tmp_edm)
@@ -247,19 +248,22 @@ if __name__ == '__main__':
     cp.read(args.config)
 
     try:
+        if not os.path.isdir(TMP_DIR):
+            os.makedirs(TMP_DIR)
+        if not os.path.isdir(SYMBOLS_DIR):
+            os.makedirs(SYMBOLS_DIR)
+    except OSError:
+        log.error('Could not create temporary directories %s and %s'\
+                % (TMP_DIR, SYMBOLS_DIR))
+        sys.exit()
+
+    try:
         outdir = cp.get('opi', 'outdir')
-        tmpdir = cp.get('opi', 'tmpdir')
         if not os.path.isdir(outdir):
             if args.force:
                 os.makedirs(outdir)
             else:
                 log.error('Please create directory %s for output files.' % outdir)
-                sys.exit()
-        if not os.path.isdir(tmpdir):
-            if args.force:
-                os.makedirs(tmpdir)
-            else:
-                log.error('Please create directory %s for temporary files.' % tmpdir)
                 sys.exit()
     except ConfigParser.NoSectionError:
         log.error('Please ensure %s is a valid config file' % args.config)

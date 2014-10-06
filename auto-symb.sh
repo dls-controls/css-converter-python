@@ -2,7 +2,7 @@
 
 symbol_file=$1
 filename=`basename $symbol_file`
-symdir=symbols
+symdir=tmp/symbols
 
 
 # Copy edl file
