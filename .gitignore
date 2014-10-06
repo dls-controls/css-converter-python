@@ -1,4 +1,6 @@
 
+# compiled python
+*.pyc
 # datafile directories
 edl/
 project/opi
