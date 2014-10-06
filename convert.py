@@ -281,7 +281,7 @@ if __name__ == '__main__':
         symbols = cp.get('edm', 'symbols')
         symbols = symbols.split(':')
     except:
-        pass
+        symbols = []
 
     datadirs = [update_version(dd) for dd in datadirs]
 
