@@ -5,7 +5,7 @@
     <include_parent_macros>true</include_parent_macros>
   </macros>
   <wuid>-5680b5dd:145bcfe3742:-5add</wuid>
-  <boy_version>3.2.18.qualifier</boy_version>
+  <boy_version>4.0.102.201410161018</boy_version>
   <scripts />
   <show_ruler>true</show_ruler>
   <height>600</height>
@@ -125,11 +125,10 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>249</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>shared/overview.opi</path>
+        <path>shared/overview2.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
           <opi.dir>/converter/opi/diag</opi.dir>
@@ -176,11 +175,10 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>198</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/mosc/MasterOsc.opi</path>
+        <path>/converter/opi/mosc/MasterOsc2.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
           <opi.dir>/converter/opi/mosc</opi.dir>
@@ -227,7 +225,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>144</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -279,7 +276,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>36</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -330,7 +326,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>90</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -479,7 +474,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>249</y>
     <actions hook="false" hook_all="false">
       <action type="EXECUTE_CMD">
@@ -528,7 +522,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>144</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -579,7 +572,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>36</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -629,7 +621,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>90</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -720,7 +711,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>198</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -829,7 +819,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>36</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -920,7 +909,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>90</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -971,7 +959,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>143</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1022,7 +1009,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>198</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1073,7 +1059,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>249</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1182,13 +1167,13 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>504</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>https://webopi.sns.gov/share/opi/Bad.opi</path>
+        <path>linac/overview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
+          <opi.dir>/converter/opi/diag</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1232,14 +1217,13 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>450</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/home/hgs15624/code/converter/project/opi/diag/shared/overview4.opi</path>
+        <path>/converter/opi/psc/LI-PC.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/linac</opi.dir>
+          <opi.dir>/converter/opi/psc</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1283,14 +1267,13 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>342</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>opi/vacuum/linacVacuum.opi</path>
+        <path>linacVacuum.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter</opi.dir>
+          <opi.dir>/converter/opi/vacuum</opi.dir>
           <dom>LI</dom>
         </macros>
         <description></description>
@@ -1335,7 +1318,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>396</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1485,7 +1467,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>504</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1536,7 +1517,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>450</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1587,7 +1567,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>342</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1639,7 +1618,6 @@ $(pv_value)</tooltip>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <alarm_pulsing>false</alarm_pulsing>
     <y>396</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
@@ -1726,7 +1704,6 @@ $(pv_value)</tooltip>
     <border_style>0</border_style>
     <rules />
     <pv_value />
-    <symbol_number>0</symbol_number>
     <border_width>1</border_width>
     <image_file></image_file>
     <border_color>
@@ -1770,7 +1747,6 @@ $(pv_value)</tooltip>
     <border_style>0</border_style>
     <rules />
     <pv_value />
-    <symbol_number>0</symbol_number>
     <border_width>1</border_width>
     <image_file></image_file>
     <border_color>
