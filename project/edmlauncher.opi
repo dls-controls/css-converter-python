@@ -5,7 +5,7 @@
     <include_parent_macros>true</include_parent_macros>
   </macros>
   <wuid>-5680b5dd:145bcfe3742:-5add</wuid>
-  <boy_version>4.0.102.201410161018</boy_version>
+  <boy_version>4.0.102.201410161315</boy_version>
   <scripts />
   <show_ruler>true</show_ruler>
   <height>600</height>
@@ -128,7 +128,7 @@ $(pv_value)</tooltip>
     <y>249</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>shared/overview2.opi</path>
+        <path>shared/overview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
           <opi.dir>/converter/opi/diag</opi.dir>
@@ -178,7 +178,7 @@ $(pv_value)</tooltip>
     <y>198</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/mosc/MasterOsc2.opi</path>
+        <path>/converter/opi/mosc/MasterOsc.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
           <opi.dir>/converter/opi/mosc</opi.dir>
