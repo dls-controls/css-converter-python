@@ -20,6 +20,8 @@ Steps:
   - try converting using edm, then converting again
  - if file is an image, copy across directly
 '''
+import utils
+import update_paths
 
 import os
 import sys

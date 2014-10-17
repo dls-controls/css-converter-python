@@ -17,7 +17,7 @@ import xml.etree.ElementTree as et
 import sys
 import copy
 
-from convert import make_writeable, make_read_only
+from utils import make_writeable, make_read_only
 
 # BOY type IDs
 LINK = 'org.csstudio.opibuilder.widgets.linkingContainer'
