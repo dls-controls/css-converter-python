@@ -23,6 +23,7 @@ Steps:
 
 import os
 import sys
+import glob
 import subprocess
 import shutil
 import stat
@@ -82,16 +83,14 @@ def is_symbol(filename, symbols):
         return True
     return False
 
-def convert_symbol(symbol_file, destination):
-    make_writeable(destination)
+def convert_symbol(symbol_file, destdir):
     # compress.py returns an edited .edl file
     command = COMPRESS_CMD + [symbol_file]
-    out = subprocess.check_output(" ".join(command), shell=True)
+    png_file = subprocess.check_output(" ".join(command), shell=True, stderr=NULL_FILE)
     # copy png to right location
-    relfilename = out.strip()
+    relfilename = png_file.strip()
     filename = os.path.basename(relfilename)
     source = os.path.join(os.getcwd(), relfilename)
-    destdir = os.path.dirname(destination)
     absfilename = os.path.join(destdir, filename)
 
     try:
@@ -126,6 +125,17 @@ def convert(filename, destination):
             make_read_only(destination)
     return x == 0
 
+def already_converted(outdir, file):
+    basename = os.path.basename(file)
+    base = '.'.join(basename.split('.')[:-1])
+    if is_symbol(file, outdir):
+        # look for the converted png
+        return len(glob.glob(os.path.join(outdir, base) + '*.png'))
+    else:
+        opifile = basename[:-len(EDL_EXT)] + OPI_EXT
+        destination = os.path.join(outdir, opifile)
+        return os.path.exists(destination)
+
 
 def parse_dir(directory, symbols, outdir, force):
     log.info('Starting directory %s' % directory)
@@ -142,19 +152,19 @@ def parse_dir(directory, symbols, outdir, force):
             name = os.path.basename(file)
             opifile = name[:-len(EDL_EXT)] + OPI_EXT
             destination = os.path.join(outdir, opifile)
-            if not force and os.path.isfile(destination):
-                log.info('Skipping existing file %s' % destination)
-            else:
-                try:
-                    if is_symbol(file, symbols):
-                        convert_symbol(file, destination)
-                        log.info('Successfully converted symbol file %s' % destination)
-                    else:
-                        convert(file, destination)
-                        log.info('Successfully converted %s' % destination)
-                except Exception as e:
-                    log.warn('Conversion of %s unsuccessful.' % file)
-                    log.warn(str(e))
+            try:
+                if not force and already_converted(outdir, file):
+                    log.info('Skipping existing file %s' % destination)
+
+                elif is_symbol(file, destination):
+                    convert_symbol(file, outdir)
+                    log.info('Successfully converted symbol file %s' % destination)
+                else:
+                    convert(file, destination)
+                    log.info('Successfully converted %s' % destination)
+            except Exception as e:
+                log.warn('Conversion of %s unsuccessful.' % file)
+                log.warn(str(e))
         elif not os.path.isdir(file) and not file.endswith('~'):
             # copy all other files
             name = os.path.basename(file)
