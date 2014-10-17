@@ -112,7 +112,13 @@ def convert(filename, destination):
     # instead of the OPIs from the converter.
     # first try converting opi
     command = CONVERT_CMD + [filename, destination]
-    x = subprocess.call(command)
+    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate()
+    x = p.returncode
+    if err != "":
+        log.info(err)
+    if out != "":
+        log.debug(out)
     make_read_only(destination)
     if x != 0: # conversion failed
         log.warn('Conversion failed with code %d; will try updating' % x)
