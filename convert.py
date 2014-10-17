@@ -166,8 +166,10 @@ def parse_dir(directory, symbols, outdir, force):
                     convert_symbol(file, outdir)
                     log.info('Successfully converted symbol file %s' % destination)
                 else:
-                    convert(file, destination)
-                    log.info('Successfully converted %s' % destination)
+                    if convert(file, destination):
+                        log.info('Successfully converted %s' % destination)
+                    else:
+                        log.error('Failed to convert %s' % file)
             except Exception as e:
                 log.warn('Conversion of %s unsuccessful.' % file)
                 log.warn(str(e))
@@ -276,11 +278,7 @@ if __name__ == '__main__':
     try:
         outdir = cp.get('opi', 'outdir')
         if not os.path.isdir(outdir):
-            if args.force:
-                os.makedirs(outdir)
-            else:
-                log.error('Please create directory %s for output files.' % outdir)
-                sys.exit()
+            os.makedirs(outdir)
     except ConfigParser.NoSectionError:
         log.error('Please ensure %s is a valid config file' % args.config)
         sys.exit()
