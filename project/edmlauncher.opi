@@ -131,7 +131,7 @@ $(pv_value)</tooltip>
         <path>shared/overview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/diag</opi.dir>
+          <opi.dir>/converter/opi/diagOpi/diagOpi</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -177,12 +177,12 @@ $(pv_value)</tooltip>
     </border_color>
     <y>198</y>
     <actions hook="false" hook_all="false">
-      <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/mosc/MasterOsc.opi</path>
+      <action type="OPEN_OPI_IN_VIEW">
+        <path>/converter/opi/diagOpi/Libera/launcher.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/mosc</opi.dir>
         </macros>
+        <Position>1</Position>
         <description></description>
       </action>
     </actions>
