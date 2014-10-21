@@ -253,7 +253,7 @@ def set_up_options():
     ''')
     parser.add_argument('-f', action='store_true', dest='force',
         help='overwrite existing OPI files')
-    parser.add_argument('config', metavar='<config-file>',
+    parser.add_argument('config', metavar='<config-file>', nargs='*',
         help='config file specifying EDM paths and output dir')
     args = parser.parse_args()
     return args
@@ -261,48 +261,51 @@ def set_up_options():
 if __name__ == '__main__':
     # Parse configuration
     args = set_up_options()
+    print args.config
 
-    cp = ConfigParser.ConfigParser()
-    cp.read(args.config)
+    for cfg in args.config:
+        log.info('\n\nStarting config file %s.\n' % cfg)
+        cp = ConfigParser.ConfigParser()
+        cp.read(cfg)
 
-    try:
-        if not os.path.isdir(TMP_DIR):
-            os.makedirs(TMP_DIR)
-        if not os.path.isdir(SYMBOLS_DIR):
-            os.makedirs(SYMBOLS_DIR)
-    except OSError:
-        log.error('Could not create temporary directories %s and %s'\
-                % (TMP_DIR, SYMBOLS_DIR))
-        sys.exit()
-
-    try:
-        outdir = cp.get('opi', 'outdir')
-        if not os.path.isdir(outdir):
-            log.info('Creating directory %s for output files.' % outdir)
-            os.makedirs(outdir)
-    except ConfigParser.NoSectionError:
-        log.error('Please ensure %s is a valid config file' % args.config)
-        sys.exit()
-
-    try:
-        datafiles = cp.get('edm', 'edmdatafiles')
-        datadirs = datadirs_from_string(datafiles)
-    except ConfigParser.NoOptionError:
         try:
-            datafilepath = cp.get('edm', 'edmpathfile')
-            datadirs = datadirs_from_file(datafilepath)
-        except ConfigParser.NoOptionError:
-            log.error('No data files option found in %s.' % args.config)
-            log.error('Use either edmdatafiles or edmpathfile options.')
+            if not os.path.isdir(TMP_DIR):
+                os.makedirs(TMP_DIR)
+            if not os.path.isdir(SYMBOLS_DIR):
+                os.makedirs(SYMBOLS_DIR)
+        except OSError:
+            log.error('Could not create temporary directories %s and %s'\
+                    % (TMP_DIR, SYMBOLS_DIR))
             sys.exit()
 
-    try:
-        symbols = cp.get('edm', 'symbols')
-        symbols = symbols.split(':')
-    except:
-        symbols = []
+        try:
+            outdir = cp.get('opi', 'outdir')
+            if not os.path.isdir(outdir):
+                log.info('Creating directory %s for output files.' % outdir)
+                os.makedirs(outdir)
+        except ConfigParser.NoSectionError:
+            log.error('Please ensure %s is a valid config file' % cfg)
+            sys.exit()
 
-    datadirs = [update_version(dd) for dd in datadirs]
+        try:
+            datafiles = cp.get('edm', 'edmdatafiles')
+            datadirs = datadirs_from_string(datafiles)
+        except ConfigParser.NoOptionError:
+            try:
+                datafilepath = cp.get('edm', 'edmpathfile')
+                datadirs = datadirs_from_file(datafilepath)
+            except ConfigParser.NoOptionError:
+                log.error('No data files option found in %s.' % cfg)
+                log.error('Use either edmdatafiles or edmpathfile options.')
+                sys.exit()
 
-    start(datadirs, symbols, outdir, args.force)
+        try:
+            symbols = cp.get('edm', 'symbols')
+            symbols = symbols.split(':')
+        except:
+            symbols = []
+
+        datadirs = [update_version(dd) for dd in datadirs]
+
+        start(datadirs, symbols, outdir, args.force)
 
