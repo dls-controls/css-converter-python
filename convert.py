@@ -11,7 +11,7 @@ if necessary:
 
     edm -convert <filename>
 
-Since this function automatically puts the file in the same directory, 
+Since this function automatically puts the file in the same directory,
 it copies the EDM files to a tmp directory first.
 
 Steps:
@@ -26,7 +26,6 @@ import sys
 import glob
 import subprocess
 import shutil
-import stat
 import ConfigParser
 import argparse
 
@@ -74,7 +73,7 @@ def update_edm(filename):
         make_writeable(tmp_edm)
         return tmp_edm
     else:
-        log.warn('EDM update failed with code %s' % x)
+        log.warn('EDM update failed with code %s', x)
 
 def is_symbol(filename, symbols):
     if filename.endswith('symbol.edl'):
@@ -121,13 +120,13 @@ def convert(filename, destination):
         log.debug(out)
     make_read_only(destination)
     if x != 0: # conversion failed
-        log.warn('Conversion failed with code %d; will try updating' % x)
+        log.warn('Conversion failed with code %d; will try updating', x)
         new_edl = update_edm(filename)
         if new_edl is not None:
-            log.warn('Updated to new-style edl %s' % new_edl)
+            log.warn('Updated to new-style edl %s', new_edl)
             command = CONVERT_CMD + [new_edl, destination]
             x = subprocess.call(command)
-            log.info("Conversion return code: %s" % x)
+            log.info("Conversion return code: %s", x)
             make_read_only(destination)
     return x == 0
 
@@ -144,15 +143,15 @@ def already_converted(outdir, file, symbols):
 
 
 def parse_dir(directory, symbols, outdir, force):
-    log.info('Starting directory %s' % directory)
+    log.info('Starting directory %s', directory)
     files = os.listdir(directory)
     files = [os.path.join(directory, file) for file in files]
     if not os.path.exists(outdir):
-        log.info('Making new output directory %s' % outdir)
+        log.info('Making new output directory %s', outdir)
         os.mkdir(outdir)
 
     for file in files:
-        log.debug('Trying %s...' % file)
+        log.debug('Trying %s...', file)
         if file.endswith(EDL_EXT):
             # change extension
             name = os.path.basename(file)
@@ -160,36 +159,36 @@ def parse_dir(directory, symbols, outdir, force):
             destination = os.path.join(outdir, opifile)
             try:
                 if not force and already_converted(outdir, file, symbols):
-                    log.info('Skipping existing file %s' % destination)
+                    log.info('Skipping existing file %s', destination)
 
                 elif is_symbol(file, symbols):
                     convert_symbol(file, outdir)
-                    log.info('Successfully converted symbol file %s' % destination)
+                    log.info('Successfully converted symbol file %s', destination)
                 else:
                     if convert(file, destination):
-                        log.info('Successfully converted %s' % destination)
+                        log.info('Successfully converted %s', destination)
                     else:
-                        log.error('Failed to convert %s' % file)
+                        log.error('Failed to convert %s', file)
             except Exception as e:
-                log.warn('Conversion of %s unsuccessful.' % file)
+                log.warn('Conversion of %s unsuccessful.', file)
                 log.warn(str(e))
         elif not os.path.isdir(file) and not file.endswith('~'):
             # copy all other files
             name = os.path.basename(file)
             destination = os.path.join(outdir, name)
             if not force and os.path.isfile(destination):
-                log.info('Skipping existing file %s' % destination)
+                log.info('Skipping existing file %s', destination)
             else:
                 # make sure we have write permissions on the destination
                 if os.path.isfile(destination):
                     make_writeable(destination)
                 if not subprocess.call(['cp', file, destination]):
                     make_read_only(destination)
-                    log.info('Successfully copied %s' % destination)
+                    log.info('Successfully copied %s', destination)
                 else:
-                    log.warn('Copying file %s unsuccessful.' % file)
+                    log.warn('Copying file %s unsuccessful.', file)
         else:
-            log.info('Ignoring %s' % file)
+            log.info('Ignoring %s', file)
 
 def start(datadirs, symbols, outdir, force):
     '''
@@ -231,15 +230,15 @@ def update_version(filepath):
             m1 = 0
             m2 = 0
             for version in versions:
-                [a, b] =  [int(i) for i in  version.split('-')]
+                [a, b] = [int(i) for i in version.split('-')]
                 if a > m1:
                     m1 = a
                     m2 = b
                 elif a == m1 and b > m2:
                     m2 = b
-            return "%s/%d-%d/%s" % (parts[0], m1, m2, parts[1])
+            return "%s/%d-%d/%s", (parts[0], m1, m2, parts[1])
     except Exception, e:
-        log.warn("Version update failed on %s: %s" % (filepath, e))
+        log.warn("Version update failed on %s: %s", (filepath, e))
         return filepath
 
     return filepath
@@ -252,9 +251,9 @@ def set_up_options():
     created to avoid unwanted files...
     ''')
     parser.add_argument('-f', action='store_true', dest='force',
-        help='overwrite existing OPI files')
+            help='overwrite existing OPI files')
     parser.add_argument('config', metavar='<config-file>', nargs='*',
-        help='config file specifying EDM paths and output dir')
+            help='config file specifying EDM paths and output dir')
     args = parser.parse_args()
     return args
 
@@ -264,7 +263,7 @@ if __name__ == '__main__':
     print args.config
 
     for cfg in args.config:
-        log.info('\n\nStarting config file %s.\n' % cfg)
+        log.info('\n\nStarting config file %s.\n', cfg)
         cp = ConfigParser.ConfigParser()
         cp.read(cfg)
 
@@ -274,17 +273,17 @@ if __name__ == '__main__':
             if not os.path.isdir(SYMBOLS_DIR):
                 os.makedirs(SYMBOLS_DIR)
         except OSError:
-            log.error('Could not create temporary directories %s and %s'\
-                    % (TMP_DIR, SYMBOLS_DIR))
+            log.error('Could not create temporary directories %s and %s',
+                    (TMP_DIR, SYMBOLS_DIR))
             sys.exit()
 
         try:
             outdir = cp.get('opi', 'outdir')
             if not os.path.isdir(outdir):
-                log.info('Creating directory %s for output files.' % outdir)
+                log.info('Creating directory %s for output files.', outdir)
                 os.makedirs(outdir)
         except ConfigParser.NoSectionError:
-            log.error('Please ensure %s is a valid config file' % cfg)
+            log.error('Please ensure %s is a valid config file', cfg)
             sys.exit()
 
         try:
@@ -295,7 +294,7 @@ if __name__ == '__main__':
                 datafilepath = cp.get('edm', 'edmpathfile')
                 datadirs = datadirs_from_file(datafilepath)
             except ConfigParser.NoOptionError:
-                log.error('No data files option found in %s.' % cfg)
+                log.error('No data files option found in %s.', cfg)
                 log.error('Use either edmdatafiles or edmpathfile options.')
                 sys.exit()
 
