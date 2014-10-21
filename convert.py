@@ -131,10 +131,10 @@ def convert(filename, destination):
             make_read_only(destination)
     return x == 0
 
-def already_converted(outdir, file):
+def already_converted(outdir, file, symbols):
     basename = os.path.basename(file)
     base = '.'.join(basename.split('.')[:-1])
-    if is_symbol(file, outdir):
+    if is_symbol(file, symbols):
         # look for the converted png
         return len(glob.glob(os.path.join(outdir, base) + '*.png'))
     else:
@@ -159,10 +159,10 @@ def parse_dir(directory, symbols, outdir, force):
             opifile = name[:-len(EDL_EXT)] + OPI_EXT
             destination = os.path.join(outdir, opifile)
             try:
-                if not force and already_converted(outdir, file):
+                if not force and already_converted(outdir, file, symbols):
                     log.info('Skipping existing file %s' % destination)
 
-                elif is_symbol(file, destination):
+                elif is_symbol(file, symbols):
                     convert_symbol(file, outdir)
                     log.info('Successfully converted symbol file %s' % destination)
                 else:
@@ -278,6 +278,7 @@ if __name__ == '__main__':
     try:
         outdir = cp.get('opi', 'outdir')
         if not os.path.isdir(outdir):
+            log.info('Creating directory %s for output files.' % outdir)
             os.makedirs(outdir)
     except ConfigParser.NoSectionError:
         log.error('Please ensure %s is a valid config file' % args.config)
