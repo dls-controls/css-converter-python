@@ -1,0 +1,19 @@
+
+# Files with menu mux buttons in
+
+project/opi/diag/sr/air.opi
+project/opi/diag/sr/FR_waveforms.opi
+project/opi/diag/sr/liberas.opi
+project/opi/diag/sr/fill.opi
+project/opi/diag/sr/fillwf.opi
+project/opi/diag/beamloss/sr_pin_overview.opi
+project/opi/diag/beamloss/pin_overview.opi
+project/opi/diag/shared/overview.opi
+project/opi/diag/tmbf/tune.opi
+project/opi/diag/motor-all.opi
+project/opi/diag/vacuumValveInterlocks.opi
+project/opi/diag/vacuumValve-embed.opi
+project/opi/diag/vacuumValveBistableInterlocks.opi
+project/opi/diag/vacuumValve.opi
+project/opi/diag/vacuumValveBistable.opi
+project/opi/diag/vacuumValveGaugeInterlocks.opi
