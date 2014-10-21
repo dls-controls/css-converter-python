@@ -236,7 +236,7 @@ def update_version(filepath):
                     m2 = b
                 elif a == m1 and b > m2:
                     m2 = b
-            return "%s/%d-%d/%s", (parts[0], m1, m2, parts[1])
+            return "%s/%d-%d/%s" % (parts[0], m1, m2, parts[1])
     except Exception, e:
         log.warn("Version update failed on %s: %s", (filepath, e))
         return filepath
