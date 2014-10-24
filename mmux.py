@@ -26,6 +26,7 @@ MENU_MUX_ID = 'org.csstudio.opibuilder.widgets.edm.muxmenu'
 def find_mm_symbols(node):
     '''
     Recursively find all MenuMux symbols from root node.
+    Return a list of (name, first_value).
     '''
     # If this widget is a grouping container, any child
     # widgets need to specify coordinates plus coordinates
@@ -38,8 +39,13 @@ def find_mm_symbols(node):
             if child.tag == 'widget':
                 if child.attrib['typeId'] == MENU_MUX_ID:
                     t = child.find('targets')
-                    syms = t.findall('s')
-                    symbols.extend(set(sym.text for sym in syms))
+                    sym1 = t.find('s')
+                    v = child.find('values')
+                    v1 = v.find('s')
+                    try:
+                        symbols.append((sym1.text, v1.text))
+                    except AttributeError:
+                        pass
                 else:
                     symbols.extend(find_mm_symbols(child))
             else:
@@ -49,10 +55,14 @@ def find_mm_symbols(node):
 
 
 def try_replace(text, symbols):
-    for sym in symbols:
+    '''
+    Find instances of symbols as macros.  Replace with a local
+    PV with a value selected as initial state.
+    '''
+    for sym, v in symbols:
         sym_rep = '$(%s)' % sym
-        sym_loc = "'loc://%s'" % sym
-        sym_loc_ts = "toString('loc://%s')" % sym
+        sym_loc = "'loc://%s(\"%s\")'" % (sym, v)
+        sym_loc_ts = "toString(%s)" % sym_loc
         if sym_rep == text:
             text = sym_loc
         elif sym_rep in text:
