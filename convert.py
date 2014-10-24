@@ -18,8 +18,9 @@ Steps:
  - if file is .edl file, try and convert
   - if conversion fails, it may be an old-style .edl file
   - try converting using edm, then converting again
- - if file is an image, copy across directly
+ - if file is a different type, copy across directly
 '''
+
 import utils
 import update_paths
 
@@ -56,39 +57,75 @@ class Converter(object):
         # Spoof EDM to find EDMDATAFILES and PATH
         # Index these directories to find which modules
         # relative paths may be in.
-        edmdatafiles, paths = utils.spoof_edm(script_file)
+        edmdatafiles, paths, working_dir = utils.spoof_edm(script_file)
         self.edmdatafiles = [f for f in edmdatafiles if f != '']
         if '.' in self.edmdatafiles:
-            dotnumber = edmdatafiles.index('.')
-            self.edmdatafiles[dotnumber] = os.path.dirname(script_file)
+            dotnumber = self.edmdatafiles.index('.')
+            self.edmdatafiles[dotnumber] = working_dir
+        paths.append(working_dir)
         self.file_dict = update_paths.index_opi_paths(edmdatafiles)
         self.path_dict = update_paths.index_paths(paths)
         self.paths = paths
         self.symbol_files = symbol_files
-        self.outdir = outdir
         self.tmpdir = TMP_DIR
         self.symbolsdir = SYMBOLS_DIR
+        self.module_name, self.version, _dummy = utils.parse_module_name(working_dir)
+        self.module_name = self.module_name.replace('/', '_')
+        self.outdir = os.path.join(outdir, "%s_%s" % (self.module_name, self.version))
 
-    def start(self, force):
+    def convert_opis(self, force):
         '''
         Given the EDM datafiles list, parse the directory and any subdirectories
         for edm files.  Create output in a similar directory structure.
         '''
         for datadir in self.edmdatafiles:
             log.debug('EDM data file %s' % datadir)
-            module_name = utils.parse_module_name(datadir)[0]
+            module_name, version, rel_path = utils.parse_module_name(datadir)
+            log.debug("%s %s %s", module_name, version, rel_path)
+            if rel_path is None:
+                rel_path = ""
+            module_name = module_name.split('/')[-1]
+            log.debug("The module name path is %s", module_name)
             entries = os.listdir(datadir)
             for entry in entries:
                 # ignore hidden directories
                 if not entry.startswith('.'):
                     full_path = os.path.join(datadir, entry)
+                    log.debug("New full path is %s", full_path)
                     if os.path.isdir(full_path):
-                        outpath = os.path.join(self.outdir, module_name, entry)
+                        outpath = os.path.join(self.outdir, module_name, rel_path, entry)
+                        log.debug("New outdir is %s", outpath)
                         if not os.path.isdir(outpath):
                             os.makedirs(outpath)
                         self.parse_dir(full_path, os.path.join(self.outdir, module_name, entry), force)
 
-            self.parse_dir(datadir, os.path.join(self.outdir, module_name), force)
+            self.parse_dir(datadir, os.path.join(self.outdir, module_name, rel_path), force)
+
+    def copy_scripts(self, force):
+        '''
+        Given the EDM PATH list, copy all files in the directory and any
+        subdirectories across. Create output in a similar directory structure.
+        '''
+        log.debug("The path files are: %s", self.paths)
+        for datadir in self.paths:
+            log.debug('EDM path directory %s' % datadir)
+            module_name, version, rel_path = utils.parse_module_name(datadir)
+            module_name = module_name.split('/')[-1]
+
+            entries = os.listdir(datadir)
+            for entry in entries:
+                # ignore hidden directories
+                if not entry.startswith('.'):
+                    full_path = os.path.join(datadir, entry)
+                    log.debug("New full path is %s", full_path)
+                    if os.path.isdir(full_path):
+                        outpath = os.path.join(self.outdir, module_name, rel_path, entry)
+                        log.debug("New outdir is %s", outpath)
+                        if not os.path.isdir(outpath):
+                            os.makedirs(outpath)
+                        self.parse_dir(full_path, os.path.join(self.outdir, module_name, entry), force)
+
+            self.parse_dir(datadir, os.path.join(self.outdir, module_name, rel_path), force)
 
     def update_edm(self, filename):
         '''
@@ -166,7 +203,7 @@ class Converter(object):
         files = [os.path.join(directory, file) for file in files]
         if not os.path.exists(outdir):
             log.info('Making new output directory %s' % outdir)
-            os.mkdir(outdir)
+            os.makedirs(outdir)
 
         for file in files:
             log.debug('Trying %s...' % file)
@@ -263,13 +300,14 @@ if __name__ == '__main__':
         log.error('Please ensure %s is a valid config file' % args.config)
         sys.exit()
 
-        try:
-            symbols = cp.get('edm', 'symbols')
-            symbols = symbols.split(':')
-        except:
-            symbols = []
+    try:
+        symbols = cp.get('edm', 'symbols')
+        symbols = symbols.split(':')
+    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+        symbols = []
 
     c = Converter(script_file, symbols, outdir)
-    c.start(args.force)
+    c.convert_opis(args.force)
+    c.copy_scripts(args.force)
 
 

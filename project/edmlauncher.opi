@@ -5,7 +5,7 @@
     <include_parent_macros>true</include_parent_macros>
   </macros>
   <wuid>-5680b5dd:145bcfe3742:-5add</wuid>
-  <boy_version>4.0.102.201410161315</boy_version>
+  <boy_version>4.0.102.201410221436</boy_version>
   <scripts />
   <show_ruler>true</show_ruler>
   <height>600</height>
@@ -131,7 +131,7 @@ $(pv_value)</tooltip>
         <path>shared/overview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/diagOpi/diagOpi</opi.dir>
+          <opi.dir>/converter/opi/diagOpi_2-44/diagOpi</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -177,12 +177,12 @@ $(pv_value)</tooltip>
     </border_color>
     <y>198</y>
     <actions hook="false" hook_all="false">
-      <action type="OPEN_OPI_IN_VIEW">
-        <path>/converter/opi/diagOpi/Libera/launcher.opi</path>
+      <action type="OPEN_EDM_OPI">
+        <path>/converter/opi/CS_CS-RF-IOC-02_Rx-y/CS-RF-IOC-02/data/MasterOsc.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
+          <opi.dir>/converter/opi/CS_CS-RF-IOC-02_Rx-y/CS-RF-IOC-02</opi.dir>
         </macros>
-        <Position>1</Position>
         <description></description>
       </action>
     </actions>
@@ -329,10 +329,10 @@ $(pv_value)</tooltip>
     <y>90</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/psc/pscL2.opi</path>
+        <path>/converter/opi/psc_4-3-14/psc/data/pscL2.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/psc</opi.dir>
+          <opi.dir>/converter/opi/psc_4-3-14/psc</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -476,10 +476,11 @@ $(pv_value)</tooltip>
     </border_color>
     <y>249</y>
     <actions hook="false" hook_all="false">
-      <action type="EXECUTE_CMD">
-        <command>/dls_sw/work/R3.14.12.3/support/i10switching/i10switching-gui.sh</command>
-        <command_directory>$(user.home)</command_directory>
-        <wait_time>10</wait_time>
+      <action type="OPEN_EDM_OPI">
+        <path>opi/diag/motor/motor.opi</path>
+        <macros>
+          <include_parent_macros>true</include_parent_macros>
+        </macros>
         <description></description>
       </action>
     </actions>

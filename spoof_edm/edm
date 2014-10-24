@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo $PWD
 echo $EDMDATAFILES
 echo $PATH
 echo "Spoof EDM complete."

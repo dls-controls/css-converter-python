@@ -137,6 +137,9 @@ if __name__ == '__main__':
 
     for file in lines:
         print "Parsing file ", file
-        parse(file)
+        try:
+            parse(file)
+        except IOError as e:
+            print "Failed to parse file %s: %s" % (file, e)
 
 

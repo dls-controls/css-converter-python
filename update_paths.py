@@ -1,8 +1,6 @@
-#!/usr/bin/nv dls-python
+#!/usr/bin/env dls-python
 
-
-
-# 1. index files 
+# 1. index files
 #  - resolve clashes by order of paths
 # 2. index edm files
 # 3. parse opi file
@@ -11,12 +9,15 @@
 import os
 import xml.etree.ElementTree as et
 import utils
+import logging as log
+LOG_FORMAT = '%(levelname)s:  %(message)s'
+LOG_LEVEL = log.DEBUG
+log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
-SCRIPT_FILE = "/dls_sw/prod/R3.14.12.3/support/diagOpi/2-44/runedm"
 
 def index_opi_paths(paths):
     '''
-    Return a dictionary: 
+    Return a dictionary:
         relative-filename: (module, path-within-module)
 
     Example:
@@ -41,16 +42,16 @@ def index_opi_paths(paths):
                     if rel_path2.endswith('edl'):
                         rel_path2 = rel_path2[:-3] + 'opi'
                     if rel_path2 in filepaths:
-                        print "clash: %s in %s and %s" % (rel_path2, module, filepaths[rel_path2])
+                        log.warn("clash: %s in %s and %s",
+                                rel_path2, module, filepaths[rel_path2])
                     else:
-                        print path, root, rel_path
                         filepaths[rel_path2] = (module, rel_path)
 
     return filepaths
 
 def index_paths(paths):
     '''
-    Return a dictionary: 
+    Return a dictionary:
         filename: (module, path-within-module)
 
     Example:
@@ -63,7 +64,7 @@ def index_paths(paths):
         try:
             module, version, rel_path = utils.parse_module_name(path)
         except Exception as e:
-            print "Failed to parse module: %s: %s" % (module, e)
+            log.warn("Failed to parse module: %s: %s", module, e)
             continue
         files = os.listdir(path)
         for f in files:
@@ -71,7 +72,8 @@ def index_paths(paths):
             #rel_path = os.path.join(path[index:], f)
             if not f.startswith('.') and not os.path.isdir(f):
                 if f in executables:
-                    print "clash: %s in %s and %s" % (rel_path, path, executables[rel_path])
+                    log.warn("clash: %s in %s and %s",
+                            (rel_path, path, executables[rel_path]))
                 else:
                     print f, rel_path
                     executables[f] = (module, rel_path)
@@ -81,14 +83,17 @@ def index_paths(paths):
 def update_opi_path(filename, opi_dict, module):
     if filename in opi_dict:
         if opi_dict[filename][0] != module:
-            print "correcting", filename,
+            log.info("correcting %s", filename)
+            log.debug(opi_dict[filename])
             rel = os.path.join('..', opi_dict[filename][0], opi_dict[filename][1], filename)
         else:
             rel = os.path.join(opi_dict[filename][1], filename)
     else:
-        print "not correcting", filename
+        log.info("not correcting %s", filename)
+
         rel = filename
 
+    log.info("output is %s", rel)
     return rel
 
 
@@ -123,6 +128,7 @@ def parse(path, file_dict, path_dict, module):
 
 if __name__ == '__main__':
 
+    SCRIPT_FILE = "/dls_sw/prod/R3.14.12.3/support/diagOpi/2-44/runedm"
     edmdatafiles, paths = utils.spoof_edm(SCRIPT_FILE)
 
     file_dict = index_opi_paths(edmdatafiles)
@@ -133,7 +139,7 @@ if __name__ == '__main__':
     print "\nPATHS:\n"
     for p in sorted(path_dict):
         print p, path_dict[p]
-    print 
+    print
 
     import sys
     root = 'opi/diagOpi/shared'

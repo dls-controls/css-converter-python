@@ -5,12 +5,13 @@ from dls_epicsparser import releaseparser
 
 import os
 import subprocess
+import logging as log
 
 def parse_module_name(filepath):
     '''
     Return (module_name, version, relative_path)
     '''
-    print "parsing",  filepath
+    log.debug("Parsing %s.",  filepath)
     parts = filepath.split('/')
     module, version, relative_path = None, None, None
 
@@ -67,21 +68,24 @@ def spoof_edm(script_file):
     path = None
 
     out = subprocess.check_output(script_file, shell=True, env=env)
-    print "all output:", out
+    log.debug("Spoof EDM output: %s", out)
     lines = out.splitlines()
     if lines[-1] != 'Spoof EDM complete.':
+        log.warn("EDM spoof failed.")
         return None
 
-    if len(lines) > 0:
+    if len(lines) > 1:
         path = lines[-2]
         path = path.strip().split(':')
         path = [p for p in path if p not in old_path]
-    if len(lines) > 1:
+    if len(lines) > 2:
         edmdatafiles = lines[-3]
         edmdatafiles = edmdatafiles.strip().split(':')
-    print "edmdf:", edmdatafiles
-    print "path", path
-    return edmdatafiles, path
+    if len(lines) > 3:
+        pwd = lines[-4].strip()
+    log.info("EDMDATAFILES: %s", edmdatafiles)
+    log.info("PATH: %s", path)
+    return edmdatafiles, path, pwd
 
 
 if __name__ == '__main__':
