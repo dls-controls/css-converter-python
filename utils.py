@@ -61,13 +61,20 @@ def spoof_edm(script_file):
     Assume that the last two lines of output are those produced by this script.
     '''
     env = os.environ.copy()
-    env['PATH'] = '/home/hgs15624/code/converter/spoof_edm:' + env['PATH']
+    old_dir = os.getcwd()
+    script_dir = os.path.dirname(script_file)
+    # Change to directory of spoofed script.
+    os.chdir(script_dir)
+    env['PATH'] = '/home/hgs15624/code/converter/spoof_edm:' + script_dir + env['PATH']
     old_path = env['PATH'].split(':')
 
     edmdatafiles = None
     path = None
 
     out = subprocess.check_output(script_file, shell=True, env=env)
+
+    # Change back to original directory.
+    os.chdir(old_dir)
     log.debug("Spoof EDM output: %s", out)
     lines = out.splitlines()
     if lines[-1] != 'Spoof EDM complete.':
