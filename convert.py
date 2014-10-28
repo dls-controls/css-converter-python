@@ -69,7 +69,12 @@ class Converter(object):
         self.symbol_files = symbol_files
         self.tmpdir = TMP_DIR
         self.symbolsdir = SYMBOLS_DIR
-        self.module_name, self.version, _dummy = utils.parse_module_name(working_dir)
+        try:
+            self.module_name, self.version, _dummy = utils.parse_module_name(working_dir)
+        except ValueError:
+            log.warn("Didn't understand script's working directory!")
+            self.module_name = os.path.basename(script_file)
+            self.version = "0-0"
         self.module_name = self.module_name.replace('/', '_')
         self.outdir = os.path.join(outdir, "%s_%s" % (self.module_name, self.version))
 
@@ -80,7 +85,10 @@ class Converter(object):
         '''
         for datadir in self.edmdatafiles:
             log.debug('EDM data file %s' % datadir)
-            module_name, version, rel_path = utils.parse_module_name(datadir)
+            try:
+                module_name, version, rel_path = utils.parse_module_name(datadir)
+            except ValueError:
+                continue
             log.debug("%s %s %s", module_name, version, rel_path)
             if rel_path is None:
                 rel_path = ""
@@ -109,7 +117,13 @@ class Converter(object):
         log.debug("The path files are: %s", self.paths)
         for datadir in self.paths:
             log.debug('EDM path directory %s' % datadir)
-            module_name, version, rel_path = utils.parse_module_name(datadir)
+            try:
+                module_name, version, rel_path = utils.parse_module_name(datadir)
+                if rel_path is None:
+                    rel_path = ""
+            except ValueError:
+                log.warn("Can't parse path %s" % datadir)
+                continue
             module_name = module_name.split('/')[-1]
 
             entries = os.listdir(datadir)
@@ -181,7 +195,7 @@ class Converter(object):
         # preprocess symbol files - Matt's symbol widget requires pngs
         # instead of the OPIs from the converter.
         # first try converting opi
-        print "converting", filename
+        log.debug("Converting %s" % filename)
         command = CONVERT_CMD + [filename, destination]
         x = subprocess.call(command)
         utils.make_read_only(destination)
