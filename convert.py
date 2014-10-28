@@ -248,6 +248,7 @@ class Converter(object):
                     else:
                         self.convert(file, destination)
                         log.info('Successfully converted %s' % destination)
+                        self.update_paths(destination)
                 except Exception as e:
                     log.warn('Conversion of %s unsuccessful.' % file)
                     log.warn(str(e))
