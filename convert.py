@@ -166,6 +166,18 @@ class Converter(object):
             return True
         return False
 
+    def already_converted(self, outdir, file):
+        basename = os.path.basename(file)
+        base = '.'.join(basename.split('.')[:-1])
+        if self.is_symbol(file, outdir):
+            # look for the converted png
+            return len(glob.glob(os.path.join(outdir, base) + '*.png'))
+        else:
+            opifile = basename[:-len(EDL_EXT)] + OPI_EXT
+            destination = os.path.join(outdir, opifile)
+            return os.path.exists(destination)
+
+
     def convert_symbol(self, symbol_file, destination):
         utils.make_writeable(destination)
         # compress.py returns an edited .edl file
@@ -226,20 +238,19 @@ class Converter(object):
                 name = os.path.basename(file)
                 opifile = name[:-len(EDL_EXT)] + OPI_EXT
                 destination = os.path.join(outdir, opifile)
-                if not force and os.path.isfile(destination):
-                    log.info('Skipping existing file %s' % destination)
-                else:
-                    try:
-                        if self.is_symbol(file, symbols):
-                            self.convert_symbol(file, destination)
-                            log.info('Successfully converted symbol file %s' % destination)
-                        else:
-                            self.convert(file, destination)
-                            log.info('Successfully converted %s' % destination)
-                            self.update_paths(destination)
-                    except Exception as e:
-                        log.warn('Conversion of %s unsuccessful.' % file)
-                        log.warn(str(e))
+                try:
+                    if not force and self.already_converted(outdir, file):
+                        log.info('Skipping existing file %s' % destination)
+
+                    elif self.is_symbol(file, destination):
+                        self.convert_symbol(file, outdir)
+                        log.info('Successfully converted symbol file %s' % destination)
+                    else:
+                        self.convert(file, destination)
+                        log.info('Successfully converted %s' % destination)
+                except Exception as e:
+                    log.warn('Conversion of %s unsuccessful.' % file)
+                    log.warn(str(e))
             elif not os.path.isdir(file) and not file.endswith('~'):
                 # copy all other files
                 name = os.path.basename(file)
@@ -264,7 +275,6 @@ class Converter(object):
         log.debug('Module for path %s is %s' % (filepath, module))
         update_paths.parse(filepath, self.file_dict, self.path_dict, module)
 
->>>>>>> First pass at restructure of converter.
 
 def set_up_options():
     parser = argparse.ArgumentParser(description='''
