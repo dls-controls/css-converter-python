@@ -1,11 +1,8 @@
 
-from pkg_resources import require
-require('dls_epicsparser')
-from dls_epicsparser import releaseparser
-
 import os
 import subprocess
 import logging as log
+
 
 def parse_module_name(filepath):
     '''
@@ -25,7 +22,6 @@ def parse_module_name(filepath):
         if len(parts) > i+3:
             relative_path = '/'.join(parts[i+3:])
     elif 'ioc' in parts:
-        #print parse_release(filepath)
         index = parts.index('ioc')
         v = -1
         for i, p in enumerate(parts):
@@ -40,18 +36,16 @@ def parse_module_name(filepath):
         raise ValueError('Module %s not understood' % filepath)
     return module, version, relative_path
 
+
 def make_read_only(filename):
     if os.path.exists(filename):
         os.chmod(filename, 0o444)
+
 
 def make_writeable(filename):
     if os.path.exists(filename):
         os.chmod(filename, 0o777)
 
-def parse_release(module_path):
-    rel_parse = releaseparser.Release(module_path)
-    paths = [p for p in rel_parse.flatten(paths=True)]
-    return paths
 
 def spoof_edm(script_file):
     '''
@@ -75,7 +69,7 @@ def spoof_edm(script_file):
 
     # Change back to original directory.
     os.chdir(old_dir)
-    log.debug("Spoof EDM output: %s", out)
+    log.debug("Spoof EDM output:\n\n%s", out)
     lines = out.splitlines()
     if lines[-1] != 'Spoof EDM complete.':
         log.warn("EDM spoof failed.")
