@@ -81,11 +81,17 @@ def index_paths(paths):
     return executables
 
 def update_opi_path(filename, opi_dict, module):
+    if filename.startswith('./'):
+        filename = filename[2:]
     if filename in opi_dict:
         if opi_dict[filename][0] != module:
             log.info("correcting %s", filename)
             log.debug(opi_dict[filename])
-            rel = os.path.join('..', opi_dict[filename][0], opi_dict[filename][1], filename)
+            # we only need the last part of the path
+            # i.e. CS/CS-DI-IOC-09  ->  CS-DI-IOC-09
+            module_path = opi_dict[filename][0]
+            collapsed_path = module_path.split('/')[-1]
+            rel = os.path.join('..', collapsed_path, opi_dict[filename][1], filename)
         else:
             rel = os.path.join(opi_dict[filename][1], filename)
     else:
