@@ -101,7 +101,8 @@ def update_paths(node, file_dict, path_dict, module):
     '''
     Recursively update all paths in the opi file to project-relative ones.
     '''
-    if node.tag == 'path':
+    UPDATEABLES = ['path', 'image_file']
+    if node.tag in UPDATEABLES:
         node.text = update_opi_path(node.text, file_dict, module)
     elif node.tag == 'command':
         cmd_parts = node.text.split()
