@@ -105,7 +105,7 @@ class Converter(object):
                         log.debug("New outdir is %s", outpath)
                         if not os.path.isdir(outpath):
                             os.makedirs(outpath)
-                        self.parse_dir(full_path, os.path.join(self.outdir, module_name, entry), force)
+                        self.parse_dir(full_path, outpath, force)
 
             self.parse_dir(datadir, os.path.join(self.outdir, module_name, rel_path), force)
 
