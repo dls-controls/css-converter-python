@@ -1,12 +1,11 @@
 
 # OPI files whose layers need rearranging
-./project/opi/diag/shared/overview.opi
-./project/opi/diag/shared/fan_overview.opi
-./project/opi/vacuum/diamondVacuumOverview.opi
-./project/opi/psc/pscL2.opi
-./project/opi/psc/pscAllOn.opi
-./project/opi/diag/sr/best.opi
-./project/opi/psc/psc/pscL2.opi
-./project/opi/psc/pscAllOn.opi
-./opi/diagOpi/shared/overview.opi
+./project/opi/diagOpi_2-44/diagOpi/shared/overview.opi
+./project/opi/diagOpi_2-44/diagOpi/shared/fan_overview.opi
+./project/opi/diagOpi_2-44/diagOpi/sr/best.opi
+./project/opi/vacuum.sh_0-0/vacuum/data/diamondVacuumOverview.opi
+./project/opi/psc_4-3-14/psc/data/pscL2.opi
+./project/opi/psc_4-3-14/psc/data/pscAllOn.opi
+./project/opi/psc_4-3-14/psc/data/pscL2.opi
+./project/opi/psc_4-3-14/psc/data/pscAllOn.opi
 
