@@ -62,8 +62,9 @@ class Converter(object):
         if '.' in self.edmdatafiles:
             dotnumber = self.edmdatafiles.index('.')
             self.edmdatafiles[dotnumber] = working_dir
+            log.debug("Replaced path '.' with %s", working_dir)
         paths.append(working_dir)
-        self.file_dict = update_paths.index_opi_paths(edmdatafiles)
+        self.file_dict = update_paths.index_opi_paths(self.edmdatafiles)
         self.path_dict = update_paths.index_paths(paths)
         self.paths = paths
         self.symbol_files = symbol_files
