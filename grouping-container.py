@@ -12,7 +12,8 @@ dimensions so that they match the contents.
 
 import sys
 import xml.etree.ElementTree as et
-from convert import make_writeable, make_read_only
+from utils import make_writeable, make_read_only
+
 
 
 GROUPING_CONTAINER = 'org.csstudio.opibuilder.widgets.groupingContainer'
