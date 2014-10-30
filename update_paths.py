@@ -10,9 +10,6 @@ import os
 import xml.etree.ElementTree as et
 import utils
 import logging as log
-LOG_FORMAT = '%(levelname)s:  %(message)s'
-LOG_LEVEL = log.DEBUG
-log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 TAGS_TO_UPDATE = ['path', 'image_file']
 
@@ -31,12 +28,16 @@ def index_opi_paths(paths):
     filepaths = {}
 
     for path in paths:
+        log.debug("Indexing path %s", path)
         for root, dirs, files in os.walk(path):
             dirs[:] = [d for d in dirs if not d[0] == '.']
             if root.startswith('.'):
                 continue
             else:
-                module, version, rel_path = utils.parse_module_name(path)
+                try:
+                    module, version, rel_path = utils.parse_module_name(path)
+                except ValueError:
+                    continue
                 for f in files:
                     rel_path2 = os.path.join(root[len(path) + 1:], f)
                     if rel_path2.endswith('edl'):
@@ -47,6 +48,7 @@ def index_opi_paths(paths):
                     else:
                         filepaths[rel_path2] = (module, rel_path)
 
+    log.debug("Indexed OPI paths: %s", filepaths)
     return filepaths
 
 
@@ -72,7 +74,7 @@ def index_paths(paths):
             if not f.startswith('.') and not os.path.isdir(f):
                 if f in executables:
                     log.warn("clash: %s in %s and %s",
-                            rel_path, path, executables[rel_path])
+                            rel_path, path, executables[f])
                 else:
                     executables[f] = (module, rel_path)
 
