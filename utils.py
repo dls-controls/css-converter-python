@@ -65,7 +65,8 @@ def spoof_edm(script_file):
     edmdatafiles = None
     path = None
 
-    out = subprocess.check_output(script_file, shell=True, env=env)
+    # These scripts often expect a port number and edl file.
+    out = subprocess.check_output([script_file + ' 5064 dummy.edl'], shell=True, env=env)
 
     # Change back to original directory.
     os.chdir(old_dir)
