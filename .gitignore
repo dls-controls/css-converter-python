@@ -1,6 +1,8 @@
 
 # compiled python
 *.pyc
+# vim ctags file
+tags
 # datafile directories
 edl/
 project/opi
