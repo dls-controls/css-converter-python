@@ -58,11 +58,8 @@ class Converter(object):
         # Index these directories to find which modules
         # relative paths may be in.
         edmdatafiles, paths, working_dir = utils.spoof_edm(script_file)
-        self.edmdatafiles = [f for f in edmdatafiles if f != '']
-        if '.' in self.edmdatafiles:
-            dotnumber = self.edmdatafiles.index('.')
-            self.edmdatafiles[dotnumber] = working_dir
-            log.debug("Replaced path '.' with %s", working_dir)
+        self.edmdatafiles = [f for f in edmdatafiles if f not in  ('', '.')]
+        self.edmdatafiles.append(working_dir)
         paths.append(working_dir)
         self.file_dict = update_paths.index_opi_paths(self.edmdatafiles)
         self.path_dict = update_paths.index_paths(paths)
