@@ -73,7 +73,7 @@ def convert_symbol(symbol_file, destination):
         raise e
 
 
-def update_edm(filename):
+def update_edl(filename):
     '''
     Copy EDM file to temporary location.  Attempt to convert to
     new format using EDM. Return location of converted file.
@@ -92,7 +92,7 @@ def update_edm(filename):
         log.warn('EDM update failed with code %s' % x)
 
 
-def convert(filename, destination):
+def convert_edl(filename, destination):
     '''
     Try to convert .edl file.  If it fails, try updating .edl file
     using edm before converting again.
@@ -107,7 +107,7 @@ def convert(filename, destination):
     utils.make_read_only(destination)
     if x != 0: # conversion failed
         log.warn('Conversion failed with code %d; will try updating' % x)
-        new_edl = update_edm(filename)
+        new_edl = update_edl(filename)
         if new_edl is not None:
             log.warn('Updated to new-style edl %s' % new_edl)
             command = CONVERT_CMD + [new_edl, destination]
@@ -260,7 +260,7 @@ class Converter(object):
                         convert_symbol(file, destination)
                         log.info('Successfully converted symbol file %s' % destination)
                     else:
-                        convert(file, destination)
+                        convert_edl(file, destination)
                         log.info('Successfully converted %s' % destination)
                         self.update_paths(destination)
                 except Exception as e:
