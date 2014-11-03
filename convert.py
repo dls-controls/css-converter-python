@@ -157,17 +157,17 @@ class Converter(object):
         else:
             log.warn('EDM update failed with code %s' % x)
 
-    def is_symbol(self, filename, symbols):
+    def is_symbol(self, filename):
         if filename.endswith('symbol.edl'):
             return True
-        if os.path.basename(filename) in symbols:
+        if os.path.basename(filename) in self.symbol_files:
             return True
         return False
 
     def already_converted(self, outdir, file):
         basename = os.path.basename(file)
         base = '.'.join(basename.split('.')[:-1])
-        if self.is_symbol(file, outdir):
+        if self.is_symbol(file):
             # look for the converted png
             return len(glob.glob(os.path.join(outdir, base) + '*.png'))
         else:
@@ -240,8 +240,8 @@ class Converter(object):
                     if not force and self.already_converted(outdir, file):
                         log.info('Skipping existing file %s' % destination)
 
-                    elif self.is_symbol(file, destination):
-                        self.convert_symbol(file, outdir)
+                    elif self.is_symbol(file):
+                        self.convert_symbol(file, destination)
                         log.info('Successfully converted symbol file %s' % destination)
                     else:
                         self.convert(file, destination)
