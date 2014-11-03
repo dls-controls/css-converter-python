@@ -86,11 +86,21 @@ def update_opi_path(filename, opi_dict, module):
     Return the corrected path according to the contents of the
     opi_dict.
 
-    Note that if the 'module' of a file is nexted directories, we 
+    Note that if the 'module' of a file is nested directories, we
     only need to put ../<lastdir>/relative/path
     '''
     if filename.startswith('./'):
         filename = filename[2:]
+    # Symbol files are converted to pngs with different names
+    # We have to update the new filenames, but the old ones are
+    # in the index.
+    if filename.endswith('png'):
+        # Remove everything after the last -
+        stub = '-'.join(p for p in filename.split('-')[:-1])
+        original_name = stub + '.opi'
+        if original_name in opi_dict:
+            opi_dict[filename] = opi_dict[original_name]
+        log.debug("Updated opi_dict for %s", filename)
     if filename in opi_dict:
         if opi_dict[filename][0] != module:
             log.debug("Correcting %s", filename)
