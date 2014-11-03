@@ -51,6 +51,72 @@ UPDATE_CMD = ['edm', '-convert']
 SYMB_SCRIPT = os.path.join(os.getcwd(), 'auto-symb.sh')
 COMPRESS_CMD = [SYMB_SCRIPT]
 
+
+def convert_symbol(symbol_file, destination):
+    utils.make_writeable(destination)
+    # compress.py returns an edited .edl file
+    command = COMPRESS_CMD + [symbol_file]
+    out = subprocess.check_output(" ".join(command), shell=True)
+    # copy png to right location
+    relfilename = out.strip()
+    filename = os.path.basename(relfilename)
+    source = os.path.join(os.getcwd(), relfilename)
+    destdir = os.path.dirname(destination)
+    absfilename = os.path.join(destdir, filename)
+
+    try:
+        utils.make_writeable(absfilename)
+        shutil.copyfile(source, absfilename)
+        utils.make_read_only(absfilename)
+    except Exception as e:
+        log.warn("Failed copying file" + str(e))
+        raise e
+
+
+def update_edm(filename):
+    '''
+    Copy EDM file to temporary location.  Attempt to convert to
+    new format using EDM. Return location of converted file.
+    '''
+    tmp_edm = os.path.join(TMP_DIR, os.path.basename(filename))
+    if os.path.exists(tmp_edm):
+        # make sure we have write permissions on the destination
+        utils.make_writeable(tmp_edm)
+    shutil.copyfile(filename, tmp_edm)
+    cmd = UPDATE_CMD + [tmp_edm]
+    x = subprocess.call(cmd, stdout=NULL_FILE, stderr=NULL_FILE)
+    if not x:
+        utils.make_writeable(tmp_edm)
+        return tmp_edm
+    else:
+        log.warn('EDM update failed with code %s' % x)
+
+
+def convert(filename, destination):
+    '''
+    Try to convert .edl file.  If it fails, try updating .edl file
+    using edm before converting again.
+    '''
+    utils.make_writeable(destination)
+    # preprocess symbol files - Matt's symbol widget requires pngs
+    # instead of the OPIs from the converter.
+    # first try converting opi
+    log.debug("Converting %s" % filename)
+    command = CONVERT_CMD + [filename, destination]
+    x = subprocess.call(command)
+    utils.make_read_only(destination)
+    if x != 0: # conversion failed
+        log.warn('Conversion failed with code %d; will try updating' % x)
+        new_edl = update_edm(filename)
+        if new_edl is not None:
+            log.warn('Updated to new-style edl %s' % new_edl)
+            command = CONVERT_CMD + [new_edl, destination]
+            x = subprocess.call(command)
+            log.info("Conversion return code: %s" % x)
+            utils.make_read_only(destination)
+    return x == 0
+
+
 class Converter(object):
 
     def __init__(self, script_file, symbol_files, outdir):
@@ -61,6 +127,7 @@ class Converter(object):
         self.edmdatafiles = [f for f in edmdatafiles if f not in  ('', '.')]
         self.edmdatafiles.append(working_dir)
         paths.append(working_dir)
+        log.debug("%s, %s", self.edmdatafiles, paths)
         self.file_dict = update_paths.index_opi_paths(self.edmdatafiles)
         self.path_dict = update_paths.index_paths(paths)
         self.paths = paths
@@ -86,7 +153,9 @@ class Converter(object):
             try:
                 module_name, version, rel_path = utils.parse_module_name(datadir)
             except ValueError:
-                continue
+                module_name = ""
+                rel_path = ""
+                version = None
             log.debug("%s %s %s", module_name, version, rel_path)
             if rel_path is None:
                 rel_path = ""
@@ -139,25 +208,13 @@ class Converter(object):
 
             self.parse_dir(datadir, os.path.join(self.outdir, module_name, rel_path), force)
 
-    def update_edm(self, filename):
-        '''
-        Copy EDM file to temporary location.  Attempt to convert to
-        new format using EDM. Return location of converted file.
-        '''
-        tmp_edm = os.path.join(TMP_DIR, os.path.basename(filename))
-        if os.path.exists(tmp_edm):
-            # make sure we have write permissions on the destination
-            utils.make_writeable(tmp_edm)
-        shutil.copyfile(filename, tmp_edm)
-        cmd = UPDATE_CMD + [tmp_edm]
-        x = subprocess.call(cmd, stdout=NULL_FILE, stderr=NULL_FILE)
-        if not x:
-            utils.make_writeable(tmp_edm)
-            return tmp_edm
-        else:
-            log.warn('EDM update failed with code %s' % x)
 
     def is_symbol(self, filename):
+        '''
+        Return True if:
+         - the opi file name ends with 'symbol.edl'
+         - the opi file name is included in self.symbol_files
+        '''
         if filename.endswith('symbol.edl'):
             return True
         if os.path.basename(filename) in self.symbol_files:
@@ -165,6 +222,11 @@ class Converter(object):
         return False
 
     def already_converted(self, outdir, file):
+        '''
+        Return True if:
+         - there is already a converted file in the destination
+         - there is a png of the right name in place of a symbol file
+        '''
         basename = os.path.basename(file)
         base = '.'.join(basename.split('.')[:-1])
         if self.is_symbol(file):
@@ -174,52 +236,6 @@ class Converter(object):
             opifile = basename[:-len(EDL_EXT)] + OPI_EXT
             destination = os.path.join(outdir, opifile)
             return os.path.exists(destination)
-
-
-    def convert_symbol(self, symbol_file, destination):
-        utils.make_writeable(destination)
-        # compress.py returns an edited .edl file
-        command = COMPRESS_CMD + [symbol_file]
-        out = subprocess.check_output(" ".join(command), shell=True)
-        # copy png to right location
-        relfilename = out.strip()
-        filename = os.path.basename(relfilename)
-        source = os.path.join(os.getcwd(), relfilename)
-        destdir = os.path.dirname(destination)
-        absfilename = os.path.join(destdir, filename)
-
-        try:
-            utils.make_writeable(absfilename)
-            shutil.copyfile(source, absfilename)
-            utils.make_read_only(absfilename)
-        except Exception as e:
-            log.warn("Failed copying file" + str(e))
-            raise e
-
-    def convert(self, filename, destination):
-        '''
-        Try to convert .edl file.  If it fails, try updating .edl file
-        using edm before converting again.
-        '''
-        utils.make_writeable(destination)
-        # preprocess symbol files - Matt's symbol widget requires pngs
-        # instead of the OPIs from the converter.
-        # first try converting opi
-        log.debug("Converting %s" % filename)
-        command = CONVERT_CMD + [filename, destination]
-        x = subprocess.call(command)
-        utils.make_read_only(destination)
-        if x != 0: # conversion failed
-            log.warn('Conversion failed with code %d; will try updating' % x)
-            new_edl = self.update_edm(filename)
-            if new_edl is not None:
-                log.warn('Updated to new-style edl %s' % new_edl)
-                command = CONVERT_CMD + [new_edl, destination]
-                x = subprocess.call(command)
-                log.info("Conversion return code: %s" % x)
-                utils.make_read_only(destination)
-        return x == 0
-
 
     def parse_dir(self, directory, outdir, force):
         log.info('Starting directory %s' % directory)
@@ -241,10 +257,10 @@ class Converter(object):
                         log.info('Skipping existing file %s' % destination)
 
                     elif self.is_symbol(file):
-                        self.convert_symbol(file, destination)
+                        convert_symbol(file, destination)
                         log.info('Successfully converted symbol file %s' % destination)
                     else:
-                        self.convert(file, destination)
+                        convert(file, destination)
                         log.info('Successfully converted %s' % destination)
                         self.update_paths(destination)
                 except Exception as e:
@@ -267,7 +283,6 @@ class Converter(object):
                         log.warn('Copying file %s unsuccessful.' % file)
             else:
                 log.info('Ignoring %s' % file)
-
 
     def update_paths(self, filepath):
         module = filepath.split('/')[1]
