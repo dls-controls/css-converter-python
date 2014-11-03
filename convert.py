@@ -53,6 +53,10 @@ COMPRESS_CMD = [SYMB_SCRIPT]
 
 
 def convert_symbol(symbol_file, destination):
+    '''
+    Convert an EDM symbol file into the png used by the CSS symbol widget.
+    This uses an external shell script.
+    '''
     utils.make_writeable(destination)
     # compress.py returns an edited .edl file
     command = COMPRESS_CMD + [symbol_file]
@@ -118,8 +122,20 @@ def convert_edl(filename, destination):
 
 
 class Converter(object):
+    '''
+    Given a script used to start EDM, deduce the directories needed
+    for conversion and convert them in the appropriate format.
+    Output goes in the directory provided.
+
+    Since we can't easily determine symbol files, these may be specified
+    on creation.
+    '''
 
     def __init__(self, script_file, symbol_files, outdir):
+        '''
+        Given the EDM entry script, deduce the paths to convert.
+        A list of symbol files is stored to help when converting.
+        '''
         # Spoof EDM to find EDMDATAFILES and PATH
         # Index these directories to find which modules
         # relative paths may be in.
@@ -145,8 +161,9 @@ class Converter(object):
 
     def convert_opis(self, force):
         '''
-        Given the EDM datafiles list, parse the directory and any subdirectories
-        for edm files.  Create output in a similar directory structure.
+        Given the EDM datafiles list, parse the directory and (recursively)
+        any subdirectories for edm files.  Create output in a similar
+        directory structure.
         '''
         for datadir in self.edmdatafiles:
             log.debug('EDM data file %s' % datadir)
@@ -172,9 +189,9 @@ class Converter(object):
                         log.debug("New outdir is %s", outpath)
                         if not os.path.isdir(outpath):
                             os.makedirs(outpath)
-                        self.parse_dir(full_path, outpath, force)
+                        self.convert_dir(full_path, outpath, force)
 
-            self.parse_dir(datadir, os.path.join(self.outdir, module_name, rel_path), force)
+            self.convert_dir(datadir, os.path.join(self.outdir, module_name, rel_path), force)
 
     def copy_scripts(self, force):
         '''
@@ -204,9 +221,9 @@ class Converter(object):
                         log.debug("New outdir is %s", outpath)
                         if not os.path.isdir(outpath):
                             os.makedirs(outpath)
-                        self.parse_dir(full_path, os.path.join(self.outdir, module_name, entry), force)
+                        self.convert_dir(full_path, os.path.join(self.outdir, module_name, entry), force)
 
-            self.parse_dir(datadir, os.path.join(self.outdir, module_name, rel_path), force)
+            self.convert_dir(datadir, os.path.join(self.outdir, module_name, rel_path), force)
 
 
     def is_symbol(self, filename):
@@ -237,10 +254,14 @@ class Converter(object):
             destination = os.path.join(outdir, opifile)
             return os.path.exists(destination)
 
-    def parse_dir(self, directory, outdir, force):
-        log.info('Starting directory %s' % directory)
-        files = os.listdir(directory)
-        files = [os.path.join(directory, file) for file in files]
+    def convert_dir(self, indir, outdir, force):
+        '''
+        Convert or copy files in one directory to the corresponding output
+        directory.
+        '''
+        log.info('Starting directory %s' % indir)
+        files = os.listdir(indir)
+        files = [os.path.join(indir, file) for file in files]
         if not os.path.exists(outdir):
             log.info('Making new output directory %s' % outdir)
             os.makedirs(outdir)
