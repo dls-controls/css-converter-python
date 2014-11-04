@@ -37,9 +37,13 @@ def parse_module_name(filepath):
     return module, version, relative_path
 
 
-def make_read_only(filename):
+def make_read_only(filename, executable=False):
+    if executable:
+        perms = 0o555
+    else:
+        perms = 0o444
     if os.path.exists(filename):
-        os.chmod(filename, 0o444)
+        os.chmod(filename, perms)
 
 
 def make_writeable(filename):

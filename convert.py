@@ -290,6 +290,7 @@ class Converter(object):
             log.warn(str(e))
 
     def copy_one_file(self, full_path, outdir, force):
+        executable = os.access(full_path, os.X_OK)
         name = os.path.basename(full_path)
         destination = os.path.join(outdir, name)
         if not force and os.path.isfile(destination):
@@ -299,7 +300,7 @@ class Converter(object):
             if os.path.isfile(destination):
                 utils.make_writeable(destination)
             if not subprocess.call(['cp', full_path, destination]):
-                utils.make_read_only(destination)
+                utils.make_read_only(destination, executable)
                 log.info('Successfully copied %s' % destination)
             else:
                 log.warn('Copying file %s unsuccessful.' % full_path)
