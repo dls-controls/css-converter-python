@@ -161,6 +161,9 @@ class Converter(object):
             self.version = "0-0"
         self.module_name = self.module_name.replace('/', '_')
         self.outdir = os.path.join(outdir, "%s_%s" % (self.module_name, self.version))
+        if not os.path.exists(self.outdir):
+            log.info('Making new output directory %s' % self.outdir)
+            os.makedirs(self.outdir)
         self.generate_project_file()
 
     def generate_project_file(self):
@@ -203,8 +206,6 @@ class Converter(object):
                     if os.path.isdir(full_path):
                         outpath = os.path.join(self.outdir, module_name, rel_path, entry)
                         log.debug("New outdir is %s", outpath)
-                        if not os.path.isdir(outpath):
-                            os.makedirs(outpath)
                         self.convert_dir(full_path, outpath, force)
 
             self.convert_dir(datadir, os.path.join(self.outdir, module_name, rel_path), force)
@@ -313,10 +314,9 @@ class Converter(object):
          - otherwise, copy the file
         '''
         log.info('Starting directory %s' % indir)
-        full_paths = [os.path.join(indir, f) for f in os.listdir(indir)]
-        if not os.path.exists(outdir):
-            log.info('Making new output directory %s' % outdir)
+        if not os.path.isdir(outdir):
             os.makedirs(outdir)
+        full_paths = [os.path.join(indir, f) for f in os.listdir(indir)]
 
         for full_path in full_paths:
             log.debug('Trying %s...' % full_path)
