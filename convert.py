@@ -142,11 +142,10 @@ class Converter(object):
         edmdatafiles, paths, working_dir = utils.spoof_edm(script_file)
         self.edmdatafiles = [f for f in edmdatafiles if f not in  ('', '.')]
         self.edmdatafiles.append(working_dir)
-        paths.append(working_dir)
-        log.debug("%s, %s", self.edmdatafiles, paths)
-        self.file_dict = update_paths.index_opi_paths(self.edmdatafiles)
-        self.path_dict = update_paths.index_paths(paths)
         self.paths = paths
+        self.paths.append(working_dir)
+        self.file_dict = update_paths.index_opi_paths(self.edmdatafiles)
+        self.path_dict = update_paths.index_paths(self.paths)
         self.symbol_files = symbol_files
         self.tmpdir = TMP_DIR
         self.symbolsdir = SYMBOLS_DIR
