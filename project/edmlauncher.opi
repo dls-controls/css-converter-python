@@ -628,7 +628,7 @@ $(pv_value)</tooltip>
         <path>/converter/opi/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09/opi/rffb.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09/CS-DI-IOC-09</opi.dir>
+          <opi.dir>/converter/opi/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1521,10 +1521,9 @@ $(pv_value)</tooltip>
     <y>450</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/ops/MPS-Temperatures.opi</path>
+        <path>/converter/opi/MPS-Temperatures.sh_0-0/MPS-Temperatures.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/ops</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1571,7 +1570,7 @@ $(pv_value)</tooltip>
     <y>342</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/ops/ID_Control.opi</path>
+        <path>/converter/opi/ID_Control.sh_0-0/ID_Control.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
           <opi.dir>/converter/opi/ops</opi.dir>
@@ -1622,10 +1621,10 @@ $(pv_value)</tooltip>
     <y>396</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/ops/FE_Control.opi</path>
+        <path>/converter/opi/FE_Control.sh_0-0/FE_Control.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/ops</opi.dir>
+          <opi.dir>/converter/opi/FE_Control.sh_0-0</opi.dir>
         </macros>
         <description></description>
       </action>
