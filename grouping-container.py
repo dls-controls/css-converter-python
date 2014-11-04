@@ -29,6 +29,25 @@ def get_container_size(widget):
     return w, h
 
 
+def get_negative_excursion(widget):
+    '''
+    Returns the widgets position or zero, whichever is greater.
+    '''
+    x = int(widget.find('x').text)
+    y = int(widget.find('y').text)
+    return min(x, 0), min(y, 0)
+
+
+def move(widget, dx, dy):
+    '''
+    Moves the widget by the offset specified.
+    '''
+    x = int(widget.find('x').text)
+    y = int(widget.find('y').text)
+    widget.find('x').text = '%d' % (x + dx)
+    widget.find('y').text = '%d' % (y + dy)
+
+
 def set_grouping_container_size(container_widget):
     '''
     Searches through the child widgets of the grouping container to determine
@@ -37,17 +56,32 @@ def set_grouping_container_size(container_widget):
     '''
     w = 0
     h = 0
+    offset_x = 0
+    offset_y = 0
     children = container_widget.getchildren()
-    for child in children:
-        if child.tag == 'widget':
-            if child.attrib['typeId'] == GROUPING_CONTAINER:
-                cw, ch = set_grouping_container_size(child)
-            else:
-                cw, ch = get_container_size(child)
-            w = max(cw, w)
-            h = max(ch, h)
+    widgets = [child for child in children if child.tag == 'widget']
+    for child in widgets:
+        if child.attrib['typeId'] == GROUPING_CONTAINER:
+            cw, ch = set_grouping_container_size(child)
+        else:
+            cw, ch = get_container_size(child)
+        coffset_x, coffset_y = get_negative_excursion(child)
+        w = max(cw, w)
+        h = max(ch, h)
+        offset_x = min(coffset_x, offset_x)
+        offset_y = min(coffset_y, offset_y)
+
     container_widget.find('width').text = '%d' % w
     container_widget.find('height').text = '%d' % h
+
+    # Account for negative child positions
+    if offset_x or offset_y:
+        move(container_widget, offset_x, offset_y)
+        for child in widgets:
+            move(child, -offset_x, -offset_y)
+        # Redetermine the size now all the widgets have moved
+        set_grouping_container_size(container_widget)
+
     return get_container_size(container_widget)
 
 
