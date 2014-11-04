@@ -135,7 +135,7 @@ class Converter(object):
     on creation.
     '''
 
-    def __init__(self, script_file, symbol_files, outdir):
+    def __init__(self, script_file, script_args, symbol_files, outdir):
         '''
         Given the EDM entry script, deduce the paths to convert.
         A list of symbol files is stored to help when converting.
@@ -143,7 +143,7 @@ class Converter(object):
         # Spoof EDM to find EDMDATAFILES and PATH
         # Index these directories to find which modules
         # relative paths may be in.
-        edmdatafiles, paths, working_dir = utils.spoof_edm(script_file)
+        edmdatafiles, paths, working_dir = utils.spoof_edm(script_file, script_args)
         self.edmdatafiles = [f for f in edmdatafiles if f not in  ('', '.')]
         self.edmdatafiles.append(working_dir)
         self.paths = paths
@@ -352,7 +352,7 @@ if __name__ == '__main__':
 
     # Parse configuration
     args = set_up_options()
-    print args.config
+    log.debug("Config files supplied: %s", args.config)
 
     for cfg in args.config:
         log.info('\n\nStarting config file %s.\n', cfg)
@@ -376,6 +376,11 @@ if __name__ == '__main__':
         sys.exit()
 
     try:
+        script_args = cp.get('edm', 'script_args')
+    except ConfigParser.NoOptionError:
+        script_args = None
+
+    try:
         outdir = cp.get('opi', 'outdir')
     except ConfigParser.NoSectionError:
         log.error('Please ensure %s is a valid config file' % args.config)
@@ -387,7 +392,7 @@ if __name__ == '__main__':
     except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
         symbols = []
 
-    c = Converter(script_file, symbols, outdir)
+    c = Converter(script_file, script_args, symbols, outdir)
     c.convert_opis(args.force)
     c.copy_scripts(args.force)
 

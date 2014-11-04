@@ -51,13 +51,17 @@ def make_writeable(filename):
         os.chmod(filename, 0o777)
 
 
-def spoof_edm(script_file):
+def spoof_edm(script_file, args_string=""):
     '''
     Use a script called 'edm' to extract the EDMDATAFILES and PATH variables
     from any script used to run edm.
 
     Assume that the last two lines of output are those produced by this script.
     '''
+    if args_string is None:
+        args_string = ""
+    if args_string is None:
+        args_string = ""
     env = os.environ.copy()
     old_dir = os.getcwd()
     script_dir = os.path.dirname(script_file)
@@ -69,8 +73,12 @@ def spoof_edm(script_file):
     edmdatafiles = None
     path = None
 
+    args_string = args_string.replace('$PORT', '5064')
+    command_string = "%s %s" % (script_file, args_string)
+    log.debug("Spoofing script: %s", command_string)
+
     # These scripts often expect a port number and edl file.
-    out = subprocess.check_output([script_file + ' 5064 dummy.edl'], shell=True, env=env)
+    out = subprocess.check_output([command_string], shell=True, env=env)
 
     # Change back to original directory.
     os.chdir(old_dir)
@@ -87,6 +95,7 @@ def spoof_edm(script_file):
     if len(lines) > 2:
         edmdatafiles = lines[-3]
         edmdatafiles = edmdatafiles.strip().split(':')
+        edmdatafiles = [e for e in edmdatafiles if e != '']
     if len(lines) > 3:
         pwd = lines[-4].strip()
     log.info("EDMDATAFILES: %s", edmdatafiles)
