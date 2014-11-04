@@ -1,4 +1,4 @@
 
 # OPI files whose groups need resizing
 ./project/opi/vacuum.sh_0-0/vacuum/data/diamondVacIlks.opi
-
+./project/opi/psc_4-3-14/psc/data/pscL5adc.opi
