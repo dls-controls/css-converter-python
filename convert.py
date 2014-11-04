@@ -29,6 +29,7 @@ import sys
 import glob
 import subprocess
 import shutil
+import string
 import ConfigParser
 import argparse
 
@@ -50,6 +51,9 @@ CONVERT_CMD = ['java', '-jar', 'conv.jar']
 UPDATE_CMD = ['edm', '-convert']
 SYMB_SCRIPT = os.path.join(os.getcwd(), 'auto-symb.sh')
 COMPRESS_CMD = [SYMB_SCRIPT]
+
+PROJECT_TEMPLATE = 'project.template'
+PROJECT_FILENAME = '.project'
 
 
 def convert_symbol(symbol_file, destination):
@@ -157,6 +161,19 @@ class Converter(object):
             self.version = "0-0"
         self.module_name = self.module_name.replace('/', '_')
         self.outdir = os.path.join(outdir, "%s_%s" % (self.module_name, self.version))
+        self.generate_project_file()
+
+    def generate_project_file(self):
+        '''
+        Create an Eclipse project file for this set of OPIs.
+        '''
+        with open(PROJECT_TEMPLATE) as f:
+            content = f.read()
+        s = string.Template(content)
+        updated_content = s.substitute(module_name=self.module_name,
+                version=self.version)
+        with open(os.path.join(self.outdir, PROJECT_FILENAME), 'w') as f:
+            f.write(updated_content)
 
     def convert_opis(self, force):
         '''

@@ -131,7 +131,7 @@ $(pv_value)</tooltip>
         <path>shared/overview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/diagOpi_2-44/diagOpi</opi.dir>
+          <opi.dir>/diagOpi_2-44/diagOpi</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -178,10 +178,10 @@ $(pv_value)</tooltip>
     <y>198</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/CS_CS-RF-IOC-02_Rx-y/CS-RF-IOC-02/data/MasterOsc.opi</path>
+        <path>/CS_CS-RF-IOC-02_Rx-y/CS-RF-IOC-02/data/MasterOsc.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/CS_CS-RF-IOC-02_Rx-y/CS-RF-IOC-02</opi.dir>
+          <opi.dir>/CS_CS-RF-IOC-02_Rx-y/CS-RF-IOC-02</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -228,10 +228,10 @@ $(pv_value)</tooltip>
     <y>144</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/RF_None/RF/SR-RF-Overview.opi</path>
+        <path>/RF_None/RF/SR-RF-Overview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/RF_None/RF/</opi.dir>
+          <opi.dir>/RF_None/RF/</opi.dir>
           <dom>SR</dom>
         </macros>
         <description></description>
@@ -279,10 +279,10 @@ $(pv_value)</tooltip>
     <y>36</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/LI_TI_Rx-y/TI/data/LI-TI-EVG-01.opi</path>
+        <path>/LI_TI_Rx-y/TI/data/LI-TI-EVG-01.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/LI_TI_Rx-y/TI</opi.dir>
+          <opi.dir>/LI_TI_Rx-y/TI</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -329,10 +329,10 @@ $(pv_value)</tooltip>
     <y>90</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/psc_4-3-14/psc/data/pscL2.opi</path>
+        <path>/psc_4-3-14/psc/data/pscL2.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/psc_4-3-14/psc</opi.dir>
+          <opi.dir>/psc_4-3-14/psc</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -525,10 +525,10 @@ $(pv_value)</tooltip>
     <y>144</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09/opi/vefb.opi</path>
+        <path>/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09/opi/vefb.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09</opi.dir>
+          <opi.dir>/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -575,10 +575,10 @@ $(pv_value)</tooltip>
     <y>36</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/fastfeedback_11-11/fastfeedback/fofbApp/opi/fofb.opi</path>
+        <path>/fastfeedback_11-11/fastfeedback/fofbApp/opi/fofb.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/fastfeedback_11-11/fastfeedback</opi.dir>
+          <opi.dir>/fastfeedback_11-11/fastfeedback</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -625,10 +625,10 @@ $(pv_value)</tooltip>
     <y>90</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09/opi/rffb.opi</path>
+        <path>/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09/opi/rffb.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09</opi.dir>
+          <opi.dir>/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -715,10 +715,10 @@ $(pv_value)</tooltip>
     <y>198</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09/opi/tfb.opi</path>
+        <path>/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09/opi/tfb.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09</opi.dir>
+          <opi.dir>/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -823,10 +823,10 @@ $(pv_value)</tooltip>
     <y>36</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/vacuum.sh_0-0/vacuum/data/diamondVacuumOverview.opi</path>
+        <path>/vacuum.sh_0-0/vacuum/data/diamondVacuumOverview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/vacuum.sh_0-0/vacuum/</opi.dir>
+          <opi.dir>/vacuum.sh_0-0/vacuum/</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -913,10 +913,10 @@ $(pv_value)</tooltip>
     <y>90</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/vacuum.sh_0-0/vacuum/data/diamondVacIlks.opi</path>
+        <path>/vacuum.sh_0-0/vacuum/data/diamondVacIlks.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/vacuum.sh_0-0/vacuum/</opi.dir>
+          <opi.dir>/vacuum.sh_0-0/vacuum/</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -963,10 +963,10 @@ $(pv_value)</tooltip>
     <y>143</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/vacuum.sh_0-0/vacuum/data/diamondVacuum.opi</path>
+        <path>/vacuum.sh_0-0/vacuum/data/diamondVacuum.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/vacuum.sh_0-0/vacuum/</opi.dir>
+          <opi.dir>/vacuum.sh_0-0/vacuum/</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1013,10 +1013,10 @@ $(pv_value)</tooltip>
     <y>198</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/vacuum.sh_0-0/vacuum/data/srRgas.opi</path>
+        <path>/vacuum.sh_0-0/vacuum/data/srRgas.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/vacuum.sh_0-0/vacuum/</opi.dir>
+          <opi.dir>/vacuum.sh_0-0/vacuum/</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1063,10 +1063,10 @@ $(pv_value)</tooltip>
     <y>249</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/vacuum.sh_0-0/vacuum/data/diamondVacCtrl.opi</path>
+        <path>/vacuum.sh_0-0/vacuum/data/diamondVacCtrl.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/vacuum.sh_0-0/vacuum/</opi.dir>
+          <opi.dir>/vacuum.sh_0-0/vacuum/</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1171,10 +1171,10 @@ $(pv_value)</tooltip>
     <y>504</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/diagOpi_2-44/diagOpi/linac/overview.opi</path>
+        <path>/diagOpi_2-44/diagOpi/linac/overview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/diagOpi_2-44/diagOpi</opi.dir>
+          <opi.dir>/diagOpi_2-44/diagOpi</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1221,10 +1221,10 @@ $(pv_value)</tooltip>
     <y>450</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/LI-ACCEL.sh_0-0/psc/data/LI-PC.opi</path>
+        <path>/LI-ACCEL.sh_0-0/psc/data/LI-PC.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/LI-ACCEL.sh_0-0/psc</opi.dir>
+          <opi.dir>/LI-ACCEL.sh_0-0/psc</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1274,7 +1274,7 @@ $(pv_value)</tooltip>
         <path>linacVacuum.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/vacuum</opi.dir>
+          <opi.dir>/vacuum</opi.dir>
           <dom>LI</dom>
         </macros>
         <description></description>
@@ -1322,10 +1322,10 @@ $(pv_value)</tooltip>
     <y>396</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/LI-ACCEL.sh_0-0/RF/data/LI-RF.opi</path>
+        <path>/LI-ACCEL.sh_0-0/RF/data/LI-RF.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/LI-ACCEL.sh_0-0/RF/</opi.dir>
+          <opi.dir>/LI-ACCEL.sh_0-0/RF/</opi.dir>
           <bin>/bin/Linux</bin>
         </macros>
         <description></description>
@@ -1471,10 +1471,10 @@ $(pv_value)</tooltip>
     <y>504</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/ops/Leak.opi</path>
+        <path>/ops/Leak.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/ops</opi.dir>
+          <opi.dir>/ops</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1521,7 +1521,7 @@ $(pv_value)</tooltip>
     <y>450</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/MPS-Temperatures.sh_0-0/MPS-Temperatures.opi</path>
+        <path>/MPS-Temperatures.sh_0-0/MPS-Temperatures.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
@@ -1570,11 +1570,11 @@ $(pv_value)</tooltip>
     <y>342</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/ID_Control.sh_0-0/ID_Control.opi</path>
+        <path>/ID_Control.sh_0-0/ID_Control.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/ops</opi.dir>
-          <here>/converter/opi/ops</here>
+          <opi.dir>/ops</opi.dir>
+          <here>/ops</here>
         </macros>
         <description></description>
       </action>
@@ -1621,10 +1621,10 @@ $(pv_value)</tooltip>
     <y>396</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/FE_Control.sh_0-0/FE_Control.opi</path>
+        <path>/FE_Control.sh_0-0/FE_Control.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/FE_Control.sh_0-0</opi.dir>
+          <opi.dir>/FE_Control.sh_0-0</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1797,10 +1797,10 @@ $(pv_value)</tooltip>
     <y>342</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/pss_9-16/pss/data/pss_main.opi</path>
+        <path>/pss_9-16/pss/data/pss_main.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/pss_9-16/pss/</opi.dir>
+          <opi.dir>/pss_9-16/pss/</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1847,10 +1847,10 @@ $(pv_value)</tooltip>
     <y>396</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/radiationSafety_Rx-y/radiationSafety/data/radiation.opi</path>
+        <path>/radiationSafety_Rx-y/radiationSafety/data/radiation.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/radiationSafety_Rx-y/radiationSafety</opi.dir>
+          <opi.dir>/radiationSafety_Rx-y/radiationSafety</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1897,10 +1897,10 @@ $(pv_value)</tooltip>
     <y>450</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/converter/opi/radiationSafety_Rx-y/radiationSafety/data/radiation_mobile.opi</path>
+        <path>/radiationSafety_Rx-y/radiationSafety/data/radiation_mobile.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/converter/opi/radiationSafety_Rx-y/radiationSafety</opi.dir>
+          <opi.dir>/radiationSafety_Rx-y/radiationSafety</opi.dir>
         </macros>
         <description></description>
       </action>
