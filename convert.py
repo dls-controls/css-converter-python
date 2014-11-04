@@ -254,56 +254,61 @@ class Converter(object):
             destination = os.path.join(outdir, opifile)
             return os.path.exists(destination)
 
+    def convert_one_file(self, full_path, outdir, force):
+        # change extension
+        name = os.path.basename(full_path)
+        opifile = name[:-len(EDL_EXT)] + OPI_EXT
+        destination = os.path.join(outdir, opifile)
+        try:
+            if not force and self.already_converted(outdir, full_path):
+                log.info('Skipping existing file %s' % destination)
+            elif self.is_symbol(full_path):
+                convert_symbol(full_path, destination)
+                log.info('Successfully converted symbol file %s' % destination)
+            else:
+                convert_edl(full_path, destination)
+                log.info('Successfully converted %s' % destination)
+                self.update_paths(destination)
+        except Exception as e:
+            log.warn('Conversion of %s unsuccessful.' % full_path)
+            log.warn(str(e))
+
+    def copy_one_file(self, full_path, outdir, force):
+        name = os.path.basename(full_path)
+        destination = os.path.join(outdir, name)
+        if not force and os.path.isfile(destination):
+            log.info('Skipping existing file %s' % destination)
+        else:
+            # make sure we have write permissions on the destination
+            if os.path.isfile(destination):
+                utils.make_writeable(destination)
+            if not subprocess.call(['cp', full_path, destination]):
+                utils.make_read_only(destination)
+                log.info('Successfully copied %s' % destination)
+            else:
+                log.warn('Copying file %s unsuccessful.' % full_path)
+
     def convert_dir(self, indir, outdir, force):
         '''
         Convert or copy files in one directory to the corresponding output
-        directory.
+        directory:
+         - if the file ends with 'edl', convert
+         - otherwise, copy the file
         '''
         log.info('Starting directory %s' % indir)
-        files = os.listdir(indir)
-        files = [os.path.join(indir, file) for file in files]
+        full_paths = [os.path.join(indir, f) for f in os.listdir(indir)]
         if not os.path.exists(outdir):
             log.info('Making new output directory %s' % outdir)
             os.makedirs(outdir)
 
-        for file in files:
-            log.debug('Trying %s...' % file)
-            if file.endswith(EDL_EXT):
-                # change extension
-                name = os.path.basename(file)
-                opifile = name[:-len(EDL_EXT)] + OPI_EXT
-                destination = os.path.join(outdir, opifile)
-                try:
-                    if not force and self.already_converted(outdir, file):
-                        log.info('Skipping existing file %s' % destination)
-
-                    elif self.is_symbol(file):
-                        convert_symbol(file, destination)
-                        log.info('Successfully converted symbol file %s' % destination)
-                    else:
-                        convert_edl(file, destination)
-                        log.info('Successfully converted %s' % destination)
-                        self.update_paths(destination)
-                except Exception as e:
-                    log.warn('Conversion of %s unsuccessful.' % file)
-                    log.warn(str(e))
-            elif not os.path.isdir(file) and not file.endswith('~'):
-                # copy all other files
-                name = os.path.basename(file)
-                destination = os.path.join(outdir, name)
-                if not force and os.path.isfile(destination):
-                    log.info('Skipping existing file %s' % destination)
-                else:
-                    # make sure we have write permissions on the destination
-                    if os.path.isfile(destination):
-                        utils.make_writeable(destination)
-                    if not subprocess.call(['cp', file, destination]):
-                        utils.make_read_only(destination)
-                        log.info('Successfully copied %s' % destination)
-                    else:
-                        log.warn('Copying file %s unsuccessful.' % file)
+        for full_path in full_paths:
+            log.debug('Trying %s...' % full_path)
+            if full_path.endswith(EDL_EXT):
+                self.convert_one_file(full_path, outdir, force)
+            elif not os.path.isdir(full_path) and not full_path.endswith('~'):
+                self.copy_one_file(full_path, outdir, force)
             else:
-                log.info('Ignoring %s' % file)
+                log.info('Ignoring %s' % full_path)
 
     def update_paths(self, filepath):
         module = filepath.split('/')[1]
