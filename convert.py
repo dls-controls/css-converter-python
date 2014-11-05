@@ -185,6 +185,9 @@ class Converter(object):
         directory structure.
         '''
         for datadir in self.edmdatafiles:
+            # Currently can't handle relative directories.
+            if datadir.startswith('.'):
+                continue
             log.debug('EDM data file %s' % datadir)
             try:
                 module_name, version, rel_path = utils.parse_module_name(datadir)
