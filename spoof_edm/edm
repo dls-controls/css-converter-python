@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo $@
 echo $PWD
 echo $EDMDATAFILES
 echo $PATH

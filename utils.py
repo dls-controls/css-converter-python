@@ -69,7 +69,7 @@ def spoof_edm(script_file, args=[]):
     edmdatafiles = None
     path = None
 
-    args_string = "".join(a for a in args)
+    args_string = " ".join(a for a in args)
     args_string = args_string.replace('$PORT', '5064')
     command_string = "%s %s" % (script_file, args_string)
     log.debug("Spoofing script: %s", command_string)
@@ -95,9 +95,11 @@ def spoof_edm(script_file, args=[]):
         edmdatafiles = [e for e in edmdatafiles if e != '']
     if len(lines) > 3:
         pwd = lines[-4].strip()
+    if len(lines) > 4:
+        args = lines[-5].strip().split()
     log.info("EDMDATAFILES: %s", edmdatafiles)
     log.info("PATH: %s", path)
-    return edmdatafiles, path, pwd
+    return edmdatafiles, path, pwd, args
 
 
 if __name__ == '__main__':

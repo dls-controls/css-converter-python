@@ -143,7 +143,7 @@ class Converter(object):
         # Spoof EDM to find EDMDATAFILES and PATH
         # Index these directories to find which modules
         # relative paths may be in.
-        edmdatafiles, paths, working_dir = utils.spoof_edm(script_file, script_args)
+        edmdatafiles, paths, working_dir, args = utils.spoof_edm(script_file, script_args)
         self.edmdatafiles = [f for f in edmdatafiles if f not in  ('', '.')]
         self.edmdatafiles.append(working_dir)
         self.paths = paths
