@@ -367,34 +367,34 @@ if __name__ == '__main__':
         except OSError:
             log.error('Could not create temporary directories %s and %s',
                     (TMP_DIR, SYMBOLS_DIR))
-            sys.exit()
+            continue
 
-    try:
-        script_file = cp.get('edm', 'edm_script')
-    except ConfigParser.NoSectionError:
-        log.error('Please ensure %s is a valid config file' % args.config)
-        sys.exit()
+        try:
+            script_file = cp.get('edm', 'edm_script')
+        except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+            log.error('Please ensure %s is a valid config file' % args.config)
+            continue
 
-    try:
-        script_args = cp.get('edm', 'script_args')
-        script_args = script_args.split()
-    except ConfigParser.NoOptionError:
-        script_args = []
+        try:
+            script_args = cp.get('edm', 'script_args')
+            script_args = script_args.split()
+        except ConfigParser.NoOptionError:
+            script_args = []
 
-    try:
-        outdir = cp.get('opi', 'outdir')
-    except ConfigParser.NoSectionError:
-        log.error('Please ensure %s is a valid config file' % args.config)
-        sys.exit()
+        try:
+            outdir = cp.get('opi', 'outdir')
+        except ConfigParser.NoSectionError:
+            log.error('Please ensure %s is a valid config file' % args.config)
+            continue
 
-    try:
-        symbols = cp.get('edm', 'symbols')
-        symbols = symbols.split(':')
-    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-        symbols = []
+        try:
+            symbols = cp.get('edm', 'symbols')
+            symbols = symbols.split(':')
+        except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+            symbols = []
 
-    c = Converter(script_file, script_args, symbols, outdir)
-    c.convert_opis(args.force)
-    c.copy_scripts(args.force)
+        c = Converter(script_file, script_args, symbols, outdir)
+        c.convert_opis(args.force)
+        c.copy_scripts(args.force)
 
 
