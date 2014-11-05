@@ -377,8 +377,9 @@ if __name__ == '__main__':
 
     try:
         script_args = cp.get('edm', 'script_args')
+        script_args = script_args.split()
     except ConfigParser.NoOptionError:
-        script_args = None
+        script_args = []
 
     try:
         outdir = cp.get('opi', 'outdir')
