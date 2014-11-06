@@ -158,8 +158,10 @@ class Converter(object):
         except ValueError:
             log.warn("Didn't understand script's working directory!")
             self.module_name = os.path.basename(script_file)
-            self.version = "0-0"
+            self.version = None
         self.module_name = self.module_name.replace('/', '_')
+        if self.version is None:
+            self.version = 'no-version'
         self.outdir = os.path.join(outdir, "%s_%s" % (self.module_name, self.version))
         if not os.path.exists(self.outdir):
             log.info('Making new output directory %s' % self.outdir)

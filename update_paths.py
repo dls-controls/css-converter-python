@@ -36,6 +36,8 @@ def index_opi_paths(paths):
             else:
                 try:
                     module, version, rel_path = utils.parse_module_name(path)
+                    if rel_path is None:
+                        rel_path = ''
                 except ValueError:
                     continue
                 for f in files:
