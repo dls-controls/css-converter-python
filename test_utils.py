@@ -1,0 +1,67 @@
+
+import utils
+
+import unittest
+
+
+class UtilsTest(unittest.TestCase):
+
+    def test_parse_module_name_module_only(self):
+        path = '/dls_sw/prod/R3.14.12.3/support/diagOpi'
+        module, version, rel_path = utils.parse_module_name(path)
+        self.assertEquals(module, 'diagOpi')
+        self.assertEquals(version, None)
+        self.assertEquals(rel_path, None)
+
+    def test_parse_module_name_module_only_in_work(self):
+        path = '/dls_sw/work/R3.14.12.3/support/motor/'
+        module, version, rel_path = utils.parse_module_name(path)
+        self.assertEquals(module, 'motor')
+        self.assertEquals(version, None)
+        self.assertEquals(rel_path, None)
+
+    def test_parse_module_name_module_and_version(self):
+        path = '/dls_sw/prod/R3.14.12.3/support/motor/6-7-1dls8'
+        module, version, rel_path = utils.parse_module_name(path)
+        self.assertEquals(module, 'motor')
+        self.assertEquals(version, '6-7-1dls8')
+        self.assertEquals(rel_path, None)
+
+    def test_parse_module_name_module_version_path(self):
+        path = '/dls_sw/prod/R3.14.12.3/support/motor/6-7-1dls8/motorApp/ACRSrc/Makefile'
+        module, version, rel_path = utils.parse_module_name(path)
+        self.assertEquals(module, 'motor')
+        self.assertEquals(version, '6-7-1dls8')
+        self.assertEquals(rel_path, 'motorApp/ACRSrc/Makefile')
+
+    def test_parse_module_name_nested_module(self):
+        path = '/dls_sw/prod/R3.14.12.3/ioc/ME09C/ME09C-EA-IOC-01/1-3'
+        module, version, rel_path = utils.parse_module_name(path)
+        self.assertEquals(module, 'ME09C/ME09C-EA-IOC-01')
+        self.assertEquals(version, '1-3')
+        self.assertEquals(rel_path, None)
+
+    def test_parse_module_name_module_version_path_diag(self):
+        path = '/dls_sw/prod/R3.14.12.3/support/diagOpi/2-44/booster/waveform.edl'
+        module, version, rel_path = utils.parse_module_name(path)
+        self.assertEquals(module, 'diagOpi')
+        self.assertEquals(version, '2-44')
+        self.assertEquals(rel_path, 'booster/waveform.edl')
+
+    def test_parse_module_name_module_and_version_in_work(self):
+        path = '/dls_sw/work/R3.14.12.3/support/motor/6-7-1dls8'
+        module, version, rel_path = utils.parse_module_name(path)
+        self.assertEquals(module, 'motor')
+        self.assertEquals(version, '6-7-1dls8')
+        self.assertEquals(rel_path, None)
+
+    def test_parse_module_launcher(self):
+        path = '/dls_sw/prod/etc/Launcher'
+        self.assertRaises(ValueError, utils.parse_module_name, path)
+
+    def test_parse_module_name_no_module(self):
+        path = '/dls_sw/prod/R3.14.12.3/support/'
+        self.assertRaises(ValueError, utils.parse_module_name, path)
+
+if __name__ == '__main__':
+    unittest.main()

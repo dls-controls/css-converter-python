@@ -7,33 +7,36 @@ import logging as log
 def parse_module_name(filepath):
     '''
     Return (module_name, version, relative_path)
+
+    If the path is not an ioc or a support module, raise ValueError.
     '''
     log.debug("Parsing %s.",  filepath)
+    # Remove last slash, which may give different results
+    filepath = filepath.rstrip('/')
     parts = filepath.split('/')
     module, version, relative_path = None, None, None
 
     if 'support' in parts:
-        i = parts.index('support')
-        module = parts[i+1]
-        version = None
-        relative_path = None
-        if 'prod' in parts and len(parts) > i+2:
-            version = parts[i+2]
-        if len(parts) > i+3:
-            relative_path = '/'.join(parts[i+3:])
+        root_index = parts.index('support')
     elif 'ioc' in parts:
-        index = parts.index('ioc')
-        v = -1
-        for i, p in enumerate(parts):
-            if p == "":
-                continue
-            if p[0].isdigit() or p == 'Rx-y':
-                version = p
-                v = i
-        module = '/'.join(parts[index+1:v])
-        relative_path = '/'.join(parts[v+1:])
+        root_index = parts.index('ioc')
     else:
         raise ValueError('Module %s not understood' % filepath)
+
+    v = root_index + 2
+    for i, p in enumerate(parts):
+        if p == "":
+            continue
+        if p[0].isdigit() or p == 'Rx-y':
+            version = p
+            v = i
+    module = '/'.join(parts[root_index+1:v])
+    if module == '':
+        raise ValueError('No module found in %s' % filepath)
+    relative_path = '/'.join(parts[v+1:])
+    if relative_path == '':
+        relative_path = None
+
     return module, version, relative_path
 
 
@@ -101,14 +104,3 @@ def spoof_edm(script_file, args=[]):
     log.info("PATH: %s", path)
     return edmdatafiles, path, pwd, args
 
-
-if __name__ == '__main__':
-    print parse_module_name('/dls_sw/work/R3.14.12.3/support/motor/')
-    print parse_module_name('/dls_sw/prod/R3.14.12.3/support/motor/6-7-1dls8')
-    print parse_module_name('/dls_sw/prod/R3.14.12.3/support/motor/6-7-1dls8/motorApp/ACRSrc/Makefile')
-    print parse_module_name('/dls_sw/prod/R3.14.12.3/support/diagOpi')
-    print parse_module_name('/dls_sw/prod/R3.14.12.3/ioc/ME09C/ME09C-EA-IOC-01/1-3')
-    print parse_module_name('/dls_sw/prod/R3.14.12.3/ioc/ME09C/ME09C-EA-IOC-01/1-3/ME09C-EA-IOC-01App/data/')
-    print parse_module_name('/dls_sw/prod/R3.14.12.3/support/diagOpi/2-44/scripts')
-    print parse_module_name('/dls_sw/prod/R3.14.12.3/ioc/Libera/2.05.15/opi/libera/clock_graphs.edl')
-    print parse_module_name('/dls_sw/prod/etc/Launcher')
