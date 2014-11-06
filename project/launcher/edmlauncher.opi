@@ -1859,56 +1859,6 @@ $(pv_value)</tooltip>
 $(pv_value)</tooltip>
     <x>504</x>
   </widget>
-  <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
-    <border_alarm_sensitive>false</border_alarm_sensitive>
-    <visible>true</visible>
-    <wuid>-332ddb56:1495b9e2a3c:-3195</wuid>
-    <scripts />
-    <height>40</height>
-    <style>1</style>
-    <name>Action Button_47</name>
-    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
-    <scale_options>
-      <width_scalable>true</width_scalable>
-      <height_scalable>true</height_scalable>
-      <keep_wh_ratio>false</keep_wh_ratio>
-    </scale_options>
-    <pv_name></pv_name>
-    <foreground_color>
-      <color red="0" green="0" blue="0" />
-    </foreground_color>
-    <widget_type>Action Button</widget_type>
-    <enabled>true</enabled>
-    <text>Radiation Mobile</text>
-    <font>
-      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
-    </font>
-    <width>187</width>
-    <border_style>0</border_style>
-    <push_action_index>0</push_action_index>
-    <image></image>
-    <rules />
-    <pv_value />
-    <toggle_button>false</toggle_button>
-    <border_width>1</border_width>
-    <border_color>
-      <color red="0" green="128" blue="255" />
-    </border_color>
-    <y>450</y>
-    <actions hook="false" hook_all="false">
-      <action type="OPEN_EDM_OPI">
-        <path>/radiationSafety_Rx-y/radiationSafety/data/radiation_mobile.opi</path>
-        <macros>
-          <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/radiationSafety_Rx-y/radiationSafety</opi.dir>
-        </macros>
-        <description></description>
-      </action>
-    </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
-    <x>504</x>
-  </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Rectangle" version="1.0.0">
     <border_alarm_sensitive>false</border_alarm_sensitive>
     <visible>true</visible>
@@ -1967,6 +1917,56 @@ $(pv_value)</tooltip>
     <x>492</x>
     <gradient>false</gradient>
   </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <visible>true</visible>
+    <wuid>-332ddb56:1495b9e2a3c:-3195</wuid>
+    <scripts />
+    <height>40</height>
+    <style>1</style>
+    <name>Action Button_47</name>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <pv_name></pv_name>
+    <foreground_color>
+      <color red="0" green="0" blue="0" />
+    </foreground_color>
+    <widget_type>Action Button</widget_type>
+    <enabled>true</enabled>
+    <text>Radiation Mobile</text>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+    </font>
+    <width>187</width>
+    <border_style>0</border_style>
+    <push_action_index>0</push_action_index>
+    <image></image>
+    <rules />
+    <pv_value />
+    <toggle_button>false</toggle_button>
+    <border_width>1</border_width>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <y>450</y>
+    <actions hook="false" hook_all="false">
+      <action type="OPEN_EDM_OPI">
+        <path>/radiationSafety_Rx-y/radiationSafety/data/radiation_mobile.opi</path>
+        <macros>
+          <include_parent_macros>true</include_parent_macros>
+          <opi.dir>/radiationSafety_Rx-y/radiationSafety</opi.dir>
+        </macros>
+        <description></description>
+      </action>
+    </actions>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <x>504</x>
+  </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
     <visible>true</visible>
     <vertical_alignment>1</vertical_alignment>
@@ -2006,5 +2006,55 @@ $(pv_value)</tooltip>
     <wrap_words>false</wrap_words>
     <tooltip></tooltip>
     <x>492</x>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <visible>true</visible>
+    <wuid>-7d662963:14985e75543:-7fca</wuid>
+    <scripts />
+    <height>40</height>
+    <style>1</style>
+    <name>Action Button_48</name>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <pv_name></pv_name>
+    <foreground_color>
+      <color red="0" green="0" blue="0" />
+    </foreground_color>
+    <widget_type>Action Button</widget_type>
+    <enabled>true</enabled>
+    <text>Limited Access</text>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+    </font>
+    <width>187</width>
+    <border_style>0</border_style>
+    <push_action_index>0</push_action_index>
+    <image></image>
+    <rules />
+    <pv_value />
+    <toggle_button>false</toggle_button>
+    <border_width>1</border_width>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <y>504</y>
+    <actions hook="false" hook_all="false">
+      <action type="OPEN_EDM_OPI">
+        <path>/pss_9-16/lobbyAccess/data/pss-cameras.opi</path>
+        <macros>
+          <include_parent_macros>true</include_parent_macros>
+          <opi.dir>/pss_9-16/lobbyAccess/</opi.dir>
+        </macros>
+        <description></description>
+      </action>
+    </actions>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <x>504</x>
   </widget>
 </display>
