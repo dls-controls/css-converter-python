@@ -63,5 +63,18 @@ class UtilsTest(unittest.TestCase):
         path = '/dls_sw/prod/R3.14.12.3/support/'
         self.assertRaises(ValueError, utils.parse_module_name, path)
 
+    def test_parse_module_name_module_version_Rxy(self):
+        path = '/dls_sw/prod/R3.14.12.3/support/BudkerSCMPW/Rx-y/data/SCMPW.sh'
+        def mock_realpath(path):
+            return '/dls_sw/prod/R3.14.12.3/support/BudkerSCMPW/1-7/data/SCMPW.sh'
+        import os
+        old_realpath = os.path.realpath
+        os.path.realpath = mock_realpath
+        module, version, rel_path = utils.parse_module_name(path)
+        os.path.realpath = old_realpath
+        self.assertEquals(module, 'BudkerSCMPW')
+        self.assertEquals(version, '1-7')
+        self.assertEquals(rel_path, 'data/SCMPW.sh')
+
 if __name__ == '__main__':
     unittest.main()

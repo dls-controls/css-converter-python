@@ -236,10 +236,10 @@ $(pv_value)</tooltip>
     <y>198</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/CS_CS-RF-IOC-02_Rx-y/CS-RF-IOC-02/data/MasterOsc.opi</path>
+        <path>/CS_CS-RF-IOC-02_3-0/CS-RF-IOC-02/data/MasterOsc.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/CS_CS-RF-IOC-02_Rx-y/CS-RF-IOC-02</opi.dir>
+          <opi.dir>/CS_CS-RF-IOC-02_3-0/CS-RF-IOC-02</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -337,10 +337,10 @@ $(pv_value)</tooltip>
     <y>36</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/LI_TI_Rx-y/TI/data/LI-TI-EVG-01.opi</path>
+        <path>/LI_TI_5-2/TI/data/LI-TI-EVG-01.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/LI_TI_Rx-y/TI</opi.dir>
+          <opi.dir>/LI_TI_5-2/TI</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1905,10 +1905,10 @@ $(pv_value)</tooltip>
     <y>396</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/radiationSafety_Rx-y/radiationSafety/data/radiation.opi</path>
+        <path>/radiationSafety_3-15/radiationSafety/data/radiation.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/radiationSafety_Rx-y/radiationSafety</opi.dir>
+          <opi.dir>/radiationSafety_3-15/radiationSafety</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -2013,10 +2013,10 @@ $(pv_value)</tooltip>
     <y>450</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/radiationSafety_Rx-y/radiationSafety/data/radiation_mobile.opi</path>
+        <path>/radiationSafety_3-15/radiationSafety/data/radiation_mobile.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/radiationSafety_Rx-y/radiationSafety</opi.dir>
+          <opi.dir>/radiationSafety_3-15/radiationSafety</opi.dir>
         </macros>
         <description></description>
       </action>
