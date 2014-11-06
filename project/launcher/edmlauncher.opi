@@ -5,7 +5,7 @@
     <include_parent_macros>true</include_parent_macros>
   </macros>
   <wuid>-5680b5dd:145bcfe3742:-5add</wuid>
-  <boy_version>4.0.102.qualifier</boy_version>
+  <boy_version>4.0.102.201411050817</boy_version>
   <scripts />
   <show_ruler>true</show_ruler>
   <height>600</height>
@@ -1271,10 +1271,10 @@ $(pv_value)</tooltip>
     <y>342</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>linacVacuum.opi</path>
+        <path>/vacuum.sh_no-version/vacuum/data/linacVacuum.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/vacuum</opi.dir>
+          <opi.dir>/vacuum.sh_no-version/vacuum</opi.dir>
           <dom>LI</dom>
         </macros>
         <description></description>
@@ -1471,10 +1471,10 @@ $(pv_value)</tooltip>
     <y>504</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/ops/Leak.opi</path>
+        <path>/SV_SV-CS-IOC-01_Rx-y/SV-CS-IOC-01/data/Leak.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/ops</opi.dir>
+          <opi.dir>/SV_SV-CS-IOC-01_Rx-y/SV-CS-IOC-01</opi.dir>
         </macros>
         <description></description>
       </action>
