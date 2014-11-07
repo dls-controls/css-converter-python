@@ -139,7 +139,7 @@ if __name__ == '__main__':
         print "Parsing file ", file
         try:
             parse(file)
-        except IOError as e:
+        except (OSError, IOError) as e:
             print "Failed to parse file %s: %s" % (file, e)
 
 
