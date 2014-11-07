@@ -27,7 +27,7 @@ project/opi/LI-ACCEL.sh_no-version/psc/data/pscL4-BS-DIPOL-data.opi
 project/opi/LI-ACCEL.sh_no-version/psc/data/viewer.opi
 project/opi/LI-ACCEL.sh_no-version/psc/data/pscL5Scope.opi
 project/opi/LI-ACCEL.sh_no-version/psc/data/pscL5Scopemon.opi
-project/opi/CS_CS-RF-IOC-02_Rx-y/CS-RF-IOC-02/data/MasterOsc.opi
+project/opi/CS_CS-RF-IOC-02_3-0/CS-RF-IOC-02/data/MasterOsc.opi
 project/opi/RF_no-version/Thales-RF/data/Calibrate.opi
 project/opi/RF_no-version/Thales-RF/data/RFcalib.opi
 project/opi/RF_no-version/Thales-RF/data/PSM.opi
@@ -51,3 +51,16 @@ project/opi/psc_4-3-14/psc/data/viewer.opi
 project/opi/psc_4-3-14/psc/data/pscL5Scope.opi
 project/opi/psc_4-3-14/psc/data/pscL5Scopemon.opi
 project/opi/pss_9-16/pss/data/pss_module.opi
+project/opi/ga.sh_no-version/motor/data/motor-all.opi
+project/opi/SR15I_ID_4-8/psc/data/pscL4-BS-DIPOL-data.opi
+project/opi/SR15I_ID_4-8/psc/data/viewer.opi
+project/opi/SR15I_ID_4-8/psc/data/pscL5Scope.opi
+project/opi/SR15I_ID_4-8/psc/data/pscL5Scopemon.opi
+project/opi/SR15I_ID_4-8/CS/data/SR12I-SCW.opi
+project/opi/SR15I_ID_4-8/ID/data/SCW.opi
+project/opi/SR12I_CS_3-10/psc/data/pscL4-BS-DIPOL-data.opi
+project/opi/SR12I_CS_3-10/psc/data/viewer.opi
+project/opi/SR12I_CS_3-10/psc/data/pscL5Scope.opi
+project/opi/SR12I_CS_3-10/psc/data/pscL5Scopemon.opi
+project/opi/SR12I_CS_3-10/CS/data/SR12I-SCW.opi
+project/opi/SR12I_CS_3-10/ID/data/SCW.opi
