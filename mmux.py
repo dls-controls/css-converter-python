@@ -211,8 +211,12 @@ def perform_postprocess():
         lines = [line.strip() for line in lines if not line == '']
 
     for filepath in lines:
-        print 'Parsing file', filepath
-        parse(filepath)
+        try:
+            print 'Parsing file', filepath
+            parse(filepath)
+        except OSError as e:
+            print 'Update failed: %s' % e
+            continue
 
 
 if __name__ == '__main__':
