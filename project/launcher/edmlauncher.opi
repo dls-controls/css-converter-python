@@ -2354,10 +2354,10 @@ $(pv_value)</tooltip>
     <y>90</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/SR12I_CS_Rx-y/CS/data/SR12I-SCW.opi</path>
+        <path>/SR12I_CS_3-10/CS/data/SR12I-SCW.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/SR12I_CS_Rx-y/CS</opi.dir>
+          <opi.dir>/SR12I_CS_3-10/CS</opi.dir>
           <SCW_NAME>SR12I-CS-SCMPW-01</SCW_NAME>
           <SCW_PSU>SR12I-PC-SCMPW</SCW_PSU>
           <SCW_COOLER>SR12I-CS-COMPR</SCW_COOLER>
@@ -2448,10 +2448,10 @@ $(pv_value)</tooltip>
     <y>143</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/SR12I_CS_Rx-y/BudkerSCMPW/data/SCMPW_quench.opi</path>
+        <path>/SR12I_CS_3-10/BudkerSCMPW/data/SCMPW_quench.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/SR12I_CS_Rx-y/BudkerSCMPW</opi.dir>
+          <opi.dir>/SR12I_CS_3-10/BudkerSCMPW</opi.dir>
           <SCW_NAME>SR12I-CS-SCMPW-01</SCW_NAME>
           <SCW_PSU>SR12I-PC-SCMPW</SCW_PSU>
           <SCW_COOLER>SR12I-CS-COMPR</SCW_COOLER>
@@ -2502,14 +2502,14 @@ $(pv_value)</tooltip>
     <y>198</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/SR15I_ID_Rx-y/ID/data/SCW.opi</path>
+        <path>/SR15I_ID_4-8/ID/data/SCW.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/SR12I_CS_Rx-y/CS</opi.dir>
-          <SCW_NAME>SR12I-CS-SCMPW-01</SCW_NAME>
-          <SCW_PSU>SR12I-PC-SCMPW</SCW_PSU>
-          <SCW_COOLER>SR12I-CS-COMPR</SCW_COOLER>
-          <eurotherm>SR12I-CS-PCTRL-01</eurotherm>
+          <opi.dir>/SR15I_ID_4-8/ID</opi.dir>
+          <SCW_NAME>SR15I-CS-SCMPW-01</SCW_NAME>
+          <SCW_PSU>SR15I-PC-SCMPW</SCW_PSU>
+          <SCW_COOLER>SR15I-CS-COMPR</SCW_COOLER>
+          <eurotherm>SR15I-CS-PCTRL-01</eurotherm>
         </macros>
         <description></description>
       </action>
