@@ -186,10 +186,9 @@ $(pv_value)</tooltip>
     <y>249</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>shared/overview.opi</path>
+        <path>../diagOpi_2-44/diagOpi/shared/overview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/diagOpi_2-44/diagOpi</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -239,7 +238,6 @@ $(pv_value)</tooltip>
         <path>/CS_CS-RF-IOC-02_3-0/CS-RF-IOC-02/data/MasterOsc.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/CS_CS-RF-IOC-02_3-0/CS-RF-IOC-02</opi.dir>
         </macros>
         <description></description>
       </action>

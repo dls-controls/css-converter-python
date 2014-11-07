@@ -83,7 +83,7 @@ def index_paths(paths):
     return executables
 
 
-def update_opi_path(filename, opi_dict, module):
+def update_opi_path(filename, depth, opi_dict, module):
     '''
     Return the corrected path according to the contents of the
     opi_dict.
@@ -111,7 +111,8 @@ def update_opi_path(filename, opi_dict, module):
             # i.e. CS/CS-DI-IOC-09  ->  CS-DI-IOC-09
             module_path = opi_dict[filename][0]
             collapsed_path = module_path.split('/')[-1]
-            rel = os.path.join('..', collapsed_path, opi_dict[filename][1], filename)
+            down = '/'.join(['..'] * depth)
+            rel = os.path.join(down, collapsed_path, opi_dict[filename][1], filename)
         else:
             rel = os.path.join(opi_dict[filename][1], filename)
     else:
@@ -123,27 +124,27 @@ def update_opi_path(filename, opi_dict, module):
     return rel
 
 
-def update_paths(node, file_dict, path_dict, module):
+def update_paths(node, depth, file_dict, path_dict, module):
     '''
     Recursively update all paths in the opi file to project-relative ones.
     '''
     if node.tag in TAGS_TO_UPDATE:
-        node.text = update_opi_path(node.text, file_dict, module)
+        node.text = update_opi_path(node.text, depth, file_dict, module)
     elif node.tag == 'command':
         cmd_parts = node.text.split()
-        updated_cmd = update_opi_path(cmd_parts[0], path_dict, module)
+        updated_cmd = update_opi_path(cmd_parts[0], depth, path_dict, module)
         node.text = ' '.join([updated_cmd] + cmd_parts[1:])
     else:
         for child in node:
-            update_paths(child, file_dict, path_dict, module)
+            update_paths(child, depth, file_dict, path_dict, module)
 
 
-def parse(path, file_dict, path_dict, module):
+def parse(path, depth, file_dict, path_dict, module):
     log.debug('Starting to update paths in %s', path)
     tree = et.parse(path)
     root = tree.getroot()
 
-    update_paths(root, file_dict, path_dict, module)
+    update_paths(root, depth, file_dict, path_dict, module)
 
     # write the new tree out to the same file
     utils.make_writeable(path)

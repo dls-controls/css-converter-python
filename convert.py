@@ -277,6 +277,11 @@ class Converter(object):
             return os.path.exists(destination)
 
     def convert_one_file(self, full_path, outdir, force):
+        log.debug('Converting to %s', outdir)
+        log.debug('self.outdir is %s', self.outdir)
+        rel = outdir[len(self.outdir) + 1:]
+        log.debug('rel is %s', rel)
+        depth = len(rel.split('/'))
         # change extension
         name = os.path.basename(full_path)
         opifile = name[:-len(EDL_EXT)] + OPI_EXT
@@ -290,7 +295,7 @@ class Converter(object):
             else:
                 convert_edl(full_path, destination)
                 log.info('Successfully converted %s' % destination)
-                self.update_paths(destination)
+                self.update_paths(destination, depth)
         except Exception as e:
             log.warn('Conversion of %s unsuccessful.' % full_path)
             log.warn(str(e))
@@ -332,10 +337,10 @@ class Converter(object):
             else:
                 log.info('Ignoring %s' % full_path)
 
-    def update_paths(self, filepath):
+    def update_paths(self, filepath, depth):
         module = filepath.split('/')[1]
         log.debug('Module for path %s is %s' % (filepath, module))
-        update_paths.parse(filepath, self.file_dict, self.path_dict, module)
+        update_paths.parse(filepath, depth, self.file_dict, self.path_dict, module)
 
 
 def set_up_options():
