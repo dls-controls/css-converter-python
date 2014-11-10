@@ -5,7 +5,7 @@
     <include_parent_macros>true</include_parent_macros>
   </macros>
   <wuid>-5680b5dd:145bcfe3742:-5add</wuid>
-  <boy_version>4.0.102.201411050817</boy_version>
+  <boy_version>4.0.102.qualifier</boy_version>
   <scripts />
   <show_ruler>true</show_ruler>
   <height>1000</height>
@@ -287,7 +287,6 @@ $(pv_value)</tooltip>
         <path>/RF_no-version/RF/SR-RF-Overview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/RF_no-version/RF/</opi.dir>
           <dom>SR</dom>
         </macros>
         <description></description>
@@ -338,7 +337,6 @@ $(pv_value)</tooltip>
         <path>/LI_TI_5-2/TI/data/LI-TI-EVG-01.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/LI_TI_5-2/TI</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -388,7 +386,6 @@ $(pv_value)</tooltip>
         <path>/psc_4-3-14/psc/data/pscL2.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/psc_4-3-14/psc</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -584,7 +581,6 @@ $(pv_value)</tooltip>
         <path>/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09/opi/vefb.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -634,7 +630,6 @@ $(pv_value)</tooltip>
         <path>/fastfeedback_11-11/fastfeedback/fofbApp/opi/fofb.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/fastfeedback_11-11/fastfeedback</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -684,7 +679,6 @@ $(pv_value)</tooltip>
         <path>/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09/opi/rffb.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -774,7 +768,6 @@ $(pv_value)</tooltip>
         <path>/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09/opi/tfb.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/CS_CS-DI-IOC-09_1-46/CS-DI-IOC-09</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -882,7 +875,6 @@ $(pv_value)</tooltip>
         <path>/vacuum.sh_no-version/vacuum/data/diamondVacuumOverview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/vacuum.sh_no-version/vacuum/</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -972,7 +964,6 @@ $(pv_value)</tooltip>
         <path>/vacuum.sh_no-version/vacuum/data/diamondVacIlks.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/vacuum.sh_no-version/vacuum/</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1022,7 +1013,6 @@ $(pv_value)</tooltip>
         <path>/vacuum.sh_no-version/vacuum/data/diamondVacuum.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/vacuum.sh_no-version/vacuum/</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1072,7 +1062,6 @@ $(pv_value)</tooltip>
         <path>/vacuum.sh_no-version/vacuum/data/srRgas.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/vacuum.sh_no-version/vacuum/</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1122,7 +1111,6 @@ $(pv_value)</tooltip>
         <path>/vacuum.sh_no-version/vacuum/data/diamondVacCtrl.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/vacuum.sh_no-version/vacuum/</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1230,7 +1218,6 @@ $(pv_value)</tooltip>
         <path>/diagOpi_2-44/diagOpi/linac/overview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/diagOpi_2-44/diagOpi</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1280,7 +1267,6 @@ $(pv_value)</tooltip>
         <path>/LI-ACCEL.sh_no-version/psc/data/LI-PC.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/LI-ACCEL.sh_no-version/psc</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1330,7 +1316,6 @@ $(pv_value)</tooltip>
         <path>/vacuum.sh_no-version/vacuum/data/linacVacuum.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/vacuum.sh_no-version/vacuum</opi.dir>
           <dom>LI</dom>
         </macros>
         <description></description>
@@ -1381,7 +1366,6 @@ $(pv_value)</tooltip>
         <path>/LI-ACCEL.sh_no-version/RF/data/LI-RF.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/LI-ACCEL.sh_no-version/RF/</opi.dir>
           <bin>/bin/Linux</bin>
         </macros>
         <description></description>
@@ -1530,7 +1514,6 @@ $(pv_value)</tooltip>
         <path>/SV_SV-CS-IOC-01_2-1/SV-CS-IOC-01/data/Leak.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/SV_SV-CS-IOC-01_2-1/SV-CS-IOC-01</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1629,7 +1612,6 @@ $(pv_value)</tooltip>
         <path>/ID_Control.sh_no-version/ID_Control.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/ops</opi.dir>
           <here>/ops</here>
         </macros>
         <description></description>
@@ -1680,7 +1662,6 @@ $(pv_value)</tooltip>
         <path>/FE_Control.sh_no-version/FE_Control.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/FE_Control.sh_no-version</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1856,7 +1837,6 @@ $(pv_value)</tooltip>
         <path>/pss_9-16/pss/data/pss_main.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/pss_9-16/pss/</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -1906,7 +1886,6 @@ $(pv_value)</tooltip>
         <path>/radiationSafety_3-15/radiationSafety/data/radiation.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/radiationSafety_3-15/radiationSafety</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -2014,7 +1993,6 @@ $(pv_value)</tooltip>
         <path>/radiationSafety_3-15/radiationSafety/data/radiation_mobile.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/radiationSafety_3-15/radiationSafety</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -2104,7 +2082,6 @@ $(pv_value)</tooltip>
         <path>/pss_9-16/lobbyAccess/data/pss-cameras.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/pss_9-16/lobbyAccess/</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -2255,7 +2232,6 @@ $(pv_value)</tooltip>
         <path>/ga.sh_no-version/girderControl/data/girderTop.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/ga.sh_no-version/girderControl</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -2305,7 +2281,6 @@ $(pv_value)</tooltip>
         <path>/idedm.sh_no-version/insertionDeviceOverview/data/ID_overview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>idedm.sh_no-version/insertionDeviceOverview</opi.dir>
         </macros>
         <description></description>
       </action>
@@ -2355,7 +2330,6 @@ $(pv_value)</tooltip>
         <path>/SR12I_CS_3-10/CS/data/SR12I-SCW.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/SR12I_CS_3-10/CS</opi.dir>
           <SCW_NAME>SR12I-CS-SCMPW-01</SCW_NAME>
           <SCW_PSU>SR12I-PC-SCMPW</SCW_PSU>
           <SCW_COOLER>SR12I-CS-COMPR</SCW_COOLER>
@@ -2449,7 +2423,6 @@ $(pv_value)</tooltip>
         <path>/SR12I_CS_3-10/BudkerSCMPW/data/SCMPW_quench.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/SR12I_CS_3-10/BudkerSCMPW</opi.dir>
           <SCW_NAME>SR12I-CS-SCMPW-01</SCW_NAME>
           <SCW_PSU>SR12I-PC-SCMPW</SCW_PSU>
           <SCW_COOLER>SR12I-CS-COMPR</SCW_COOLER>
@@ -2503,7 +2476,6 @@ $(pv_value)</tooltip>
         <path>/SR15I_ID_4-8/ID/data/SCW.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <opi.dir>/SR15I_ID_4-8/ID</opi.dir>
           <SCW_NAME>SR15I-CS-SCMPW-01</SCW_NAME>
           <SCW_PSU>SR15I-PC-SCMPW</SCW_PSU>
           <SCW_COOLER>SR15I-CS-COMPR</SCW_COOLER>
