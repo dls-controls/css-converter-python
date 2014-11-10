@@ -114,28 +114,42 @@ def update_opi_path(filename, depth, opi_dict, module):
     log.info("Updated path is %s", rel)
     return rel
 
+def update_script(script_text, depth, opi_dict, module):
+    if 'opi_file' in script_text:
+        # Regex group the contents of the quotes containing the filename.
+        pattern = 'widget.setPropertyValue *\( *"opi_file" *, *"(.*)"'
+        p = re.compile(pattern)
+        m = p.search(script_text)
+        old_path = m.group(1)
+        new_path = update_opi_path(m.group(1), depth, opi_dict, module)
+        log.info("Updated path in script: %s" % new_path)
+        script_text = script_text.replace(m.group(1), new_path)
 
-def update_paths(node, depth, file_dict, path_dict, module):
+    return script_text
+
+
+def update_paths(node, depth, opi_dict, path_dict, module):
     '''
     Recursively update all paths in the opi file to project-relative ones.
     '''
     if node.tag in TAGS_TO_UPDATE:
-        node.text = update_opi_path(node.text, depth, file_dict, module)
-    elif node.tag == 'command':
+        node.text = update_opi_path(node.text, depth, opi_dict, module)
+    if node.tag == 'command':
         cmd_parts = node.text.split()
         updated_cmd = update_opi_path(cmd_parts[0], depth, path_dict, module)
         node.text = ' '.join([updated_cmd] + cmd_parts[1:])
-    else:
-        for child in node:
-            update_paths(child, depth, file_dict, path_dict, module)
+    if node.tag == 'scriptText':
+        node.text = update_script(node.text, depth, opi_dict, module)
+    for child in node:
+        update_paths(child, depth, opi_dict, path_dict, module)
 
 
-def parse(path, depth, file_dict, path_dict, module):
-    log.debug('Starting to update paths in %s', path)
+def parse(path, depth, opi_dict, path_dict, module):
+    log.debug('Starting to update paths in %s; depth %s', path, depth)
     tree = et.parse(path)
     root = tree.getroot()
 
-    update_paths(root, depth, file_dict, path_dict, module)
+    update_paths(root, depth, opi_dict, path_dict, module)
 
     # write the new tree out to the same file
     utils.make_writeable(path)
