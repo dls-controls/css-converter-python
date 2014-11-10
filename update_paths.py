@@ -15,21 +15,29 @@ import logging as log
 TAGS_TO_UPDATE = ['path', 'image_file']
 
 
-def index_path(root, path, recurse):
+def index_dir(root, path, recurse):
+    '''
+    Index directory as described in index_paths().
+    Optionally recurse into subdirectories.
+    Ignore hidden files.
+    '''
     filepaths = {}
     log.debug("Indexing path %s", path)
     files = os.listdir(path)
-    module, version, path_within_module = utils.parse_module_name(path)
+    # Path within module is always relative to root - the EDMDATAFILE
+    # or path variable.
+    module, version, path_within_module = utils.parse_module_name(root)
     if path_within_module is None:
         path_within_module = ''
     for f in files:
         if f.startswith('.'):
             continue
         else:
-            if os.path.isdir(f) and recurse:
+            if os.path.isdir(os.path.join(path, f)) and recurse:
                 filepaths.update(index_path(root, os.path.join(path, f), True))
             else:
-                relative_path = os.path.join(root[len(path) + 1:], f)
+                # Remove root from path to get the path relative to root
+                relative_path = os.path.join(path[len(root) + 1:], f)
                 if relative_path.endswith('edl'):
                     relative_path = relative_path[:-3] + 'opi'
                 if relative_path in filepaths:
