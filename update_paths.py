@@ -7,81 +7,72 @@
 # 4. replace files with indexed versions
 
 import os
+import re
 import xml.etree.ElementTree as et
 import utils
 import logging as log
 
 TAGS_TO_UPDATE = ['path', 'image_file']
 
-def index_opi_paths(paths):
+
+def index_path(root, path, recurse):
+    filepaths = {}
+    log.debug("Indexing path %s", path)
+    files = os.listdir(path)
+    module, version, path_within_module = utils.parse_module_name(path)
+    if path_within_module is None:
+        path_within_module = ''
+    for f in files:
+        if f.startswith('.'):
+            continue
+        else:
+            if os.path.isdir(f) and recurse:
+                filepaths.update(index_path(root, os.path.join(path, f), True))
+            else:
+                relative_path = os.path.join(root[len(path) + 1:], f)
+                if relative_path.endswith('edl'):
+                    relative_path = relative_path[:-3] + 'opi'
+                if relative_path in filepaths:
+                    log.warn("clash: %s in %s and %s",
+                            relative_path, module, filepaths[relative_path])
+                else:
+                    filepaths[relative_path] = (module, path_within_module)
+    return filepaths
+
+
+def index_paths(paths, recurse):
     '''
+    Index all files available to EDM given the list of paths
+    which correspond to the EDMDATAFILES variable.
+    Assume any path points to a location within a 'module'
+    (either a support module or an IOC).
+    The keys in the returned dictionary are paths relative
+    to EDMDATAFILES - that is, what will be found in an
+    EDM screen.  The values are a tuple (module, path-within-module)
+    which allow full construction of a relative path in
+    CSS.
+
     Return a dictionary:
         relative-filename: (module, path-within-module)
 
     Also changes 'edl' extension to 'opi'
 
     Example:
-        full path:  .../Libera/<version>/data/libera/overview.edl
-        key, value: libera/overview.opi: (Libera, data)
+        EDMDATAFILES entry: .../Libera/<version>/data/
+        full path:          .../Libera/<version>/data/libera/overview.edl
+        key, value:         'libera/overview.opi': ('Libera', 'data')
 
     '''
     filepaths = {}
 
     for path in paths:
-        log.debug("Indexing path %s", path)
-        for root, dirs, files in os.walk(path):
-            # ignore hidden directories
-            dirs[:] = [d for d in dirs if not d[0] == '.']
-            if root.startswith('.'):
-                continue
-            else:
-                try:
-                    module, version, rel_path = utils.parse_module_name(path)
-                    if rel_path is None:
-                        rel_path = ''
-                except ValueError:
-                    continue
-                for f in files:
-                    rel_path2 = os.path.join(root[len(path) + 1:], f)
-                    if rel_path2.endswith('edl'):
-                        rel_path2 = rel_path2[:-3] + 'opi'
-                    if rel_path2 in filepaths:
-                        log.warn("clash: %s in %s and %s",
-                                rel_path2, module, filepaths[rel_path2])
-                    else:
-                        filepaths[rel_path2] = (module, rel_path)
+        try:
+            filepaths.update(index_path(path, path, recurse))
+        except ValueError:
+            continue
 
     log.info("Indexed OPI paths: %s", filepaths)
     return filepaths
-
-
-def index_paths(paths):
-    '''
-    Return a dictionary:
-        filename: (module, path-within-module)
-
-    Example:
-        full path:  .../diagOpi/<version>/scripts/diagnostics-help
-        key, value: diagnostics-help: (diagOpi, scripts)
-
-    '''
-    executables = {}
-    for path in paths:
-        try:
-            module, version, rel_path = utils.parse_module_name(path)
-        except Exception as e:
-            log.warn("Failed to parse module: %s: %s", path, e)
-            continue
-        files = os.listdir(path)
-        for f in files:
-            if not f.startswith('.') and not os.path.isdir(f):
-                if f in executables:
-                    log.warn("clash: %s in %s and %s",
-                            rel_path, path, executables[f])
-                else:
-                    executables[f] = (module, rel_path)
-
-    return executables
 
 
 def update_opi_path(filename, depth, opi_dict, module):

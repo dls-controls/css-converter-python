@@ -148,8 +148,9 @@ class Converter(object):
         self.edmdatafiles.append(working_dir)
         self.paths = paths
         self.paths.append(working_dir)
-        self.file_dict = update_paths.index_opi_paths(self.edmdatafiles)
-        self.path_dict = update_paths.index_paths(self.paths)
+        # OPI files can be in nested directories; executable files can't.
+        self.opi_dict = update_paths.index_paths(self.edmdatafiles, True)
+        self.path_dict = update_paths.index_paths(self.paths, False)
         self.symbol_files = symbol_files
         self.tmpdir = TMP_DIR
         self.symbolsdir = SYMBOLS_DIR
@@ -281,7 +282,7 @@ class Converter(object):
         log.debug('self.outdir is %s', self.outdir)
         rel = outdir[len(self.outdir) + 1:]
         log.debug('rel is %s', rel)
-        depth = len(rel.split('/'))
+        depth = len(rel.strip('/').split('/'))
         # change extension
         name = os.path.basename(full_path)
         opifile = name[:-len(EDL_EXT)] + OPI_EXT
@@ -340,7 +341,7 @@ class Converter(object):
     def update_paths(self, filepath, depth):
         module = filepath.split('/')[1]
         log.debug('Module for path %s is %s' % (filepath, module))
-        update_paths.parse(filepath, depth, self.file_dict, self.path_dict, module)
+        update_paths.parse(filepath, depth, self.opi_dict, self.path_dict, module)
 
 
 def set_up_options():
