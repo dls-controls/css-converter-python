@@ -11,9 +11,7 @@ def parse_module_name(filepath):
     If the path is not an ioc or a support module, raise ValueError.
     '''
     log.debug("Parsing %s.",  filepath)
-    print filepath
     filepath = os.path.realpath(filepath)
-    print filepath
     # Remove last slash, which may give different results
     filepath = filepath.rstrip('/')
     parts = filepath.split('/')

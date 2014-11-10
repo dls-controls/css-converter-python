@@ -30,6 +30,7 @@ def index_opi_paths(paths):
     for path in paths:
         log.debug("Indexing path %s", path)
         for root, dirs, files in os.walk(path):
+            # ignore hidden directories
             dirs[:] = [d for d in dirs if not d[0] == '.']
             if root.startswith('.'):
                 continue
@@ -50,7 +51,7 @@ def index_opi_paths(paths):
                     else:
                         filepaths[rel_path2] = (module, rel_path)
 
-    log.debug("Indexed OPI paths: %s", filepaths)
+    log.info("Indexed OPI paths: %s", filepaths)
     return filepaths
 
 
@@ -105,8 +106,7 @@ def update_opi_path(filename, depth, opi_dict, module):
         log.debug("Updated opi_dict for %s", filename)
     if filename in opi_dict:
         if opi_dict[filename][0] != module:
-            log.debug("Correcting %s", filename)
-            log.debug(opi_dict[filename])
+            log.info('Correcting filename %s', filename)
             # we only need the last part of the path
             # i.e. CS/CS-DI-IOC-09  ->  CS-DI-IOC-09
             module_path = opi_dict[filename][0]
