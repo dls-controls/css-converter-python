@@ -34,17 +34,19 @@ def index_dir(root, path, recurse):
             continue
         else:
             if os.path.isdir(os.path.join(path, f)) and recurse:
-                filepaths.update(index_path(root, os.path.join(path, f), True))
+                new_index = index_dir(root, os.path.join(path, f), True)
+                for file in new_index:
+                    if file not in filepaths:
+                        filepaths[file] = new_index[file]
+                    else:
+                        log.warn("clash: %s in %s and %s",
+                                relative_path, module, filepaths[relative_path])
             else:
                 # Remove root from path to get the path relative to root
                 relative_path = os.path.join(path[len(root) + 1:], f)
                 if relative_path.endswith('edl'):
                     relative_path = relative_path[:-3] + 'opi'
-                if relative_path in filepaths:
-                    log.warn("clash: %s in %s and %s",
-                            relative_path, module, filepaths[relative_path])
-                else:
-                    filepaths[relative_path] = (module, path_within_module)
+                filepaths[relative_path] = (module, path_within_module)
     return filepaths
 
 
@@ -75,8 +77,15 @@ def index_paths(paths, recurse):
 
     for path in paths:
         try:
-            filepaths.update(index_path(path, path, recurse))
-        except ValueError:
+            new_index = index_dir(path, path, recurse)
+            for file in new_index:
+                if file not in filepaths:
+                    filepaths[file] = new_index[file]
+                else:
+                    log.warn("clash: %s in %s and %s",
+                            file, new_index[file], filepaths[file])
+        except (OSError, ValueError) as e:
+            log.warn('Skipping indexing for %s: %s', path, e)
             continue
 
     log.info("Indexed OPI paths: %s", filepaths)
