@@ -149,8 +149,8 @@ class Converter(object):
         self.paths = paths
         self.paths.append(working_dir)
         # OPI files can be in nested directories; executable files can't.
-        self.opi_dict = update_paths.index_paths(self.edmdatafiles, True)
-        self.path_dict = update_paths.index_paths(self.paths, False)
+        self.opi_index = update_paths.index_paths(self.edmdatafiles, True)
+        self.path_index = update_paths.index_paths(self.paths, False)
         self.symbol_files = symbol_files
         self.tmpdir = TMP_DIR
         self.symbolsdir = SYMBOLS_DIR
@@ -280,7 +280,7 @@ class Converter(object):
     def convert_one_file(self, full_path, outdir, force):
         '''
         Apppropriately convert one edl file, including updating
-        any relative paths using the opi_dict index.
+        any relative paths using the opi_index dict.
         '''
         # Figure out the 'depth' of the file.  This is how many 
         # nested directories any relative path must descend before
@@ -345,7 +345,7 @@ class Converter(object):
     def update_paths(self, filepath, depth):
         module = filepath.split('/')[1]
         log.debug('Module for path %s is %s' % (filepath, module))
-        update_paths.parse(filepath, depth, self.opi_dict, self.path_dict, module)
+        update_paths.parse(filepath, depth, self.opi_index, self.path_index, module)
 
 
 def set_up_options():

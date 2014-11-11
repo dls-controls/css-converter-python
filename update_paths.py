@@ -98,10 +98,10 @@ def index_paths(paths, recurse):
     return filepaths
 
 
-def update_opi_path(filename, depth, opi_dict, module):
+def update_opi_path(filename, depth, opi_index, module):
     '''
     Return the corrected path according to the contents of the
-    opi_dict.
+    opi_index.
 
     Note that if the 'module' of a file is nested directories, we
     only need to put ../<lastdir>/relative/path
@@ -115,20 +115,20 @@ def update_opi_path(filename, depth, opi_dict, module):
         # Remove everything after the last -
         stub = '-'.join(p for p in filename.split('-')[:-1])
         original_name = stub + '.opi'
-        if original_name in opi_dict:
-            opi_dict[filename] = opi_dict[original_name]
-        log.debug("Updated opi_dict for %s", filename)
-    if filename in opi_dict:
-        if opi_dict[filename][0] != module:
+        if original_name in opi_index:
+            opi_index[filename] = opi_index[original_name]
+        log.debug("Updated opi_index for %s", filename)
+    if filename in opi_index:
+        if opi_index[filename][0] != module:
             log.info('Correcting filename %s', filename)
             # we only need the last part of the path
             # i.e. CS/CS-DI-IOC-09  ->  CS-DI-IOC-09
-            module_path = opi_dict[filename][0]
+            module_path = opi_index[filename][0]
             collapsed_path = module_path.split('/')[-1]
             down = '/'.join(['..'] * depth)
-            rel = os.path.join(down, collapsed_path, opi_dict[filename][1], filename)
+            rel = os.path.join(down, collapsed_path, opi_index[filename][1], filename)
         else:
-            rel = os.path.join(opi_dict[filename][1], filename)
+            rel = os.path.join(opi_index[filename][1], filename)
     else:
         log.debug("Not correcting %s", filename)
 
@@ -137,42 +137,42 @@ def update_opi_path(filename, depth, opi_dict, module):
     log.info("Updated path is %s", rel)
     return rel
 
-def update_script(script_text, depth, opi_dict, module):
+def update_script(script_text, depth, opi_index, module):
     if 'opi_file' in script_text:
         # Regex group the contents of the quotes containing the filename.
         pattern = 'widget.setPropertyValue *\( *"opi_file" *, *"(.*)"'
         p = re.compile(pattern)
         m = p.search(script_text)
         old_path = m.group(1)
-        new_path = update_opi_path(m.group(1), depth, opi_dict, module)
+        new_path = update_opi_path(m.group(1), depth, opi_index, module)
         log.info("Updated path in script: %s" % new_path)
         script_text = script_text.replace(m.group(1), new_path)
 
     return script_text
 
 
-def update_paths(node, depth, opi_dict, path_dict, module):
+def update_paths(node, depth, opi_index, path_index, module):
     '''
     Recursively update all paths in the opi file to project-relative ones.
     '''
     if node.tag in TAGS_TO_UPDATE:
-        node.text = update_opi_path(node.text, depth, opi_dict, module)
+        node.text = update_opi_path(node.text, depth, opi_index, module)
     if node.tag == 'command':
         cmd_parts = node.text.split()
-        updated_cmd = update_opi_path(cmd_parts[0], depth, path_dict, module)
+        updated_cmd = update_opi_path(cmd_parts[0], depth, path_index, module)
         node.text = ' '.join([updated_cmd] + cmd_parts[1:])
     if node.tag == 'scriptText':
-        node.text = update_script(node.text, depth, opi_dict, module)
+        node.text = update_script(node.text, depth, opi_index, module)
     for child in node:
-        update_paths(child, depth, opi_dict, path_dict, module)
+        update_paths(child, depth, opi_index, path_index, module)
 
 
-def parse(path, depth, opi_dict, path_dict, module):
+def parse(path, depth, opi_index, path_index, module):
     log.debug('Starting to update paths in %s; depth %s', path, depth)
     tree = et.parse(path)
     root = tree.getroot()
 
-    update_paths(root, depth, opi_dict, path_dict, module)
+    update_paths(root, depth, opi_index, path_index, module)
 
     # write the new tree out to the same file
     utils.make_writeable(path)
