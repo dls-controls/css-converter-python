@@ -22,7 +22,7 @@ Steps:
 '''
 
 import utils
-import update_paths
+import paths
 
 import os
 import sys
@@ -143,13 +143,14 @@ class Converter(object):
         # Spoof EDM to find EDMDATAFILES and PATH
         # Index these directories to find which modules
         # relative paths may be in.
-        edmdatafiles, paths, working_dir, args = utils.spoof_edm(script_file, script_args)
+        edmdatafiles, path_dirs, working_dir, args = utils.spoof_edm(script_file, script_args)
         self.edmdatafiles = [f for f in edmdatafiles if f not in  ('', '.')]
         self.edmdatafiles.append(working_dir)
-        self.paths = paths
-        self.paths.append(working_dir)
-        self.file_dict = update_paths.index_opi_paths(self.edmdatafiles)
-        self.path_dict = update_paths.index_paths(self.paths)
+        self.path_dirs = path_dirs
+        self.path_dirs.append(working_dir)
+        # OPI files can be in nested directories; executable files can't.
+        self.opi_index = paths.index_paths(self.edmdatafiles, True)
+        self.path_index = paths.index_paths(self.path_dirs, False)
         self.symbol_files = symbol_files
         self.tmpdir = TMP_DIR
         self.symbolsdir = SYMBOLS_DIR
@@ -162,13 +163,13 @@ class Converter(object):
         self.module_name = self.module_name.replace('/', '_')
         if self.version is None:
             self.version = 'no-version'
-        self.outdir = os.path.join(outdir, "%s_%s" % (self.module_name, self.version))
-        if not os.path.exists(self.outdir):
-            log.info('Making new output directory %s' % self.outdir)
-            os.makedirs(self.outdir)
-        self.generate_project_file()
+        self.root_outdir = os.path.join(outdir, "%s_%s" % (self.module_name, self.version))
+        if not os.path.exists(self.root_outdir):
+            log.info('Making new output directory %s' % self.root_outdir)
+            os.makedirs(self.root_outdir)
+        self._generate_project_file()
 
-    def generate_project_file(self):
+    def _generate_project_file(self):
         '''
         Create an Eclipse project file for this set of OPIs.
         '''
@@ -177,7 +178,7 @@ class Converter(object):
         s = string.Template(content)
         updated_content = s.substitute(module_name=self.module_name,
                 version=self.version)
-        with open(os.path.join(self.outdir, PROJECT_FILENAME), 'w') as f:
+        with open(os.path.join(self.root_outdir, PROJECT_FILENAME), 'w') as f:
             f.write(updated_content)
 
     def convert_opis(self, force):
@@ -209,19 +210,19 @@ class Converter(object):
                     full_path = os.path.join(datadir, entry)
                     log.debug("New full path is %s", full_path)
                     if os.path.isdir(full_path):
-                        outpath = os.path.join(self.outdir, module_name, rel_path, entry)
+                        outpath = os.path.join(self.root_outdir, module_name, rel_path, entry)
                         log.debug("New outdir is %s", outpath)
-                        self.convert_dir(full_path, outpath, force)
+                        self._convert_dir(full_path, outpath, force)
 
-            self.convert_dir(datadir, os.path.join(self.outdir, module_name, rel_path), force)
+            self._convert_dir(datadir, os.path.join(self.root_outdir, module_name, rel_path), force)
 
     def copy_scripts(self, force):
         '''
         Given the EDM PATH list, copy all files in the directory and any
         subdirectories across. Create output in a similar directory structure.
         '''
-        log.debug("The path files are: %s", self.paths)
-        for datadir in self.paths:
+        log.debug("The path files are: %s", self.path_dirs)
+        for datadir in self.path_dirs:
             log.debug('EDM path directory %s' % datadir)
             try:
                 module_name, version, rel_path = utils.parse_module_name(datadir)
@@ -239,16 +240,16 @@ class Converter(object):
                     full_path = os.path.join(datadir, entry)
                     log.debug("New full path is %s", full_path)
                     if os.path.isdir(full_path):
-                        outpath = os.path.join(self.outdir, module_name, rel_path, entry)
+                        outpath = os.path.join(self.root_outdir, module_name, rel_path, entry)
                         log.debug("New outdir is %s", outpath)
                         if not os.path.isdir(outpath):
                             os.makedirs(outpath)
-                        self.convert_dir(full_path, os.path.join(self.outdir, module_name, entry), force)
+                        self._convert_dir(full_path, os.path.join(self.root_outdir, module_name, entry), force)
 
-            self.convert_dir(datadir, os.path.join(self.outdir, module_name, rel_path), force)
+            self._convert_dir(datadir, os.path.join(self.root_outdir, module_name, rel_path), force)
 
 
-    def is_symbol(self, filename):
+    def _is_symbol(self, filename):
         '''
         Return True if:
          - the opi file name ends with 'symbol.edl'
@@ -260,7 +261,7 @@ class Converter(object):
             return True
         return False
 
-    def already_converted(self, outdir, file):
+    def _already_converted(self, outdir, file):
         '''
         Return True if:
          - there is already a converted file in the destination
@@ -268,7 +269,7 @@ class Converter(object):
         '''
         basename = os.path.basename(file)
         base = '.'.join(basename.split('.')[:-1])
-        if self.is_symbol(file):
+        if self._is_symbol(file):
             # look for the converted png
             return len(glob.glob(os.path.join(outdir, base) + '*.png'))
         else:
@@ -276,26 +277,35 @@ class Converter(object):
             destination = os.path.join(outdir, opifile)
             return os.path.exists(destination)
 
-    def convert_one_file(self, full_path, outdir, force):
+    def _convert_one_file(self, full_path, outdir, force):
+        '''
+        Apppropriately convert one edl file, including updating
+        any relative paths using the opi_index dict.
+        '''
+        # Figure out the 'depth' of the file.  This is how many 
+        # nested directories any relative path must descend before
+        # adding the relative path back on.
+        relative_dir = os.path.relpath(outdir, self.root_outdir)
+        depth = len(relative_dir.strip('/').split('/'))
         # change extension
         name = os.path.basename(full_path)
         opifile = name[:-len(EDL_EXT)] + OPI_EXT
         destination = os.path.join(outdir, opifile)
         try:
-            if not force and self.already_converted(outdir, full_path):
+            if not force and self._already_converted(outdir, full_path):
                 log.info('Skipping existing file %s' % destination)
-            elif self.is_symbol(full_path):
+            elif self._is_symbol(full_path):
                 convert_symbol(full_path, destination)
                 log.info('Successfully converted symbol file %s' % destination)
             else:
                 convert_edl(full_path, destination)
                 log.info('Successfully converted %s' % destination)
-                self.update_paths(destination)
+                self.update_paths(destination, depth)
         except Exception as e:
             log.warn('Conversion of %s unsuccessful.' % full_path)
             log.warn(str(e))
 
-    def copy_one_file(self, full_path, outdir, force):
+    def _copy_one_file(self, full_path, outdir, force):
         executable = os.access(full_path, os.X_OK)
         name = os.path.basename(full_path)
         destination = os.path.join(outdir, name)
@@ -311,7 +321,7 @@ class Converter(object):
             else:
                 log.warn('Copying file %s unsuccessful.' % full_path)
 
-    def convert_dir(self, indir, outdir, force):
+    def _convert_dir(self, indir, outdir, force):
         '''
         Convert or copy files in one directory to the corresponding output
         directory:
@@ -326,16 +336,16 @@ class Converter(object):
         for full_path in full_paths:
             log.debug('Trying %s...' % full_path)
             if full_path.endswith(EDL_EXT):
-                self.convert_one_file(full_path, outdir, force)
+                self._convert_one_file(full_path, outdir, force)
             elif not os.path.isdir(full_path) and not full_path.endswith('~'):
-                self.copy_one_file(full_path, outdir, force)
+                self._copy_one_file(full_path, outdir, force)
             else:
                 log.info('Ignoring %s' % full_path)
 
-    def update_paths(self, filepath):
+    def update_paths(self, filepath, depth):
         module = filepath.split('/')[1]
         log.debug('Module for path %s is %s' % (filepath, module))
-        update_paths.parse(filepath, self.file_dict, self.path_dict, module)
+        paths.update_opi_file(filepath, depth, self.opi_index, self.path_index, module)
 
 
 def set_up_options():
