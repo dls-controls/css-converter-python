@@ -18,10 +18,16 @@ TAGS_TO_UPDATE = ['path', 'image_file']
 def index_dir(root, directory, recurse):
     '''
     Index directory as described in index_paths().
+    root is EDMDATAFILE or PATH directory, so relative_path
+    is relative to this directory.
+    path_within_module is the path of root within the 
+    IOC or support module.
     Optionally recurse into subdirectories.
     Ignore hidden files.
     '''
     filepaths = {}
+    root = root.rstrip('/')
+    directory = directory.rstrip('/')
     log.debug("Indexing directory %s", directory)
     files = os.listdir(directory)
     # Path within module is always relative to root - the EDMDATAFILE
@@ -42,8 +48,9 @@ def index_dir(root, directory, recurse):
                         log.warn("clash: %s in %s and %s",
                                 relative_path, module, filepaths[relative_path])
             else:
-                # Remove root from path to get the path relative to root
-                relative_path = os.path.join(directory[len(root) + 1:], f)
+                # Remove root from directory to get the path relative to directory
+                relative_path = os.path.join(directory.replace(root, ''), f)
+                relative_path = relative_path.lstrip('/')
                 if relative_path.endswith('edl'):
                     relative_path = relative_path[:-3] + 'opi'
                 filepaths[relative_path] = (module, path_within_module)
