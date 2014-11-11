@@ -22,7 +22,7 @@ Steps:
 '''
 
 import utils
-import update_paths
+import paths
 
 import os
 import sys
@@ -143,14 +143,14 @@ class Converter(object):
         # Spoof EDM to find EDMDATAFILES and PATH
         # Index these directories to find which modules
         # relative paths may be in.
-        edmdatafiles, paths, working_dir, args = utils.spoof_edm(script_file, script_args)
+        edmdatafiles, path_dirs, working_dir, args = utils.spoof_edm(script_file, script_args)
         self.edmdatafiles = [f for f in edmdatafiles if f not in  ('', '.')]
         self.edmdatafiles.append(working_dir)
-        self.paths = paths
-        self.paths.append(working_dir)
+        self.path_dirs = path_dirs
+        self.path_dirs.append(working_dir)
         # OPI files can be in nested directories; executable files can't.
-        self.opi_index = update_paths.index_paths(self.edmdatafiles, True)
-        self.path_index = update_paths.index_paths(self.paths, False)
+        self.opi_index = paths.index_paths(self.edmdatafiles, True)
+        self.path_index = paths.index_paths(self.path_dirs, False)
         self.symbol_files = symbol_files
         self.tmpdir = TMP_DIR
         self.symbolsdir = SYMBOLS_DIR
@@ -221,8 +221,8 @@ class Converter(object):
         Given the EDM PATH list, copy all files in the directory and any
         subdirectories across. Create output in a similar directory structure.
         '''
-        log.debug("The path files are: %s", self.paths)
-        for datadir in self.paths:
+        log.debug("The path files are: %s", self.path_dirs)
+        for datadir in self.path_dirs:
             log.debug('EDM path directory %s' % datadir)
             try:
                 module_name, version, rel_path = utils.parse_module_name(datadir)
@@ -345,7 +345,7 @@ class Converter(object):
     def update_paths(self, filepath, depth):
         module = filepath.split('/')[1]
         log.debug('Module for path %s is %s' % (filepath, module))
-        update_paths.parse(filepath, depth, self.opi_index, self.path_index, module)
+        paths.update_opi_file(filepath, depth, self.opi_index, self.path_index, module)
 
 
 def set_up_options():

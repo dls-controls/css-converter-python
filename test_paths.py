@@ -1,5 +1,5 @@
 
-import update_paths
+import paths
 
 import unittest
 
@@ -13,7 +13,7 @@ class UpdatePathsTest(unittest.TestCase):
         '''
         root = '/dls_sw/prod/R3.14.12.3/ioc/TMBF/2.8/opi'
         path = '/dls_sw/prod/R3.14.12.3/ioc/TMBF/2.8/opi'
-        index = update_paths.index_dir(root, path, False)
+        index = paths.index_dir(root, path, False)
         contents = {'runtmbf': ('TMBF', 'opi'),
                     'tmbf': ('TMBF', 'opi'),
                     'tmbf_launcher.opi': ('TMBF', 'opi'),
@@ -28,7 +28,7 @@ class UpdatePathsTest(unittest.TestCase):
         '''
         root = '/dls_sw/prod/R3.14.12.3/ioc/TMBF/2.8/opi'
         path = '/dls_sw/prod/R3.14.12.3/ioc/TMBF/2.8/opi'
-        index = update_paths.index_dir(root, path, True)
+        index = paths.index_dir(root, path, True)
         contents = {'tmbf/debug.opi': ('TMBF', 'opi'),
                     'scripts/set_adc_offset': ('TMBF', 'opi'),
                     'tmbf/window.opi': ('TMBF', 'opi'),
