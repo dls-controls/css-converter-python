@@ -167,9 +167,9 @@ class Converter(object):
         if not os.path.exists(self.root_outdir):
             log.info('Making new output directory %s' % self.root_outdir)
             os.makedirs(self.root_outdir)
-        self.generate_project_file()
+        self._generate_project_file()
 
-    def generate_project_file(self):
+    def _generate_project_file(self):
         '''
         Create an Eclipse project file for this set of OPIs.
         '''
@@ -212,9 +212,9 @@ class Converter(object):
                     if os.path.isdir(full_path):
                         outpath = os.path.join(self.root_outdir, module_name, rel_path, entry)
                         log.debug("New outdir is %s", outpath)
-                        self.convert_dir(full_path, outpath, force)
+                        self._convert_dir(full_path, outpath, force)
 
-            self.convert_dir(datadir, os.path.join(self.root_outdir, module_name, rel_path), force)
+            self._convert_dir(datadir, os.path.join(self.root_outdir, module_name, rel_path), force)
 
     def copy_scripts(self, force):
         '''
@@ -244,12 +244,12 @@ class Converter(object):
                         log.debug("New outdir is %s", outpath)
                         if not os.path.isdir(outpath):
                             os.makedirs(outpath)
-                        self.convert_dir(full_path, os.path.join(self.root_outdir, module_name, entry), force)
+                        self._convert_dir(full_path, os.path.join(self.root_outdir, module_name, entry), force)
 
-            self.convert_dir(datadir, os.path.join(self.root_outdir, module_name, rel_path), force)
+            self._convert_dir(datadir, os.path.join(self.root_outdir, module_name, rel_path), force)
 
 
-    def is_symbol(self, filename):
+    def _is_symbol(self, filename):
         '''
         Return True if:
          - the opi file name ends with 'symbol.edl'
@@ -261,7 +261,7 @@ class Converter(object):
             return True
         return False
 
-    def already_converted(self, outdir, file):
+    def _already_converted(self, outdir, file):
         '''
         Return True if:
          - there is already a converted file in the destination
@@ -269,7 +269,7 @@ class Converter(object):
         '''
         basename = os.path.basename(file)
         base = '.'.join(basename.split('.')[:-1])
-        if self.is_symbol(file):
+        if self._is_symbol(file):
             # look for the converted png
             return len(glob.glob(os.path.join(outdir, base) + '*.png'))
         else:
@@ -277,7 +277,7 @@ class Converter(object):
             destination = os.path.join(outdir, opifile)
             return os.path.exists(destination)
 
-    def convert_one_file(self, full_path, outdir, force):
+    def _convert_one_file(self, full_path, outdir, force):
         '''
         Apppropriately convert one edl file, including updating
         any relative paths using the opi_index dict.
@@ -292,9 +292,9 @@ class Converter(object):
         opifile = name[:-len(EDL_EXT)] + OPI_EXT
         destination = os.path.join(outdir, opifile)
         try:
-            if not force and self.already_converted(outdir, full_path):
+            if not force and self._already_converted(outdir, full_path):
                 log.info('Skipping existing file %s' % destination)
-            elif self.is_symbol(full_path):
+            elif self._is_symbol(full_path):
                 convert_symbol(full_path, destination)
                 log.info('Successfully converted symbol file %s' % destination)
             else:
@@ -305,7 +305,7 @@ class Converter(object):
             log.warn('Conversion of %s unsuccessful.' % full_path)
             log.warn(str(e))
 
-    def copy_one_file(self, full_path, outdir, force):
+    def _copy_one_file(self, full_path, outdir, force):
         executable = os.access(full_path, os.X_OK)
         name = os.path.basename(full_path)
         destination = os.path.join(outdir, name)
@@ -321,7 +321,7 @@ class Converter(object):
             else:
                 log.warn('Copying file %s unsuccessful.' % full_path)
 
-    def convert_dir(self, indir, outdir, force):
+    def _convert_dir(self, indir, outdir, force):
         '''
         Convert or copy files in one directory to the corresponding output
         directory:
@@ -336,9 +336,9 @@ class Converter(object):
         for full_path in full_paths:
             log.debug('Trying %s...' % full_path)
             if full_path.endswith(EDL_EXT):
-                self.convert_one_file(full_path, outdir, force)
+                self._convert_one_file(full_path, outdir, force)
             elif not os.path.isdir(full_path) and not full_path.endswith('~'):
-                self.copy_one_file(full_path, outdir, force)
+                self._copy_one_file(full_path, outdir, force)
             else:
                 log.info('Ignoring %s' % full_path)
 

@@ -15,7 +15,7 @@ import logging as log
 TAGS_TO_UPDATE = ['path', 'image_file']
 
 
-def index_dir(root, directory, recurse):
+def _index_dir(root, directory, recurse):
     '''
     Index directory as described in index_paths().
     root is EDMDATAFILE or PATH directory, so relative_path
@@ -40,7 +40,7 @@ def index_dir(root, directory, recurse):
             continue
         else:
             if os.path.isdir(os.path.join(directory, f)) and recurse:
-                new_index = index_dir(root, os.path.join(directory, f), True)
+                new_index = _index_dir(root, os.path.join(directory, f), True)
                 for file in new_index:
                     if file not in filepaths:
                         filepaths[file] = new_index[file]
@@ -83,7 +83,7 @@ def index_paths(paths, recurse):
 
     for path in paths:
         try:
-            new_index = index_dir(path, path, recurse)
+            new_index = _index_dir(path, path, recurse)
             for file in new_index:
                 if file not in filepaths:
                     filepaths[file] = new_index[file]
@@ -98,7 +98,7 @@ def index_paths(paths, recurse):
     return filepaths
 
 
-def update_opi_path(filename, depth, opi_index, module):
+def _update_opi_path(filename, depth, opi_index, module):
     '''
     Return the corrected path according to the contents of the
     opi_index.
@@ -137,42 +137,42 @@ def update_opi_path(filename, depth, opi_index, module):
     log.info("Updated path is %s", rel)
     return rel
 
-def update_script(script_text, depth, opi_index, module):
+def _update_script(script_text, depth, opi_index, module):
     if 'opi_file' in script_text:
         # Regex group the contents of the quotes containing the filename.
         pattern = 'widget.setPropertyValue *\( *"opi_file" *, *"(.*)"'
         p = re.compile(pattern)
         m = p.search(script_text)
         old_path = m.group(1)
-        new_path = update_opi_path(m.group(1), depth, opi_index, module)
+        new_path = _update_opi_path(m.group(1), depth, opi_index, module)
         log.info("Updated path in script: %s" % new_path)
         script_text = script_text.replace(m.group(1), new_path)
 
     return script_text
 
 
-def update_paths(node, depth, opi_index, path_index, module):
+def _update_paths(node, depth, opi_index, path_index, module):
     '''
     Recursively update all paths in the opi file to project-relative ones.
     '''
     if node.tag in TAGS_TO_UPDATE:
-        node.text = update_opi_path(node.text, depth, opi_index, module)
+        node.text = _update_opi_path(node.text, depth, opi_index, module)
     if node.tag == 'command':
         cmd_parts = node.text.split()
-        updated_cmd = update_opi_path(cmd_parts[0], depth, path_index, module)
+        updated_cmd = _update_opi_path(cmd_parts[0], depth, path_index, module)
         node.text = ' '.join([updated_cmd] + cmd_parts[1:])
     if node.tag == 'scriptText':
-        node.text = update_script(node.text, depth, opi_index, module)
+        node.text = _update_script(node.text, depth, opi_index, module)
     for child in node:
-        update_paths(child, depth, opi_index, path_index, module)
+        _update_paths(child, depth, opi_index, path_index, module)
 
 
-def parse(path, depth, opi_index, path_index, module):
+def update_opi_file(path, depth, opi_index, path_index, module):
     log.debug('Starting to update paths in %s; depth %s', path, depth)
     tree = et.parse(path)
     root = tree.getroot()
 
-    update_paths(root, depth, opi_index, path_index, module)
+    _update_paths(root, depth, opi_index, path_index, module)
 
     # write the new tree out to the same file
     utils.make_writeable(path)
