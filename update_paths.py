@@ -26,8 +26,8 @@ def index_dir(root, directory, recurse):
     Ignore hidden files.
     '''
     filepaths = {}
-    root = root.rstrip('/')
-    directory = directory.rstrip('/')
+    root = os.path.normpath(root)
+    directory = os.path.normpath(directory)
     log.debug("Indexing directory %s", directory)
     files = os.listdir(directory)
     # Path within module is always relative to root - the EDMDATAFILE
@@ -48,9 +48,8 @@ def index_dir(root, directory, recurse):
                         log.warn("clash: %s in %s and %s",
                                 relative_path, module, filepaths[relative_path])
             else:
-                # Remove root from directory to get the path relative to directory
-                relative_path = os.path.join(directory.replace(root, ''), f)
-                relative_path = relative_path.lstrip('/')
+                # Get the path of the file relative to the root.
+                relative_path = os.path.relpath(os.path.join(directory, f), root)
                 if relative_path.endswith('edl'):
                     relative_path = relative_path[:-3] + 'opi'
                 filepaths[relative_path] = (module, path_within_module)
@@ -107,8 +106,8 @@ def update_opi_path(filename, depth, opi_dict, module):
     Note that if the 'module' of a file is nested directories, we
     only need to put ../<lastdir>/relative/path
     '''
-    if filename.startswith('./'):
-        filename = filename[2:]
+    # Remove a leading './' if necessary.
+    filename = os.path.normpath(filename)
     # Symbol files are converted to pngs with different names
     # We have to update the new filenames, but the old ones are
     # in the index.

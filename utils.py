@@ -12,8 +12,7 @@ def parse_module_name(filepath):
     '''
     log.debug("Parsing %s.",  filepath)
     filepath = os.path.realpath(filepath)
-    # Remove last slash, which may give different results
-    filepath = filepath.rstrip('/')
+    filepath = os.path.normpath(filepath)
     parts = filepath.split('/')
     module, version, relative_path = None, None, None
 
