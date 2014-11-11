@@ -163,10 +163,10 @@ class Converter(object):
         self.module_name = self.module_name.replace('/', '_')
         if self.version is None:
             self.version = 'no-version'
-        self.outdir = os.path.join(outdir, "%s_%s" % (self.module_name, self.version))
-        if not os.path.exists(self.outdir):
-            log.info('Making new output directory %s' % self.outdir)
-            os.makedirs(self.outdir)
+        self.root_outdir = os.path.join(outdir, "%s_%s" % (self.module_name, self.version))
+        if not os.path.exists(self.root_outdir):
+            log.info('Making new output directory %s' % self.root_outdir)
+            os.makedirs(self.root_outdir)
         self.generate_project_file()
 
     def generate_project_file(self):
@@ -178,7 +178,7 @@ class Converter(object):
         s = string.Template(content)
         updated_content = s.substitute(module_name=self.module_name,
                 version=self.version)
-        with open(os.path.join(self.outdir, PROJECT_FILENAME), 'w') as f:
+        with open(os.path.join(self.root_outdir, PROJECT_FILENAME), 'w') as f:
             f.write(updated_content)
 
     def convert_opis(self, force):
@@ -210,11 +210,11 @@ class Converter(object):
                     full_path = os.path.join(datadir, entry)
                     log.debug("New full path is %s", full_path)
                     if os.path.isdir(full_path):
-                        outpath = os.path.join(self.outdir, module_name, rel_path, entry)
+                        outpath = os.path.join(self.root_outdir, module_name, rel_path, entry)
                         log.debug("New outdir is %s", outpath)
                         self.convert_dir(full_path, outpath, force)
 
-            self.convert_dir(datadir, os.path.join(self.outdir, module_name, rel_path), force)
+            self.convert_dir(datadir, os.path.join(self.root_outdir, module_name, rel_path), force)
 
     def copy_scripts(self, force):
         '''
@@ -240,13 +240,13 @@ class Converter(object):
                     full_path = os.path.join(datadir, entry)
                     log.debug("New full path is %s", full_path)
                     if os.path.isdir(full_path):
-                        outpath = os.path.join(self.outdir, module_name, rel_path, entry)
+                        outpath = os.path.join(self.root_outdir, module_name, rel_path, entry)
                         log.debug("New outdir is %s", outpath)
                         if not os.path.isdir(outpath):
                             os.makedirs(outpath)
-                        self.convert_dir(full_path, os.path.join(self.outdir, module_name, entry), force)
+                        self.convert_dir(full_path, os.path.join(self.root_outdir, module_name, entry), force)
 
-            self.convert_dir(datadir, os.path.join(self.outdir, module_name, rel_path), force)
+            self.convert_dir(datadir, os.path.join(self.root_outdir, module_name, rel_path), force)
 
 
     def is_symbol(self, filename):
@@ -278,11 +278,15 @@ class Converter(object):
             return os.path.exists(destination)
 
     def convert_one_file(self, full_path, outdir, force):
-        log.debug('Converting to %s', outdir)
-        log.debug('self.outdir is %s', self.outdir)
-        rel = outdir[len(self.outdir) + 1:]
-        log.debug('rel is %s', rel)
-        depth = len(rel.strip('/').split('/'))
+        '''
+        Apppropriately convert one edl file, including updating
+        any relative paths using the opi_dict index.
+        '''
+        # Figure out the 'depth' of the file.  This is how many 
+        # nested directories any relative path must descend before
+        # adding the relative path back on.
+        relative_dir = os.path.relpath(outdir, self.root_outdir)
+        depth = len(relative_dir.strip('/').split('/'))
         # change extension
         name = os.path.basename(full_path)
         opifile = name[:-len(EDL_EXT)] + OPI_EXT
