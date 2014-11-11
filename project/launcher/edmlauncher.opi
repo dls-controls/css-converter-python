@@ -386,6 +386,7 @@ $(pv_value)</tooltip>
         <path>/psc_4-3-14/psc/data/pscL2.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
+          <bin>/dls_sw/prod/R3.14.12.3/support/psc/4-3-15/bin/linux-x86_64</bin>
         </macros>
         <description></description>
       </action>
@@ -2281,6 +2282,7 @@ $(pv_value)</tooltip>
         <path>/idedm.sh_no-version/insertionDeviceOverview/data/ID_overview.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
+          <here>/dls_sw/prod/R3.14.11/support/insertionDeviceOverview/1-18/data</here>
         </macros>
         <description></description>
       </action>
@@ -2476,10 +2478,10 @@ $(pv_value)</tooltip>
         <path>/SR15I_ID_4-8/ID/data/SCW.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
-          <SCW_NAME>SR15I-CS-SCMPW-01</SCW_NAME>
-          <SCW_PSU>SR15I-PC-SCMPW</SCW_PSU>
-          <SCW_COOLER>SR15I-CS-COMPR</SCW_COOLER>
-          <eurotherm>SR15I-CS-PCTRL-01</eurotherm>
+          <SCW_NAME>SR15I-ID-SCMPW-01</SCW_NAME>
+          <SCW_PSU>SR15I-ID-PSU</SCW_PSU>
+          <SCW_COOLER>SR15I-ID-COMPR</SCW_COOLER>
+          <eurotherm>SR15I-ID-PCTRL-01</eurotherm>
         </macros>
         <description></description>
       </action>
@@ -2526,7 +2528,7 @@ $(pv_value)</tooltip>
     <y>249</y>
     <actions hook="false" hook_all="false">
       <action type="OPEN_EDM_OPI">
-        <path>/bms_0-50/bms/data/R79IDTemps.opi</path>
+        <path>/bms_0-52/bms/data/R79IDTemps.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
