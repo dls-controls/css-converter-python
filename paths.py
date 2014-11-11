@@ -28,7 +28,7 @@ def _index_dir(root, directory, recurse):
     filepaths = {}
     root = os.path.normpath(root)
     directory = os.path.normpath(directory)
-    log.debug("Indexing directory %s", directory)
+    log.debug('Indexing directory %s', directory)
     files = os.listdir(directory)
     # Path within module is always relative to root - the EDMDATAFILE
     # or path variable.
@@ -41,15 +41,16 @@ def _index_dir(root, directory, recurse):
         else:
             if os.path.isdir(os.path.join(directory, f)) and recurse:
                 new_index = _index_dir(root, os.path.join(directory, f), True)
-                for file in new_index:
-                    if file not in filepaths:
-                        filepaths[file] = new_index[file]
+                for f in new_index:
+                    if f not in filepaths:
+                        filepaths[f] = new_index[f]
                     else:
-                        log.warn("clash: %s in %s and %s",
+                        log.warn('clash: %s in %s and %s',
                                 relative_path, module, filepaths[relative_path])
             else:
                 # Get the path of the file relative to the root.
-                relative_path = os.path.relpath(os.path.join(directory, f), root)
+                relative_path = os.path.relpath(os.path.join(directory, f),
+                                                root)
                 if relative_path.endswith('edl'):
                     relative_path = relative_path[:-3] + 'opi'
                 filepaths[relative_path] = (module, path_within_module)
@@ -79,23 +80,23 @@ def index_paths(paths, recurse):
         key, value:         'libera/overview.opi': ('Libera', 'data')
 
     '''
-    filepaths = {}
+    index = {}
 
     for path in paths:
         try:
             new_index = _index_dir(path, path, recurse)
-            for file in new_index:
-                if file not in filepaths:
-                    filepaths[file] = new_index[file]
+            for f in new_index:
+                if f not in index:
+                    index[f] = new_index[f]
                 else:
-                    log.warn("clash: %s in %s and %s",
-                            file, new_index[file], filepaths[file])
+                    log.warn('clash: %s in %s and %s',
+                            file, new_index[f], index[f])
         except (OSError, ValueError) as e:
             log.warn('Skipping indexing for %s: %s', path, e)
             continue
 
-    log.info("Indexed OPI paths: %s", filepaths)
-    return filepaths
+    log.info('Indexed OPI paths: %s', index)
+    return index
 
 
 def _update_opi_path(filename, depth, opi_index, module):
@@ -117,7 +118,7 @@ def _update_opi_path(filename, depth, opi_index, module):
         original_name = stub + '.opi'
         if original_name in opi_index:
             opi_index[filename] = opi_index[original_name]
-        log.debug("Updated opi_index for %s", filename)
+        log.debug('Updated opi_index for %s', filename)
     if filename in opi_index:
         if opi_index[filename][0] != module:
             log.info('Correcting filename %s', filename)
@@ -126,16 +127,18 @@ def _update_opi_path(filename, depth, opi_index, module):
             module_path = opi_index[filename][0]
             collapsed_path = module_path.split('/')[-1]
             down = '/'.join(['..'] * depth)
-            rel = os.path.join(down, collapsed_path, opi_index[filename][1], filename)
+            rel = os.path.join(down, collapsed_path,
+                               opi_index[filename][1], filename)
         else:
             rel = os.path.join(opi_index[filename][1], filename)
     else:
-        log.debug("Not correcting %s", filename)
+        log.debug('Not correcting %s', filename)
 
         rel = filename
 
-    log.info("Updated path is %s", rel)
+    log.info('Updated path is %s', rel)
     return rel
+
 
 def _update_script(script_text, depth, opi_index, module):
     if 'opi_file' in script_text:
@@ -144,8 +147,8 @@ def _update_script(script_text, depth, opi_index, module):
         p = re.compile(pattern)
         m = p.search(script_text)
         old_path = m.group(1)
-        new_path = _update_opi_path(m.group(1), depth, opi_index, module)
-        log.info("Updated path in script: %s" % new_path)
+        new_path = _update_opi_path(old_path, depth, opi_index, module)
+        log.info('Updated path in script: %s', new_path)
         script_text = script_text.replace(m.group(1), new_path)
 
     return script_text
