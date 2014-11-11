@@ -56,17 +56,24 @@ def make_writeable(filename):
 
 def spoof_edm(script_file, args=[]):
     '''
-    Use a script called 'edm' to extract the EDMDATAFILES and PATH variables
+    Use a dummy script called 'edm' to extract:
+     - the EDMDATAFILES variable
+     - the PATH variable
+     - the script's working directory
+     - the command-line arguments
     from any script used to run edm.
 
-    Assume that the last two lines of output are those produced by this script.
+    Assume that the last four lines of output are those produced by this script.
     '''
     env = os.environ.copy()
     old_dir = os.getcwd()
     script_dir = os.path.dirname(script_file)
     # Change to directory of spoofed script.
     os.chdir(script_dir)
-    env['PATH'] = '/home/hgs15624/code/converter/spoof_edm:' + script_dir + env['PATH']
+    this_dir = os.path.dirname(__file__)
+    spoof_edm_dir = os.path.join(this_dir, 'spoof_edm')
+    # Put spoof edm first on the path.
+    env['PATH'] = '%s:%s:%s' % (spoof_edm_dir, script_dir, env['PATH'])
     old_path = env['PATH'].split(':')
 
     edmdatafiles = None
@@ -74,18 +81,17 @@ def spoof_edm(script_file, args=[]):
 
     args_string = " ".join(a for a in args)
     args_string = args_string.replace('$PORT', '5064')
-    command_string = "%s %s" % (script_file, args_string)
-    log.debug("Spoofing script: %s", command_string)
+    command_string = '%s %s' % (script_file, args_string)
+    log.debug('Spoofing script: %s', command_string)
 
-    # These scripts often expect a port number and edl file.
     out = subprocess.check_output([command_string], shell=True, env=env)
 
     # Change back to original directory.
     os.chdir(old_dir)
-    log.debug("Spoof EDM output:\n\n%s", out)
+    log.debug('Spoof EDM output:\n\n%s', out)
     lines = out.splitlines()
     if lines[-1] != 'Spoof EDM complete.':
-        log.warn("EDM spoof failed.")
+        log.warn('EDM spoof failed.')
         return None
 
     if len(lines) > 1:
@@ -100,7 +106,9 @@ def spoof_edm(script_file, args=[]):
         pwd = lines[-4].strip()
     if len(lines) > 4:
         args = lines[-5].strip().split()
-    log.info("EDMDATAFILES: %s", edmdatafiles)
-    log.info("PATH: %s", path)
+    log.info('EDMDATAFILES: %s', edmdatafiles)
+    log.info('PATH: %s', path)
+    log.info('Script working directory: %s', pwd)
+    log.info('Script arguments: %s', args)
     return edmdatafiles, path, pwd, args
 
