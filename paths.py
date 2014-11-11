@@ -1,10 +1,7 @@
-#!/usr/bin/env dls-python
-
-# 1. index files
-#  - resolve clashes by order of paths
-# 2. index edm files
-# 3. parse opi file
-# 4. replace files with indexed versions
+'''
+Utility functions used for replacing paths in EDM files with paths in
+CSS OPI files.
+'''
 
 import os
 import re
@@ -18,46 +15,47 @@ TAGS_TO_UPDATE = ['path', 'image_file']
 def _index_dir(root, directory, recurse):
     '''
     Index directory as described in index_paths().
-    root is EDMDATAFILE or PATH directory, so relative_path
-    is relative to this directory.
-    path_within_module is the path of root within the 
-    IOC or support module.
-    Optionally recurse into subdirectories.
     Ignore hidden files.
+
+    Arguments:
+     - root:    the EDMDATAFILES or PATH variable inside which this
+                dir resides
+     - dir:     the directory to index
+     - recurse: whether to recursively index subdirectories
+    is relative to this directory.
     '''
-    filepaths = {}
+    index = {}
     root = os.path.normpath(root)
     directory = os.path.normpath(directory)
     log.debug('Indexing directory %s', directory)
-    files = os.listdir(directory)
-    # Path within module is always relative to root - the EDMDATAFILE
+    # path_within_module is always relative to root - the EDMDATAFILE
     # or path variable.
-    module, version, path_within_module = utils.parse_module_name(root)
+    module, _version, path_within_module = utils.parse_module_name(root)
     if path_within_module is None:
         path_within_module = ''
-    for f in files:
-        if f.startswith('.'):
+    for entry in os.listdir(directory):
+        if entry.startswith('.'):
             continue
         else:
-            if os.path.isdir(os.path.join(directory, f)) and recurse:
-                new_index = _index_dir(root, os.path.join(directory, f), True)
-                for f in new_index:
-                    if f not in filepaths:
-                        filepaths[f] = new_index[f]
+            if os.path.isdir(os.path.join(directory, entry)) and recurse:
+                new_index = _index_dir(root, os.path.join(directory, entry), True)
+                for new_entry in new_index:
+                    if new_entry not in index:
+                        index[new_entry] = new_index[new_entry]
                     else:
                         log.warn('clash: %s in %s and %s',
-                                relative_path, module, filepaths[relative_path])
+                                entry, module, index[entry])
             else:
                 # Get the path of the file relative to the root.
-                relative_path = os.path.relpath(os.path.join(directory, f),
+                relative_path = os.path.relpath(os.path.join(directory, entry),
                                                 root)
                 if relative_path.endswith('edl'):
                     relative_path = relative_path[:-3] + 'opi'
-                filepaths[relative_path] = (module, path_within_module)
-    return filepaths
+                index[relative_path] = (module, path_within_module)
+    return index
 
 
-def index_paths(paths, recurse):
+def index_paths(directories, recurse):
     '''
     Index all files available to EDM given the list of paths
     which correspond to the EDMDATAFILES variable.
@@ -68,11 +66,14 @@ def index_paths(paths, recurse):
     EDM screen.  The values are a tuple (module, path-within-module)
     which allow full construction of a relative path in
     CSS.
+    Also changes 'edl' extension to 'opi'
+
+    Arguments:
+     - directories: a list of directories to index
+     - recurse:     whether to index all subdirectories
 
     Return a dictionary:
         relative-filename: (module, path-within-module)
-
-    Also changes 'edl' extension to 'opi'
 
     Example:
         EDMDATAFILES entry: .../Libera/<version>/data/
@@ -82,17 +83,17 @@ def index_paths(paths, recurse):
     '''
     index = {}
 
-    for path in paths:
+    for directory in directories:
         try:
-            new_index = _index_dir(path, path, recurse)
-            for f in new_index:
-                if f not in index:
-                    index[f] = new_index[f]
+            new_index = _index_dir(directory, directory, recurse)
+            for entry in new_index:
+                if entry not in index:
+                    index[entry] = new_index[entry]
                 else:
                     log.warn('clash: %s in %s and %s',
-                            file, new_index[f], index[f])
+                            file, new_index[entry], index[entry])
         except (OSError, ValueError) as e:
-            log.warn('Skipping indexing for %s: %s', path, e)
+            log.warn('Skipping indexing for %s: %s', directory, e)
             continue
 
     log.info('Indexed OPI paths: %s', index)
