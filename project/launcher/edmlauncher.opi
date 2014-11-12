@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <display typeId="org.csstudio.opibuilder.Display" version="1.0.0">
   <auto_zoom_to_fit_all>false</auto_zoom_to_fit_all>
   <macros>
@@ -9,14 +9,14 @@
   <scripts />
   <show_ruler>true</show_ruler>
   <height>1000</height>
-  <name></name>
+  <name />
   <snap_to_geometry>true</snap_to_geometry>
   <show_grid>true</show_grid>
   <background_color>
-    <color red="240" green="240" blue="240" />
+    <color blue="240" green="240" red="240" />
   </background_color>
   <foreground_color>
-    <color red="192" green="192" blue="192" />
+    <color blue="192" green="192" red="192" />
   </foreground_color>
   <widget_type>Display</widget_type>
   <show_close_button>true</show_close_button>
@@ -37,11 +37,11 @@
     <visible>true</visible>
     <fill_level>0.0</fill_level>
     <line_color>
-      <color red="128" green="0" blue="255" />
+      <color blue="255" green="0" red="128" />
     </line_color>
     <wuid>-7d662963:14985e75543:-53d7</wuid>
     <bg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </bg_gradient_color>
     <scripts />
     <height>229</height>
@@ -55,17 +55,17 @@
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
     <transparent>false</transparent>
-    <pv_name></pv_name>
+    <pv_name />
     <background_color>
-      <color red="191" green="191" blue="191" />
+      <color blue="191" green="191" red="191" />
     </background_color>
     <foreground_color>
-      <color red="255" green="0" blue="0" />
+      <color blue="0" green="0" red="255" />
     </foreground_color>
     <widget_type>Rectangle</widget_type>
     <enabled>true</enabled>
     <fg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </fg_gradient_color>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <font>
@@ -80,13 +80,12 @@
     <line_width>0</line_width>
     <horizontal_fill>true</horizontal_fill>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>330</y>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>720</x>
     <gradient>false</gradient>
   </widget>
@@ -95,11 +94,11 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <fill_level>0.0</fill_level>
     <line_color>
-      <color red="128" green="0" blue="255" />
+      <color blue="255" green="0" red="128" />
     </line_color>
     <wuid>-5680b5dd:145bcfe3742:-5535</wuid>
     <bg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </bg_gradient_color>
     <scripts />
     <height>277</height>
@@ -113,17 +112,17 @@ $(pv_value)</tooltip>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
     <transparent>false</transparent>
-    <pv_name></pv_name>
+    <pv_name />
     <background_color>
-      <color red="191" green="191" blue="191" />
+      <color blue="191" green="191" red="191" />
     </background_color>
     <foreground_color>
-      <color red="255" green="0" blue="0" />
+      <color blue="0" green="0" red="255" />
     </foreground_color>
     <widget_type>Rectangle</widget_type>
     <enabled>true</enabled>
     <fg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </fg_gradient_color>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <font>
@@ -138,13 +137,12 @@ $(pv_value)</tooltip>
     <line_width>0</line_width>
     <horizontal_fill>true</horizontal_fill>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>24</y>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>36</x>
     <gradient>false</gradient>
   </widget>
@@ -162,9 +160,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -175,13 +173,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>249</y>
     <actions hook="false" hook_all="false">
@@ -190,11 +188,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>48</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -211,9 +208,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -224,13 +221,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>198</y>
     <actions hook="false" hook_all="false">
@@ -239,11 +236,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>48</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -260,9 +256,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -273,13 +269,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>144</y>
     <actions hook="false" hook_all="false">
@@ -289,11 +285,10 @@ $(pv_value)</tooltip>
           <include_parent_macros>true</include_parent_macros>
           <dom>SR</dom>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>48</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -310,9 +305,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -323,13 +318,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>36</y>
     <actions hook="false" hook_all="false">
@@ -338,11 +333,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>48</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -359,9 +353,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -372,13 +366,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>90</y>
     <actions hook="false" hook_all="false">
@@ -388,11 +382,10 @@ $(pv_value)</tooltip>
           <include_parent_macros>true</include_parent_macros>
           <bin>/dls_sw/prod/R3.14.12.3/support/psc/4-3-15/bin/linux-x86_64</bin>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>48</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
@@ -410,10 +403,10 @@ $(pv_value)</tooltip>
     </scale_options>
     <transparent>false</transparent>
     <background_color>
-      <color red="127" green="127" blue="127" />
+      <color blue="127" green="127" red="127" />
     </background_color>
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Label</widget_type>
     <enabled>true</enabled>
@@ -426,13 +419,13 @@ $(pv_value)</tooltip>
     <rules />
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <horizontal_alignment>1</horizontal_alignment>
     <actions hook="false" hook_all="false" />
     <y>11</y>
     <wrap_words>false</wrap_words>
-    <tooltip></tooltip>
+    <tooltip />
     <x>36</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Rectangle" version="1.0.0">
@@ -440,11 +433,11 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <fill_level>0.0</fill_level>
     <line_color>
-      <color red="128" green="0" blue="255" />
+      <color blue="255" green="0" red="128" />
     </line_color>
     <wuid>-3c1083dc:145bd49edc0:-6c10</wuid>
     <bg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </bg_gradient_color>
     <scripts />
     <height>277</height>
@@ -458,17 +451,17 @@ $(pv_value)</tooltip>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
     <transparent>false</transparent>
-    <pv_name></pv_name>
+    <pv_name />
     <background_color>
-      <color red="191" green="191" blue="191" />
+      <color blue="191" green="191" red="191" />
     </background_color>
     <foreground_color>
-      <color red="255" green="0" blue="0" />
+      <color blue="0" green="0" red="255" />
     </foreground_color>
     <widget_type>Rectangle</widget_type>
     <enabled>true</enabled>
     <fg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </fg_gradient_color>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <font>
@@ -483,13 +476,12 @@ $(pv_value)</tooltip>
     <line_width>0</line_width>
     <horizontal_fill>true</horizontal_fill>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>24</y>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>264</x>
     <gradient>false</gradient>
   </widget>
@@ -507,9 +499,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -520,13 +512,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>249</y>
     <actions hook="false" hook_all="false">
@@ -534,11 +526,10 @@ $(pv_value)</tooltip>
         <command>/dls_sw/work/R3.14.12.3/support/i10switching/i10switching-gui.sh</command>
         <command_directory>$(user.home)</command_directory>
         <wait_time>10</wait_time>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>276</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -555,9 +546,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -568,13 +559,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>144</y>
     <actions hook="false" hook_all="false">
@@ -583,11 +574,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>276</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -604,9 +594,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -617,13 +607,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>36</y>
     <actions hook="false" hook_all="false">
@@ -632,11 +622,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>276</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -653,9 +642,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -666,13 +655,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>90</y>
     <actions hook="false" hook_all="false">
@@ -681,11 +670,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>276</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
@@ -703,10 +691,10 @@ $(pv_value)</tooltip>
     </scale_options>
     <transparent>false</transparent>
     <background_color>
-      <color red="127" green="127" blue="127" />
+      <color blue="127" green="127" red="127" />
     </background_color>
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Label</widget_type>
     <enabled>true</enabled>
@@ -719,13 +707,13 @@ $(pv_value)</tooltip>
     <rules />
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <horizontal_alignment>1</horizontal_alignment>
     <actions hook="false" hook_all="false" />
     <y>11</y>
     <wrap_words>false</wrap_words>
-    <tooltip></tooltip>
+    <tooltip />
     <x>264</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -742,9 +730,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -755,13 +743,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>198</y>
     <actions hook="false" hook_all="false">
@@ -770,11 +758,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>276</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Rectangle" version="1.0.0">
@@ -782,11 +769,11 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <fill_level>0.0</fill_level>
     <line_color>
-      <color red="128" green="0" blue="255" />
+      <color blue="255" green="0" red="128" />
     </line_color>
     <wuid>-353568c6:145f08dda58:-7e41</wuid>
     <bg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </bg_gradient_color>
     <scripts />
     <height>277</height>
@@ -800,17 +787,17 @@ $(pv_value)</tooltip>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
     <transparent>false</transparent>
-    <pv_name></pv_name>
+    <pv_name />
     <background_color>
-      <color red="191" green="191" blue="191" />
+      <color blue="191" green="191" red="191" />
     </background_color>
     <foreground_color>
-      <color red="255" green="0" blue="0" />
+      <color blue="0" green="0" red="255" />
     </foreground_color>
     <widget_type>Rectangle</widget_type>
     <enabled>true</enabled>
     <fg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </fg_gradient_color>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <font>
@@ -825,13 +812,12 @@ $(pv_value)</tooltip>
     <line_width>0</line_width>
     <horizontal_fill>true</horizontal_fill>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>24</y>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>492</x>
     <gradient>false</gradient>
   </widget>
@@ -849,9 +835,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -862,13 +848,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>36</y>
     <actions hook="false" hook_all="false">
@@ -877,11 +863,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>504</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
@@ -899,10 +884,10 @@ $(pv_value)</tooltip>
     </scale_options>
     <transparent>false</transparent>
     <background_color>
-      <color red="127" green="127" blue="127" />
+      <color blue="127" green="127" red="127" />
     </background_color>
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Label</widget_type>
     <enabled>true</enabled>
@@ -915,13 +900,13 @@ $(pv_value)</tooltip>
     <rules />
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <horizontal_alignment>1</horizontal_alignment>
     <actions hook="false" hook_all="false" />
     <y>11</y>
     <wrap_words>false</wrap_words>
-    <tooltip></tooltip>
+    <tooltip />
     <x>492</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -938,9 +923,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -951,13 +936,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>90</y>
     <actions hook="false" hook_all="false">
@@ -966,11 +951,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>504</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -987,9 +971,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1000,13 +984,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>143</y>
     <actions hook="false" hook_all="false">
@@ -1015,11 +999,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>504</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -1036,9 +1019,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1049,13 +1032,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>198</y>
     <actions hook="false" hook_all="false">
@@ -1064,11 +1047,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>504</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -1085,9 +1067,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1098,13 +1080,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>249</y>
     <actions hook="false" hook_all="false">
@@ -1113,11 +1095,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>504</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Rectangle" version="1.0.0">
@@ -1125,11 +1106,11 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <fill_level>0.0</fill_level>
     <line_color>
-      <color red="128" green="0" blue="255" />
+      <color blue="255" green="0" red="128" />
     </line_color>
     <wuid>3e48c583:145fa59e7c8:-7920</wuid>
     <bg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </bg_gradient_color>
     <scripts />
     <height>229</height>
@@ -1143,17 +1124,17 @@ $(pv_value)</tooltip>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
     <transparent>false</transparent>
-    <pv_name></pv_name>
+    <pv_name />
     <background_color>
-      <color red="191" green="191" blue="191" />
+      <color blue="191" green="191" red="191" />
     </background_color>
     <foreground_color>
-      <color red="255" green="0" blue="0" />
+      <color blue="0" green="0" red="255" />
     </foreground_color>
     <widget_type>Rectangle</widget_type>
     <enabled>true</enabled>
     <fg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </fg_gradient_color>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <font>
@@ -1168,13 +1149,12 @@ $(pv_value)</tooltip>
     <line_width>0</line_width>
     <horizontal_fill>true</horizontal_fill>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>330</y>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>36</x>
     <gradient>false</gradient>
   </widget>
@@ -1192,9 +1172,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1205,13 +1185,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>504</y>
     <actions hook="false" hook_all="false">
@@ -1220,11 +1200,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>48</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -1241,9 +1220,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1254,13 +1233,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>450</y>
     <actions hook="false" hook_all="false">
@@ -1269,11 +1248,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>48</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -1290,9 +1268,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1303,13 +1281,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>342</y>
     <actions hook="false" hook_all="false">
@@ -1319,11 +1297,10 @@ $(pv_value)</tooltip>
           <include_parent_macros>true</include_parent_macros>
           <dom>LI</dom>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>48</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -1340,9 +1317,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1353,13 +1330,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>396</y>
     <actions hook="false" hook_all="false">
@@ -1369,11 +1346,10 @@ $(pv_value)</tooltip>
           <include_parent_macros>true</include_parent_macros>
           <bin>/bin/Linux</bin>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>48</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
@@ -1391,10 +1367,10 @@ $(pv_value)</tooltip>
     </scale_options>
     <transparent>false</transparent>
     <background_color>
-      <color red="127" green="127" blue="127" />
+      <color blue="127" green="127" red="127" />
     </background_color>
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Label</widget_type>
     <enabled>true</enabled>
@@ -1407,13 +1383,13 @@ $(pv_value)</tooltip>
     <rules />
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <horizontal_alignment>1</horizontal_alignment>
     <actions hook="false" hook_all="false" />
     <y>317</y>
     <wrap_words>false</wrap_words>
-    <tooltip></tooltip>
+    <tooltip />
     <x>36</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Rectangle" version="1.0.0">
@@ -1421,11 +1397,11 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <fill_level>0.0</fill_level>
     <line_color>
-      <color red="128" green="0" blue="255" />
+      <color blue="255" green="0" red="128" />
     </line_color>
     <wuid>-6a65536:1475ebaa3e2:3a54</wuid>
     <bg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </bg_gradient_color>
     <scripts />
     <height>229</height>
@@ -1439,17 +1415,17 @@ $(pv_value)</tooltip>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
     <transparent>false</transparent>
-    <pv_name></pv_name>
+    <pv_name />
     <background_color>
-      <color red="191" green="191" blue="191" />
+      <color blue="191" green="191" red="191" />
     </background_color>
     <foreground_color>
-      <color red="255" green="0" blue="0" />
+      <color blue="0" green="0" red="255" />
     </foreground_color>
     <widget_type>Rectangle</widget_type>
     <enabled>true</enabled>
     <fg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </fg_gradient_color>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <font>
@@ -1464,13 +1440,12 @@ $(pv_value)</tooltip>
     <line_width>0</line_width>
     <horizontal_fill>true</horizontal_fill>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>330</y>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>264</x>
     <gradient>false</gradient>
   </widget>
@@ -1488,9 +1463,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1501,13 +1476,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>504</y>
     <actions hook="false" hook_all="false">
@@ -1516,11 +1491,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>276</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -1537,9 +1511,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1550,13 +1524,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>450</y>
     <actions hook="false" hook_all="false">
@@ -1565,11 +1539,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>276</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -1586,9 +1559,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1599,13 +1572,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>342</y>
     <actions hook="false" hook_all="false">
@@ -1615,11 +1588,10 @@ $(pv_value)</tooltip>
           <include_parent_macros>true</include_parent_macros>
           <here>/ops</here>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>276</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -1636,9 +1608,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1649,13 +1621,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>396</y>
     <actions hook="false" hook_all="false">
@@ -1664,11 +1636,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>276</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
@@ -1686,10 +1657,10 @@ $(pv_value)</tooltip>
     </scale_options>
     <transparent>false</transparent>
     <background_color>
-      <color red="127" green="127" blue="127" />
+      <color blue="127" green="127" red="127" />
     </background_color>
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Label</widget_type>
     <enabled>true</enabled>
@@ -1702,13 +1673,13 @@ $(pv_value)</tooltip>
     <rules />
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <horizontal_alignment>1</horizontal_alignment>
     <actions hook="false" hook_all="false" />
     <y>317</y>
     <wrap_words>false</wrap_words>
-    <tooltip></tooltip>
+    <tooltip />
     <x>264</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.edm.symbolwidget" version="1.0.0">
@@ -1725,12 +1696,12 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <background_color>
-      <color red="0" green="0" blue="255" />
+      <color blue="255" green="0" red="0" />
     </background_color>
     <foreground_color>
-      <color red="255" green="0" blue="0" />
+      <color blue="0" green="0" red="255" />
     </foreground_color>
     <widget_type>Edm Symbol Widget</widget_type>
     <enabled>true</enabled>
@@ -1743,15 +1714,14 @@ $(pv_value)</tooltip>
     <rules />
     <pv_value />
     <border_width>1</border_width>
-    <image_file></image_file>
+    <image_file />
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>362</y>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>716</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.edm.symbolwidget" version="1.0.0">
@@ -1768,12 +1738,12 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <background_color>
-      <color red="0" green="0" blue="255" />
+      <color blue="255" green="0" red="0" />
     </background_color>
     <foreground_color>
-      <color red="255" green="0" blue="0" />
+      <color blue="0" green="0" red="255" />
     </foreground_color>
     <widget_type>Edm Symbol Widget</widget_type>
     <enabled>true</enabled>
@@ -1786,15 +1756,14 @@ $(pv_value)</tooltip>
     <rules />
     <pv_value />
     <border_width>1</border_width>
-    <image_file></image_file>
+    <image_file />
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>431</y>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>566</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -1811,9 +1780,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1824,13 +1793,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>342</y>
     <actions hook="false" hook_all="false">
@@ -1839,11 +1808,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>504</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -1860,9 +1828,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1873,13 +1841,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>396</y>
     <actions hook="false" hook_all="false">
@@ -1888,11 +1856,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>504</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Rectangle" version="1.0.0">
@@ -1900,11 +1867,11 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <fill_level>0.0</fill_level>
     <line_color>
-      <color red="128" green="0" blue="255" />
+      <color blue="255" green="0" red="128" />
     </line_color>
     <wuid>-332ddb56:1495b9e2a3c:-3053</wuid>
     <bg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </bg_gradient_color>
     <scripts />
     <height>229</height>
@@ -1918,17 +1885,17 @@ $(pv_value)</tooltip>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
     <transparent>false</transparent>
-    <pv_name></pv_name>
+    <pv_name />
     <background_color>
-      <color red="191" green="191" blue="191" />
+      <color blue="191" green="191" red="191" />
     </background_color>
     <foreground_color>
-      <color red="255" green="0" blue="0" />
+      <color blue="0" green="0" red="255" />
     </foreground_color>
     <widget_type>Rectangle</widget_type>
     <enabled>true</enabled>
     <fg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </fg_gradient_color>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <font>
@@ -1943,13 +1910,12 @@ $(pv_value)</tooltip>
     <line_width>0</line_width>
     <horizontal_fill>true</horizontal_fill>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>330</y>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>492</x>
     <gradient>false</gradient>
   </widget>
@@ -1967,9 +1933,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -1980,13 +1946,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>450</y>
     <actions hook="false" hook_all="false">
@@ -1995,11 +1961,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>504</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
@@ -2017,10 +1982,10 @@ $(pv_value)</tooltip>
     </scale_options>
     <transparent>false</transparent>
     <background_color>
-      <color red="127" green="127" blue="127" />
+      <color blue="127" green="127" red="127" />
     </background_color>
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Label</widget_type>
     <enabled>true</enabled>
@@ -2033,13 +1998,13 @@ $(pv_value)</tooltip>
     <rules />
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <horizontal_alignment>1</horizontal_alignment>
     <actions hook="false" hook_all="false" />
     <y>317</y>
     <wrap_words>false</wrap_words>
-    <tooltip></tooltip>
+    <tooltip />
     <x>492</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -2056,9 +2021,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -2069,13 +2034,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>504</y>
     <actions hook="false" hook_all="false">
@@ -2084,11 +2049,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>504</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.edm.symbolwidget" version="1.0.0">
@@ -2105,12 +2069,12 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <background_color>
-      <color red="0" green="0" blue="255" />
+      <color blue="255" green="0" red="0" />
     </background_color>
     <foreground_color>
-      <color red="255" green="0" blue="0" />
+      <color blue="0" green="0" red="255" />
     </foreground_color>
     <widget_type>Edm Symbol Widget</widget_type>
     <enabled>true</enabled>
@@ -2123,15 +2087,14 @@ $(pv_value)</tooltip>
     <rules />
     <pv_value />
     <border_width>1</border_width>
-    <image_file></image_file>
+    <image_file />
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>125</y>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>794</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Rectangle" version="1.0.0">
@@ -2139,11 +2102,11 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <fill_level>0.0</fill_level>
     <line_color>
-      <color red="128" green="0" blue="255" />
+      <color blue="255" green="0" red="128" />
     </line_color>
     <wuid>-7d662963:14985e75543:-6a06</wuid>
     <bg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </bg_gradient_color>
     <scripts />
     <height>277</height>
@@ -2157,17 +2120,17 @@ $(pv_value)</tooltip>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
     <transparent>false</transparent>
-    <pv_name></pv_name>
+    <pv_name />
     <background_color>
-      <color red="191" green="191" blue="191" />
+      <color blue="191" green="191" red="191" />
     </background_color>
     <foreground_color>
-      <color red="255" green="0" blue="0" />
+      <color blue="0" green="0" red="255" />
     </foreground_color>
     <widget_type>Rectangle</widget_type>
     <enabled>true</enabled>
     <fg_gradient_color>
-      <color red="255" green="255" blue="255" />
+      <color blue="255" green="255" red="255" />
     </fg_gradient_color>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <font>
@@ -2182,13 +2145,12 @@ $(pv_value)</tooltip>
     <line_width>0</line_width>
     <horizontal_fill>true</horizontal_fill>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <alarm_pulsing>false</alarm_pulsing>
     <actions hook="false" hook_all="false" />
     <y>24</y>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>720</x>
     <gradient>false</gradient>
   </widget>
@@ -2206,9 +2168,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -2219,13 +2181,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>342</y>
     <actions hook="false" hook_all="false">
@@ -2234,11 +2196,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>732</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -2255,9 +2216,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -2268,13 +2229,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>36</y>
     <actions hook="false" hook_all="false">
@@ -2284,11 +2245,10 @@ $(pv_value)</tooltip>
           <include_parent_macros>true</include_parent_macros>
           <here>/dls_sw/prod/R3.14.11/support/insertionDeviceOverview/1-18/data</here>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>732</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -2305,9 +2265,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -2318,13 +2278,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>90</y>
     <actions hook="false" hook_all="false">
@@ -2337,11 +2297,10 @@ $(pv_value)</tooltip>
           <SCW_COOLER>SR12I-CS-COMPR</SCW_COOLER>
           <eurotherm>SR12I-CS-PCTRL-01</eurotherm>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>732</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
@@ -2359,10 +2318,10 @@ $(pv_value)</tooltip>
     </scale_options>
     <transparent>false</transparent>
     <background_color>
-      <color red="127" green="127" blue="127" />
+      <color blue="127" green="127" red="127" />
     </background_color>
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Label</widget_type>
     <enabled>true</enabled>
@@ -2375,13 +2334,13 @@ $(pv_value)</tooltip>
     <rules />
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <horizontal_alignment>1</horizontal_alignment>
     <actions hook="false" hook_all="false" />
     <y>11</y>
     <wrap_words>false</wrap_words>
-    <tooltip></tooltip>
+    <tooltip />
     <x>720</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -2398,9 +2357,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -2411,13 +2370,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>143</y>
     <actions hook="false" hook_all="false">
@@ -2430,11 +2389,10 @@ $(pv_value)</tooltip>
           <SCW_COOLER>SR12I-CS-COMPR</SCW_COOLER>
           <eurotherm>SR12I-CS-PCTRL-01</eurotherm>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>732</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -2451,9 +2409,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -2464,13 +2422,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>198</y>
     <actions hook="false" hook_all="false">
@@ -2483,11 +2441,10 @@ $(pv_value)</tooltip>
           <SCW_COOLER>SR15I-ID-COMPR</SCW_COOLER>
           <eurotherm>SR15I-ID-PCTRL-01</eurotherm>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>732</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -2504,9 +2461,9 @@ $(pv_value)</tooltip>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
-    <pv_name></pv_name>
+    <pv_name />
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Action Button</widget_type>
     <enabled>true</enabled>
@@ -2517,13 +2474,13 @@ $(pv_value)</tooltip>
     <width>187</width>
     <border_style>0</border_style>
     <push_action_index>0</push_action_index>
-    <image></image>
+    <image />
     <rules />
     <pv_value />
     <toggle_button>false</toggle_button>
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <y>249</y>
     <actions hook="false" hook_all="false">
@@ -2532,11 +2489,10 @@ $(pv_value)</tooltip>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <description></description>
+        <description />
       </action>
     </actions>
-    <tooltip>$(pv_name)
-$(pv_value)</tooltip>
+    <tooltip />
     <x>732</x>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
@@ -2554,10 +2510,10 @@ $(pv_value)</tooltip>
     </scale_options>
     <transparent>false</transparent>
     <background_color>
-      <color red="127" green="127" blue="127" />
+      <color blue="127" green="127" red="127" />
     </background_color>
     <foreground_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </foreground_color>
     <widget_type>Label</widget_type>
     <enabled>true</enabled>
@@ -2570,13 +2526,13 @@ $(pv_value)</tooltip>
     <rules />
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <horizontal_alignment>1</horizontal_alignment>
     <actions hook="false" hook_all="false" />
     <y>317</y>
     <wrap_words>false</wrap_words>
-    <tooltip></tooltip>
+    <tooltip />
     <x>720</x>
   </widget>
 </display>
