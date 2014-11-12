@@ -32,9 +32,8 @@ def _index_dir(root, directory, recurse):
     files = os.listdir(directory)
     # Path within module is always relative to root - the EDMDATAFILE
     # or path variable.
-    module, version, path_within_module = utils.parse_module_name(root)
-    if path_within_module is None:
-        path_within_module = ''
+    module, _, path_within_module = utils.parse_module_name(root)
+
     for f in files:
         if f.startswith('.'):
             continue

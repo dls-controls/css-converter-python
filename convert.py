@@ -157,9 +157,8 @@ class Converter(object):
         self.path_dirs = path_dirs
         self.path_dirs.append(working_dir)
 
-        # OPI files can be in nested directories; executable files can't.
         self.opi_index = paths.index_paths(self.edmdatafiles, True)
-        self.path_index = paths.index_paths(self.path_dirs, False)
+        self.path_index = paths.index_paths(self.path_dirs, True)
 
         self.symbol_files = symbol_files
         self.symbol_files = symbol_dict
@@ -195,13 +194,23 @@ class Converter(object):
                                                version=self.version)
                 f.write(updated_content)
 
-    def convert_opis(self, force):
+    def process_file(self, datadir, entry, force, working_path):
+        # ignore hidden directories
+        if not entry.startswith('.'):
+            full_path = os.path.join(datadir, entry)
+            log.debug("New full path is %s", full_path)
+            if os.path.isdir(full_path):
+                outpath = os.path.join(working_path, entry)
+                log.debug("New outdir is %s", outpath)
+                self._convert_dir(full_path, outpath, force)
+
+    def convert(self, force):
         """
-        Given the EDM datafiles list, parse the directory and (recursively)
-        any subdirectories for edm files.  Create output in a similar
+        Given the EDM datafiles and PATH lists, parse the directory and
+        any subdirectories for edm/script files.  Create output in a similar
         directory structure.
         """
-        for datadir in self.edmdatafiles:
+        for datadir in self.edmdatafiles + self.path_dirs:
             # Currently can't handle relative directories.
             if datadir.startswith('.'):
                 continue
@@ -209,58 +218,20 @@ class Converter(object):
             try:
                 module_name, version, rel_path = utils.parse_module_name(datadir)
             except ValueError:
-                module_name = ""
-                rel_path = ""
-                version = None
+                log.warn("Can't parse path %s" % datadir)
+                continue
+
             log.debug("%s %s %s", module_name, version, rel_path)
             if rel_path is None:
                 rel_path = ""
             module_name = module_name.split('/')[-1]
             log.debug("The module name path is %s", module_name)
             entries = os.listdir(datadir)
+            working_path = os.path.join(self.root_outdir, module_name, rel_path)
             for entry in entries:
-                # ignore hidden directories
-                if not entry.startswith('.'):
-                    full_path = os.path.join(datadir, entry)
-                    log.debug("New full path is %s", full_path)
-                    if os.path.isdir(full_path):
-                        outpath = os.path.join(self.root_outdir, module_name, rel_path, entry)
-                        log.debug("New outdir is %s", outpath)
-                        self._convert_dir(full_path, outpath, force)
+                self.process_file(datadir, entry, force, working_path)
 
-            self._convert_dir(datadir, os.path.join(self.root_outdir, module_name, rel_path), force)
-
-    def copy_scripts(self, force):
-        """
-        Given the EDM PATH list, copy all files in the directory and any
-        subdirectories across. Create output in a similar directory structure.
-        """
-        log.debug("The path files are: %s", self.path_dirs)
-        for datadir in self.path_dirs:
-            log.debug('EDM path directory %s' % datadir)
-            try:
-                module_name, version, rel_path = utils.parse_module_name(datadir)
-                if rel_path is None:
-                    rel_path = ""
-            except ValueError:
-                log.warn("Can't parse path %s" % datadir)
-                continue
-            module_name = module_name.split('/')[-1]
-
-            entries = os.listdir(datadir)
-            for entry in entries:
-                # ignore hidden directories
-                if not entry.startswith('.'):
-                    full_path = os.path.join(datadir, entry)
-                    log.debug("New full path is %s", full_path)
-                    if os.path.isdir(full_path):
-                        outpath = os.path.join(self.root_outdir, module_name, rel_path, entry)
-                        log.debug("New outdir is %s", outpath)
-                        if not os.path.isdir(outpath):
-                            os.makedirs(outpath)
-                        self._convert_dir(full_path, os.path.join(self.root_outdir, module_name, entry), force)
-
-            self._convert_dir(datadir, os.path.join(self.root_outdir, module_name, rel_path), force)
+            self._convert_dir(datadir, working_path, force)
 
     def _is_symbol(self, filename):
         """
@@ -442,8 +413,7 @@ def run_conversion():
             (script_file, script_args, symbols, outdir) = parse_config(cfg)
 
             c = Converter(script_file, script_args, symbols, outdir, symbol_dict)
-            c.convert_opis(args.force)
-            c.copy_scripts(args.force)
+            c.convert(args.force)
         except ConfigurationError:
             log.error('Please ensure %s is a valid config file' % args.config)
 

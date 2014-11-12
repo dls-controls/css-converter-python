@@ -9,12 +9,14 @@ def parse_module_name(filepath):
     Return (module_name, version, relative_path)
 
     If the path is not an ioc or a support module, raise ValueError.
+
+    version may be None
     '''
     log.debug("Parsing %s.",  filepath)
     filepath = os.path.realpath(filepath)
     filepath = os.path.normpath(filepath)
     parts = filepath.split('/')
-    module, version, relative_path = None, None, None
+    version = None
 
     if 'support' in parts:
         root_index = parts.index('support')
@@ -34,8 +36,6 @@ def parse_module_name(filepath):
     if module == '':
         raise ValueError('No module found in %s' % filepath)
     relative_path = '/'.join(parts[v+1:])
-    if relative_path == '':
-        relative_path = None
 
     return module, version, relative_path
 
