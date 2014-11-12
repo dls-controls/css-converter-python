@@ -1,5 +1,5 @@
 #!/usr/bin/env dls-python
-'''
+"""
 Simple python script to find and convert EDM .edl files into CSS
 .opi files. It uses conv.jar, built from the latest version
 of the OPIBuilder converter (as of March 2014).
@@ -19,7 +19,7 @@ Steps:
   - if conversion fails, it may be an old-style .edl file
   - try converting using edm, then converting again
  - if file is a different type, copy across directly
-'''
+"""
 
 import utils
 import paths
@@ -56,10 +56,10 @@ PROJECT_FILENAME = '.project'
 
 
 def convert_symbol(symbol_file, destinations):
-    '''
+    """
     Convert an EDM symbol file into the png used by the CSS symbol widget.
     This uses an external shell script.
-    '''
+    """
     log.debug("Converting %s", symbol_file)
     # compress.py returns an edited .edl file
     command = COMPRESS_CMD + [symbol_file]
@@ -86,10 +86,10 @@ def convert_symbol(symbol_file, destinations):
 
 
 def update_edl(filename):
-    '''
+    """
     Copy EDM file to temporary location.  Attempt to convert to
     new format using EDM. Return location of converted file.
-    '''
+    """
     tmp_edm = os.path.join(TMP_DIR, os.path.basename(filename))
     if os.path.exists(tmp_edm):
         # make sure we have write permissions on the destination
@@ -105,10 +105,10 @@ def update_edl(filename):
 
 
 def convert_edl(filename, destination):
-    '''
+    """
     Try to convert .edl file.  If it fails, try updating .edl file
     using edm before converting again.
-    '''
+    """
     utils.make_writeable(destination)
     # preprocess symbol files - Matt's symbol widget requires pngs
     # instead of the OPIs from the converter.
@@ -130,20 +130,20 @@ def convert_edl(filename, destination):
 
 
 class Converter(object):
-    '''
+    """
     Given a script used to start EDM, deduce the directories needed
     for conversion and convert them in the appropriate format.
     Output goes in the directory provided.
 
     Since we can't easily determine symbol files, these may be specified
     on creation.
-    '''
+    """
 
     def __init__(self, script_file, script_args, symbol_files, outdir, symbol_dict):
-        '''
+        """
         Given the EDM entry script, deduce the paths to convert.
         A list of symbol files is stored to help when converting.
-        '''
+        """
         # Spoof EDM to find EDMDATAFILES and PATH
         # Index these directories to find which modules
         # relative paths may be in.
@@ -175,9 +175,9 @@ class Converter(object):
         self._generate_project_file()
 
     def _generate_project_file(self):
-        '''
+        """
         Create an Eclipse project file for this set of OPIs.
-        '''
+        """
         with open(PROJECT_TEMPLATE) as f:
             content = f.read()
         s = string.Template(content)
@@ -187,11 +187,11 @@ class Converter(object):
             f.write(updated_content)
 
     def convert_opis(self, force):
-        '''
+        """
         Given the EDM datafiles list, parse the directory and (recursively)
         any subdirectories for edm files.  Create output in a similar
         directory structure.
-        '''
+        """
         for datadir in self.edmdatafiles:
             # Currently can't handle relative directories.
             if datadir.startswith('.'):
@@ -222,10 +222,10 @@ class Converter(object):
             self._convert_dir(datadir, os.path.join(self.root_outdir, module_name, rel_path), force)
 
     def copy_scripts(self, force):
-        '''
+        """
         Given the EDM PATH list, copy all files in the directory and any
         subdirectories across. Create output in a similar directory structure.
-        '''
+        """
         log.debug("The path files are: %s", self.path_dirs)
         for datadir in self.path_dirs:
             log.debug('EDM path directory %s' % datadir)
@@ -253,13 +253,12 @@ class Converter(object):
 
             self._convert_dir(datadir, os.path.join(self.root_outdir, module_name, rel_path), force)
 
-
     def _is_symbol(self, filename):
-        '''
+        """
         Return True if:
          - the opi file name ends with 'symbol.edl'
          - the opi file name is included in self.symbol_files
-        '''
+        """
         if filename.endswith('symbol.edl'):
             return True
         if os.path.basename(filename) in self.symbol_files:
@@ -267,11 +266,11 @@ class Converter(object):
         return False
 
     def _already_converted(self, outdir, file):
-        '''
+        """
         Return True if:
          - there is already a converted file in the destination
          - there is a png of the right name in place of a symbol file
-        '''
+        """
         basename = os.path.basename(file)
         base = '.'.join(basename.split('.')[:-1])
         if self._is_symbol(file):
@@ -283,10 +282,10 @@ class Converter(object):
             return os.path.exists(destination)
 
     def _convert_one_file(self, full_path, outdir, force):
-        '''
+        """
         Apppropriately convert one edl file, including updating
         any relative paths using the opi_index dict.
-        '''
+        """
         # Figure out the 'depth' of the file.  This is how many 
         # nested directories any relative path must descend before
         # adding the relative path back on.
@@ -328,12 +327,12 @@ class Converter(object):
                 log.warn('Copying file %s unsuccessful.' % full_path)
 
     def _convert_dir(self, indir, outdir, force):
-        '''
+        """
         Convert or copy files in one directory to the corresponding output
         directory:
          - if the file ends with 'edl', convert
          - otherwise, copy the file
-        '''
+        """
         log.info('Starting directory %s' % indir)
         if not os.path.isdir(outdir):
             os.makedirs(outdir)
