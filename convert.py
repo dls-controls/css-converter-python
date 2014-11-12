@@ -157,8 +157,7 @@ class Converter(object):
         self.path_dirs = path_dirs
         self.path_dirs.append(working_dir)
 
-        self.opi_index = paths.index_paths(self.edmdatafiles, True)
-        self.path_index = paths.index_paths(self.path_dirs, True)
+        self.file_index = paths.index_paths(self.edmdatafiles + self.path_dirs, True)
 
         self.symbol_files = symbol_files
         self.symbol_files = symbol_dict
@@ -261,7 +260,7 @@ class Converter(object):
     def _convert_one_file(self, full_path, outdir, force):
         """
         Apppropriately convert one edl file, including updating
-        any relative paths using the opi_index dict.
+        any relative paths using the file_index dict.
         """
         # Figure out the 'depth' of the file.  This is how many 
         # nested directories any relative path must descend before
@@ -327,7 +326,7 @@ class Converter(object):
     def update_paths(self, filepath, depth):
         module = filepath.split('/')[1]
         log.debug('Module for path %s is %s' % (filepath, module))
-        paths.update_opi_file(filepath, depth, self.opi_index, self.path_index, module)
+        paths.update_opi_file(filepath, depth, self.file_index, module)
 
 
 def store_symbol(filename, destination, symbol_dictionary):
