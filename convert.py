@@ -60,7 +60,7 @@ def convert_symbol(symbol_file, destinations):
     Convert an EDM symbol file into the png used by the CSS symbol widget.
     This uses an external shell script.
     """
-    log.debug("Converting %s", symbol_file)
+    log.debug("Converting symbol %s", symbol_file)
     # compress.py returns an edited .edl file
     command = COMPRESS_CMD + [symbol_file]
     out = subprocess.check_output(" ".join(command), shell=True)
@@ -71,7 +71,7 @@ def convert_symbol(symbol_file, destinations):
 
     # Copy the converted png to all specified destinations
     for destination in destinations:
-        log.debug("Copying to %s", destination)
+        log.debug("... copy to %s", destination)
         try:
             utils.make_writeable(destination)
             destdir = os.path.dirname(destination)
@@ -115,18 +115,19 @@ def convert_edl(filename, destination):
     # first try converting opi
     log.debug("Converting %s" % filename)
     command = CONVERT_CMD + [filename, destination]
-    x = subprocess.call(command)
+    returncode = subprocess.call(command)
     utils.make_read_only(destination)
-    if x != 0: # conversion failed
-        log.warn('Conversion failed with code %d; will try updating' % x)
+    if returncode != 0:  # conversion failed
+        log.warn('Conversion failed with code %d; will try updating' % returncode)
         new_edl = update_edl(filename)
         if new_edl is not None:
             log.warn('Updated to new-style edl %s' % new_edl)
             command = CONVERT_CMD + [new_edl, destination]
-            x = subprocess.call(command)
-            log.info("Conversion return code: %s" % x)
+            returncode = subprocess.call(command)
+            log.info("Conversion return code: %s" % returncode)
             utils.make_read_only(destination)
-    return x == 0
+
+    return returncode == 0
 
 
 class Converter(object):
@@ -147,44 +148,52 @@ class Converter(object):
         # Spoof EDM to find EDMDATAFILES and PATH
         # Index these directories to find which modules
         # relative paths may be in.
-        edmdatafiles, path_dirs, working_dir, args = utils.spoof_edm(script_file, script_args)
-        self.edmdatafiles = [f for f in edmdatafiles if f not in  ('', '.')]
+        edmdatafiles, path_dirs, working_dir, args = utils.spoof_edm(
+            script_file, script_args)
+
+        self.edmdatafiles = [f for f in edmdatafiles if f not in ('', '.')]
         self.edmdatafiles.append(working_dir)
+
         self.path_dirs = path_dirs
         self.path_dirs.append(working_dir)
+
         # OPI files can be in nested directories; executable files can't.
         self.opi_index = paths.index_paths(self.edmdatafiles, True)
         self.path_index = paths.index_paths(self.path_dirs, False)
+
         self.symbol_files = symbol_files
-        self.tmpdir = TMP_DIR
-        self.symbolsdir = SYMBOLS_DIR
         self.symbol_files = symbol_dict
+
         try:
-            self.module_name, self.version, _dummy = utils.parse_module_name(working_dir)
+            self.module_name, self.version, _ = utils.parse_module_name(working_dir)
         except ValueError:
             log.warn("Didn't understand script's working directory!")
             self.module_name = os.path.basename(script_file)
             self.version = None
+
         self.module_name = self.module_name.replace('/', '_')
+
         if self.version is None:
             self.version = 'no-version'
+
         self.root_outdir = os.path.join(outdir, "%s_%s" % (self.module_name, self.version))
         if not os.path.exists(self.root_outdir):
             log.info('Making new output directory %s' % self.root_outdir)
             os.makedirs(self.root_outdir)
+
         self._generate_project_file()
 
     def _generate_project_file(self):
         """
         Create an Eclipse project file for this set of OPIs.
         """
-        with open(PROJECT_TEMPLATE) as f:
-            content = f.read()
-        s = string.Template(content)
-        updated_content = s.substitute(module_name=self.module_name,
-                version=self.version)
         with open(os.path.join(self.root_outdir, PROJECT_FILENAME), 'w') as f:
-            f.write(updated_content)
+            with open(PROJECT_TEMPLATE) as template:
+                content = template.read()
+                s = string.Template(content)
+                updated_content = s.substitute(module_name=self.module_name,
+                                               version=self.version)
+                f.write(updated_content)
 
     def convert_opis(self, force):
         """
@@ -259,11 +268,8 @@ class Converter(object):
          - the opi file name ends with 'symbol.edl'
          - the opi file name is included in self.symbol_files
         """
-        if filename.endswith('symbol.edl'):
-            return True
-        if os.path.basename(filename) in self.symbol_files:
-            return True
-        return False
+        return filename.endswith('symbol.edl') or \
+            os.path.basename(filename) in self.symbol_files
 
     def _already_converted(self, outdir, file):
         """
