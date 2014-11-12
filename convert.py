@@ -25,7 +25,6 @@ import utils
 import paths
 
 import os
-import sys
 import glob
 import subprocess
 import shutil
@@ -56,12 +55,12 @@ PROJECT_TEMPLATE = 'project.template'
 PROJECT_FILENAME = '.project'
 
 
-def convert_symbol(symbol_file, destination):
+def convert_symbol(symbol_file, destinations):
     '''
     Convert an EDM symbol file into the png used by the CSS symbol widget.
     This uses an external shell script.
     '''
-    utils.make_writeable(destination)
+    log.debug("Converting %s", symbol_file)
     # compress.py returns an edited .edl file
     command = COMPRESS_CMD + [symbol_file]
     out = subprocess.check_output(" ".join(command), shell=True)
@@ -69,16 +68,21 @@ def convert_symbol(symbol_file, destination):
     relfilename = out.strip()
     filename = os.path.basename(relfilename)
     source = os.path.join(os.getcwd(), relfilename)
-    destdir = os.path.dirname(destination)
-    absfilename = os.path.join(destdir, filename)
 
-    try:
-        utils.make_writeable(absfilename)
-        shutil.copyfile(source, absfilename)
-        utils.make_read_only(absfilename)
-    except Exception as e:
-        log.warn("Failed copying file" + str(e))
-        raise e
+    # Copy the converted png to all specified destinations
+    for destination in destinations:
+        log.debug("Copying to %s", destination)
+        try:
+            utils.make_writeable(destination)
+            destdir = os.path.dirname(destination)
+            absfilename = os.path.join(destdir, filename)
+
+            utils.make_writeable(absfilename)
+            shutil.copyfile(source, absfilename)
+            utils.make_read_only(absfilename)
+        except Exception as e:
+            log.warn("Failed copying file" + str(e))
+            raise e
 
 
 def update_edl(filename):
@@ -135,7 +139,7 @@ class Converter(object):
     on creation.
     '''
 
-    def __init__(self, script_file, script_args, symbol_files, outdir):
+    def __init__(self, script_file, script_args, symbol_files, outdir, symbol_dict):
         '''
         Given the EDM entry script, deduce the paths to convert.
         A list of symbol files is stored to help when converting.
@@ -154,6 +158,7 @@ class Converter(object):
         self.symbol_files = symbol_files
         self.tmpdir = TMP_DIR
         self.symbolsdir = SYMBOLS_DIR
+        self.symbol_files = symbol_dict
         try:
             self.module_name, self.version, _dummy = utils.parse_module_name(working_dir)
         except ValueError:
@@ -295,8 +300,9 @@ class Converter(object):
             if not force and self._already_converted(outdir, full_path):
                 log.info('Skipping existing file %s' % destination)
             elif self._is_symbol(full_path):
-                convert_symbol(full_path, destination)
-                log.info('Successfully converted symbol file %s' % destination)
+                store_symbol(full_path, destination, self.symbol_files)
+                # convert_symbol(full_path, destination)
+                log.info('Successfully stored symbol file %s' % destination)
             else:
                 convert_edl(full_path, destination)
                 log.info('Successfully converted %s' % destination)
@@ -348,11 +354,27 @@ class Converter(object):
         paths.update_opi_file(filepath, depth, self.opi_index, self.path_index, module)
 
 
+def store_symbol(filename, destination, symbol_dictionary):
+    """ Build a global dictionary of {fullname:<destinations>}
+        for symbol files needing conversion.
+
+        If the passed fullname is already in the dictionary the destination is
+        added to the list, provided it is not already there.
+        If the passed fullname is not in the dictionary it is added.
+    """
+    if filename in symbol_dictionary:
+        destinations = symbol_dictionary[filename]
+        if not destination in destinations:
+            destinations.append(destination)
+    else:
+        symbol_dictionary[filename] = [destination]
+
+
 def set_up_options():
     parser = argparse.ArgumentParser(description='''
     Convert whole areas of EDM screens into CSS's OPI format.
     Configuration files for each area are found in the conf/
-    directory.  The output location is not automatically 
+    directory.  The output location is not automatically
     created to avoid unwanted files...
     ''')
     parser.add_argument('-f', action='store_true', dest='force',
@@ -363,53 +385,68 @@ def set_up_options():
     return args
 
 
-if __name__ == '__main__':
+def parse_config(cfg):
+    log.info('\n\nStarting config file %s.\n', cfg)
+    cp = ConfigParser.ConfigParser()
+    cp.read(cfg)
+
+    try:
+        script_file = cp.get('edm', 'edm_script')
+    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+        raise ConfigurationError()
+
+    try:
+        script_args = cp.get('edm', 'script_args')
+        script_args = script_args.split()
+    except ConfigParser.NoOptionError:
+        script_args = []
+
+    try:
+        outdir = cp.get('opi', 'outdir')
+    except ConfigParser.NoSectionError:
+        raise ConfigurationError()
+
+    try:
+        symbols = cp.get('edm', 'symbols')
+        symbols = symbols.split(':')
+    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+        symbols = []
+
+    return script_file, script_args, symbols, outdir
+
+
+def run_conversion():
+
+    symbol_dict = {}
 
     # Parse configuration
     args = set_up_options()
     log.debug("Config files supplied: %s", args.config)
 
+    try:
+        if not os.path.isdir(TMP_DIR):
+            os.makedirs(TMP_DIR)
+        if not os.path.isdir(SYMBOLS_DIR):
+            os.makedirs(SYMBOLS_DIR)
+    except OSError:
+        log.error('Could not create temporary directories %s and %s',
+                  (TMP_DIR, SYMBOLS_DIR))
+
     for cfg in args.config:
-        log.info('\n\nStarting config file %s.\n', cfg)
-        cp = ConfigParser.ConfigParser()
-        cp.read(cfg)
-
         try:
-            if not os.path.isdir(TMP_DIR):
-                os.makedirs(TMP_DIR)
-            if not os.path.isdir(SYMBOLS_DIR):
-                os.makedirs(SYMBOLS_DIR)
-        except OSError:
-            log.error('Could not create temporary directories %s and %s',
-                    (TMP_DIR, SYMBOLS_DIR))
-            continue
+            (script_file, script_args, symbols, outdir) = parse_config(cfg)
 
-        try:
-            script_file = cp.get('edm', 'edm_script')
-        except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+            c = Converter(script_file, script_args, symbols, outdir, symbol_dict)
+            c.convert_opis(args.force)
+            c.copy_scripts(args.force)
+        except ConfigurationError:
             log.error('Please ensure %s is a valid config file' % args.config)
-            continue
 
-        try:
-            script_args = cp.get('edm', 'script_args')
-            script_args = script_args.split()
-        except ConfigParser.NoOptionError:
-            script_args = []
+    for path, destinations in symbol_dict.iteritems():
+        convert_symbol(path, destinations)
 
-        try:
-            outdir = cp.get('opi', 'outdir')
-        except ConfigParser.NoSectionError:
-            log.error('Please ensure %s is a valid config file' % args.config)
-            continue
+class ConfigurationError(Exception):
+    pass
 
-        try:
-            symbols = cp.get('edm', 'symbols')
-            symbols = symbols.split(':')
-        except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-            symbols = []
-
-        c = Converter(script_file, script_args, symbols, outdir)
-        c.convert_opis(args.force)
-        c.copy_scripts(args.force)
-
-
+if __name__ == '__main__':
+    run_conversion()
