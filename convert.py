@@ -21,8 +21,8 @@ Steps:
  - if file is a different type, copy across directly
 """
 
-import utils
-import paths
+from convert import utils
+from convert import paths
 
 import os
 import glob
