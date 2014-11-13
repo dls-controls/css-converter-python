@@ -5,13 +5,13 @@ import logging as log
 
 
 def parse_module_name(filepath):
-    '''
+    """
     Return (module_name, version, relative_path)
 
     If the path is not an ioc or a support module, raise ValueError.
 
     version may be None
-    '''
+    """
     log.debug("Parsing %s.",  filepath)
     filepath = os.path.realpath(filepath)
     filepath = os.path.normpath(filepath)
@@ -55,7 +55,7 @@ def make_writeable(filename):
 
 
 def spoof_edm(script_file, args=[]):
-    '''
+    """
     Use a dummy script called 'edm' to extract:
      - the EDMDATAFILES variable
      - the PATH variable
@@ -64,7 +64,7 @@ def spoof_edm(script_file, args=[]):
     from any script used to run edm.
 
     Assume that the last four lines of output are those produced by this script.
-    '''
+    """
     env = os.environ.copy()
     old_dir = os.getcwd()
     script_dir = os.path.dirname(script_file)

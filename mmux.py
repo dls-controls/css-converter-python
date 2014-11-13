@@ -35,18 +35,18 @@ EXCLUDED_TAGS = ['scriptText']
 
 
 def is_menumux(element):
-    ''' Return true if the tree element is a widget with typeId muxmenu
-    '''
+    """ Return true if the tree element is a widget with typeId muxmenu
+    """
 
     return element.tag == 'widget' and \
         element.get('typeId', default=MISSING) == MENU_MUX_ID
 
 
 def find_mm_symbols(node):
-    '''
+    """
     Recursively find all MenuMux symbols from root node.
     Return a list of (name, first_value).
-    '''
+    """
     symbols = {}
     if len(node) == 0:
         return symbols
@@ -96,7 +96,7 @@ def create_loc_pv(pv_name, initial_value=None):
 
 
 def try_replace(text, symbols):
-    '''
+    """
     Find instances of symbols as macros.  Replace with a local
     PV with a value selected as initial state.
 
@@ -104,7 +104,7 @@ def try_replace(text, symbols):
             - name mangled string to use
             - boolean flag for "simple" subsitition (i.e. returned value should
                 not be wrapped)
-    '''
+    """
 
     substituted = text
     simple_match = True
@@ -152,9 +152,9 @@ def try_replace(text, symbols):
 
 
 def replace_symbols(node, symbols):
-    '''
+    """
     Recursively replace any instance of a symbol with a local PV.
-    '''
+    """
     warning = False
 
     if len(node) == 0:

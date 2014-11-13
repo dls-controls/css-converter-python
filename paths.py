@@ -155,9 +155,9 @@ def _update_script(script_text, depth, file_index, module):
 
 
 def _update_paths(node, depth, file_index, module):
-    '''
+    """
     Recursively update all paths in the opi file to project-relative ones.
-    '''
+    """
     if node.tag in TAGS_TO_UPDATE:
         node.text = _update_opi_path(node.text, depth, file_index, module)
     if node.tag == 'command':

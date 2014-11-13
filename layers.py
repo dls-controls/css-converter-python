@@ -1,5 +1,5 @@
 #!/usr/bin/env dls-python
-'''
+"""
 Ordering of elements in BOY screens are determined only by their 
 position in the xml file.
 
@@ -11,7 +11,7 @@ new Rectangle ends up in the correct place.
 Run this script after transforming all the relevant areas.  Note 
 that since the widgets it makes are clickable, running this 
 script again will make yet more widgets!
-'''
+"""
 
 import xml.etree.ElementTree as et
 import sys
@@ -41,9 +41,9 @@ def clickable_widget(node):
 
 
 def find_clickables(node, x, y):
-    '''
+    """
     Recursively find all nodes which accept a mouse click
-    '''
+    """
     # If this widget is a grouping container, any child
     # widgets need to specify coordinates plus coordinates
     # of the grouping container.
@@ -67,11 +67,11 @@ def find_clickables(node, x, y):
 
 
 def create_new_clicker(node, x, y):
-    '''
+    """
     Create new transparent rectangle.  Fetch the appropriate children of 
     the node and copy them to the new widget.
     Change position to that relative to any grouping containers.
-    '''
+    """
     rect = et.Element('widget')
     rect.attrib['typeId'] = RECTANGLE
     v = et.SubElement(rect, 'transparent')
