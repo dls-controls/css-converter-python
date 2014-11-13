@@ -29,13 +29,8 @@ import glob
 import subprocess
 import shutil
 import string
-import ConfigParser
-import argparse
 
 import logging as log
-LOG_FORMAT = '%(levelname)s:  %(message)s'
-LOG_LEVEL = log.INFO
-log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
 NULL_FILE = open(os.devnull, 'w')
@@ -46,12 +41,12 @@ OPI_EXT = 'opi'
 EDL_EXT = 'edl'
 
 # Commands in lists for subprocess
-CONVERT_CMD = ['java', '-jar', 'conv.jar']
+CONVERT_CMD = ['java', '-Dedm2xml.colorsFile=res/colors.list', '-jar', 'res/conv.jar']
 UPDATE_CMD = ['edm', '-convert']
 SYMB_SCRIPT = os.path.join(os.getcwd(), 'auto-symb.sh')
 COMPRESS_CMD = [SYMB_SCRIPT]
 
-PROJECT_TEMPLATE = 'project.template'
+PROJECT_TEMPLATE = 'res/project.template'
 PROJECT_FILENAME = '.project'
 
 
@@ -152,7 +147,7 @@ class Converter(object):
             try:
                 module_name, version, rel_path = utils.parse_module_name(datadir)
             except ValueError:
-                log.warn("Can't parse path %s" % datadir)
+                log.warn("Can't parse path %s", datadir)
                 continue
 
             log.debug("%s %s %s", module_name, version, rel_path)
@@ -214,7 +209,7 @@ class Converter(object):
                 # until the end of the script to reduce focus-grabbing
                 # machine distruption
                 store_symbol(full_path, destination, self.symbol_files)
-                log.info('Successfully stored symbol file %s' % destination)
+                log.info('Successfully stored symbol file %s', destination)
             else:
                 convert_edl(full_path, destination)
                 log.info('Successfully converted %s', destination)
@@ -235,9 +230,9 @@ class Converter(object):
                 utils.make_writeable(destination)
                 shutil.copyfile(full_path, destination)
                 utils.make_read_only(destination, executable)
-                log.info('Successfully copied %s' % destination)
+                log.info('Successfully copied %s', destination)
             except Exception as e:
-                log.error("Failed copying file" + str(e))
+                log.error("Failed copying file %s: %s", full_path, str(e))
 
     def _convert_dir(self, indir, outdir, force):
         """
@@ -246,7 +241,7 @@ class Converter(object):
          - if the file ends with 'edl', convert
          - otherwise, copy the file
         """
-        log.info('Starting directory %s' % indir)
+        log.info('Starting directory %s', indir)
         if not os.path.isdir(outdir):
             os.makedirs(outdir)
 
@@ -266,7 +261,7 @@ class Converter(object):
 
     def update_paths(self, filepath, depth):
         module = filepath.split('/')[1]
-        log.debug('Module for path %s is %s' % (filepath, module))
+        log.debug('Module for path %s is %s', filepath, module)
         paths.update_opi_file(filepath, depth, self.file_index, module)
 
 
@@ -290,99 +285,6 @@ def store_symbol(source, destination, symbol_dictionary):
             destinations.append(destination)
     else:
         symbol_dictionary[source] = [destination]
-
-
-def set_up_options():
-    parser = argparse.ArgumentParser(description='''
-    Convert whole areas of EDM screens into CSS's OPI format.
-    Configuration files for each area are found in the conf/
-    directory.  The output location is not automatically
-    created to avoid unwanted files...
-    ''')
-    parser.add_argument('-f', action='store_true', dest='force',
-                        help='overwrite existing OPI files')
-    parser.add_argument('config', metavar='<config-file>', nargs='*',
-                        help='config file specifying EDM paths and output dir')
-    args = parser.parse_args()
-    return args
-
-
-def parse_config(cfg):
-    """ Parse a specified configuration file
-
-        Raises ConfigurationError if critical section is missing
-
-        Returns:
-            script_file,
-            script_args,
-            symbols,
-            outdir
-    """
-
-    log.info('\n\nStarting config file %s.\n', cfg)
-    cp = ConfigParser.ConfigParser()
-    cp.read(cfg)
-
-    try:
-        script_file = cp.get('edm', 'edm_script')
-    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-        raise ConfigurationError()
-
-    try:
-        script_args = cp.get('edm', 'script_args')
-        script_args = script_args.split()
-    except ConfigParser.NoOptionError:
-        script_args = []
-
-    try:
-        outdir = cp.get('opi', 'outdir')
-    except ConfigParser.NoSectionError:
-        raise ConfigurationError()
-
-    try:
-        symbols = cp.get('edm', 'symbols')
-        symbols = symbols.split(':')
-    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-        symbols = []
-
-    return script_file, script_args, symbols, outdir
-
-
-def run_conversion():
-    """ Perform the module conversion.
-        This is the entry point for the module
-    """
-
-    symbol_dict = {}
-
-    # Parse configuration
-    args = set_up_options()
-    log.debug('Config files supplied: %s', args.config)
-
-    try:
-        if not os.path.isdir(TMP_DIR):
-            os.makedirs(TMP_DIR)
-        if not os.path.isdir(SYMBOLS_DIR):
-            os.makedirs(SYMBOLS_DIR)
-    except OSError:
-        log.error('Could not create temporary directories %s and %s',
-                  (TMP_DIR, SYMBOLS_DIR))
-
-    for cfg in args.config:
-        try:
-            (script_file, script_args, symbols, outdir) = parse_config(cfg)
-
-            for sym in symbols:
-                print "Found symbol: " + sym
-
-            c = Converter(script_file, script_args, symbols, outdir, symbol_dict)
-            c.convert(args.force)
-        except ConfigurationError:
-            log.error('Please ensure %s is a valid config file' % args.config)
-
-    log.info("Post-processing symbol files")
-    for path, destinations in symbol_dict.iteritems():
-        convert_symbol(path, destinations)
 
 
 def convert_symbol(symbol_file, destinations):
@@ -411,7 +313,7 @@ def convert_symbol(symbol_file, destinations):
             shutil.copyfile(source, absfilename)
             utils.make_read_only(absfilename)
         except Exception as e:
-            log.error("Failed copying file" + str(e))
+            log.error("Failed copying file: %s", str(e))
 
 
 def update_edl(filename):
@@ -430,7 +332,7 @@ def update_edl(filename):
             utils.make_writeable(tmp_edm)
             return tmp_edm
         else:
-            log.warn('EDM update failed with code %s' % returncode)
+            log.warn('EDM update failed with code %s', returncode)
     except Exception as e:
         log.error("Failed copying file" + str(e))
 
@@ -445,19 +347,17 @@ def convert_edl(filename, destination):
     # preprocess symbol files - Matt's symbol widget requires pngs
     # instead of the OPIs from the converter.
     # first try converting opi
-    log.debug("Converting %s" % filename)
+    log.debug("Converting %s", filename)
     command = CONVERT_CMD + [filename, destination]
     returncode = subprocess.call(command)
     utils.make_read_only(destination)
     if returncode != 0:  # conversion failed
-        log.warn('Conversion failed with code %d; will try updating' % returncode)
+        log.warn('Conversion failed with code %d; will try updating', returncode)
         new_edl = update_edl(filename)
         if new_edl is not None:
-            log.warn('Updated to new-style edl %s' % new_edl)
+            log.warn('Updated to new-style edl %s', new_edl)
             command = CONVERT_CMD + [new_edl, destination]
             returncode = subprocess.call(command)
-            log.info("Conversion return code: %s" % returncode)
+            log.info("Conversion return code: %s", returncode)
             utils.make_read_only(destination)
 
-if __name__ == '__main__':
-    run_conversion()

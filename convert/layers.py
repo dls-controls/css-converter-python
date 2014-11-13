@@ -14,7 +14,6 @@ script again will make yet more widgets!
 """
 
 import xml.etree.ElementTree as et
-import sys
 import copy
 
 from utils import make_writeable, make_read_only
@@ -116,30 +115,7 @@ def parse(path):
     root.extend(newcs)
 
     # write the new tree out to the same file
-    make_writeable(file)
-    tree.write(file, encoding='utf-8', xml_declaration=True)
-    make_read_only(file)
-
-
-if __name__ == '__main__':
-
-    try:
-        path_file = sys.argv[1]
-    except IndexError:
-        print "Usage: ", sys.argv[0], "<path-file>"
-        sys.exit()
-
-    with open(path_file) as f:
-        lines = f.readlines()
-        lines = [line.strip() for line in lines if not line.startswith('#')]
-        lines = [line.strip() for line in lines if not line == '']
-
-
-    for file in lines:
-        print "Parsing file ", file
-        try:
-            parse(file)
-        except (OSError, IOError) as e:
-            print "Failed to parse file %s: %s" % (file, e)
-
+    make_writeable(path)
+    tree.write(path, encoding='utf-8', xml_declaration=True)
+    make_read_only(path)
 

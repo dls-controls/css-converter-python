@@ -100,19 +100,3 @@ def parse(filepath):
     tree.write(filepath, encoding='utf-8', xml_declaration=True)
     make_read_only(filepath)
 
-
-if __name__ == '__main__':
-    try:
-        path_file = sys.argv[1]
-    except IndexError:
-        print "Usage: ", sys.argv[0], "<path-file>"
-        sys.exit(-1)
-
-    with open(path_file) as f:
-        lines = f.readlines()
-        lines = [line.strip() for line in lines if not line.startswith('#')]
-        lines = [line.strip() for line in lines if not line == ''] 
-
-    for file in lines:
-        print "Parsing file ", file
-        parse(file)

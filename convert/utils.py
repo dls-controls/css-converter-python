@@ -12,7 +12,7 @@ def parse_module_name(filepath):
 
     version may be None
     """
-    log.debug("Parsing %s.",  filepath)
+    log.debug("Parsing %s.", filepath)
     filepath = os.path.realpath(filepath)
     filepath = os.path.normpath(filepath)
     parts = filepath.split('/')
@@ -71,7 +71,7 @@ def spoof_edm(script_file, args=[]):
     # Change to directory of spoofed script.
     os.chdir(script_dir)
     this_dir = os.path.dirname(__file__)
-    spoof_edm_dir = os.path.join(this_dir, 'spoof_edm')
+    spoof_edm_dir = os.path.join(this_dir, '..', 'res')
     # Put spoof edm first on the path.
     env['PATH'] = '%s:%s:%s' % (spoof_edm_dir, script_dir, env['PATH'])
     old_path = env['PATH'].split(':')

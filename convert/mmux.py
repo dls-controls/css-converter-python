@@ -15,10 +15,7 @@ Process:
 3. Replace the reference with the appropriate expression.
 '''
 import os
-import subprocess
-
 import xml.etree.ElementTree as ET
-import sys
 
 from utils import make_writeable, make_read_only
 
@@ -197,46 +194,3 @@ def parse(filepath):
     else:
         print "Skipping %s, file not found" % filepath
 
-
-def perform_postprocess():
-
-    try:
-        path_file = sys.argv[1]
-    except IndexError:
-        print 'Usage: ', sys.argv[0], '<path-file>'
-        sys.exit()
-
-    with open(path_file) as f:
-        lines = f.readlines()
-        lines = [line.strip() for line in lines if not line.startswith('#')]
-        search_paths = [line.strip() for line in lines if not line == '']
-
-    for base_dir in search_paths:
-        for filepath in build_filelist(base_dir):
-            try:
-                print 'Parsing file', filepath
-                parse(filepath)
-            except OSError as e:
-                print 'Update failed: %s' % e
-                continue
-
-
-def build_filelist(basepath):
-    """ Execute a grep on the basepath to find all files that contain a menumux
-        control
-
-        Arguments:
-            basepath - root of search
-        Returns:
-            iterator over relative filepaths
-    """
-    proc = subprocess.Popen("find " + basepath + " | xargs grep -sl " + MENU_MUX_ID,
-                            stdout=subprocess.PIPE,
-                            shell=True)
-
-    for line in iter(proc.stdout.readline, ''):
-        filepath = line.rstrip()
-        yield filepath
-
-if __name__ == '__main__':
-    perform_postprocess()
