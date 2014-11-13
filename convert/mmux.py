@@ -15,10 +15,7 @@ Process:
 3. Replace the reference with the appropriate expression.
 '''
 import os
-import subprocess
-
 import xml.etree.ElementTree as ET
-import sys
 
 from utils import make_writeable, make_read_only
 

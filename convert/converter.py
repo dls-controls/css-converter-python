@@ -147,7 +147,7 @@ class Converter(object):
             try:
                 module_name, version, rel_path = utils.parse_module_name(datadir)
             except ValueError:
-                log.warn("Can't parse path %s" % datadir)
+                log.warn("Can't parse path %s", datadir)
                 continue
 
             log.debug("%s %s %s", module_name, version, rel_path)
@@ -209,7 +209,7 @@ class Converter(object):
                 # until the end of the script to reduce focus-grabbing
                 # machine distruption
                 store_symbol(full_path, destination, self.symbol_files)
-                log.info('Successfully stored symbol file %s' % destination)
+                log.info('Successfully stored symbol file %s', destination)
             else:
                 convert_edl(full_path, destination)
                 log.info('Successfully converted %s', destination)
@@ -230,9 +230,9 @@ class Converter(object):
                 utils.make_writeable(destination)
                 shutil.copyfile(full_path, destination)
                 utils.make_read_only(destination, executable)
-                log.info('Successfully copied %s' % destination)
+                log.info('Successfully copied %s', destination)
             except Exception as e:
-                log.error("Failed copying file" + str(e))
+                log.error("Failed copying file %s: %s", full_path, str(e))
 
     def _convert_dir(self, indir, outdir, force):
         """
@@ -241,7 +241,7 @@ class Converter(object):
          - if the file ends with 'edl', convert
          - otherwise, copy the file
         """
-        log.info('Starting directory %s' % indir)
+        log.info('Starting directory %s', indir)
         if not os.path.isdir(outdir):
             os.makedirs(outdir)
 
@@ -261,7 +261,7 @@ class Converter(object):
 
     def update_paths(self, filepath, depth):
         module = filepath.split('/')[1]
-        log.debug('Module for path %s is %s' % (filepath, module))
+        log.debug('Module for path %s is %s', filepath, module)
         paths.update_opi_file(filepath, depth, self.file_index, module)
 
 
@@ -313,7 +313,7 @@ def convert_symbol(symbol_file, destinations):
             shutil.copyfile(source, absfilename)
             utils.make_read_only(absfilename)
         except Exception as e:
-            log.error("Failed copying file" + str(e))
+            log.error("Failed copying file: %s", str(e))
 
 
 def update_edl(filename):
@@ -332,7 +332,7 @@ def update_edl(filename):
             utils.make_writeable(tmp_edm)
             return tmp_edm
         else:
-            log.warn('EDM update failed with code %s' % returncode)
+            log.warn('EDM update failed with code %s', returncode)
     except Exception as e:
         log.error("Failed copying file" + str(e))
 
@@ -347,17 +347,17 @@ def convert_edl(filename, destination):
     # preprocess symbol files - Matt's symbol widget requires pngs
     # instead of the OPIs from the converter.
     # first try converting opi
-    log.debug("Converting %s" % filename)
+    log.debug("Converting %s", filename)
     command = CONVERT_CMD + [filename, destination]
     returncode = subprocess.call(command)
     utils.make_read_only(destination)
     if returncode != 0:  # conversion failed
-        log.warn('Conversion failed with code %d; will try updating' % returncode)
+        log.warn('Conversion failed with code %d; will try updating', returncode)
         new_edl = update_edl(filename)
         if new_edl is not None:
-            log.warn('Updated to new-style edl %s' % new_edl)
+            log.warn('Updated to new-style edl %s', new_edl)
             command = CONVERT_CMD + [new_edl, destination]
             returncode = subprocess.call(command)
-            log.info("Conversion return code: %s" % returncode)
+            log.info("Conversion return code: %s", returncode)
             utils.make_read_only(destination)
 

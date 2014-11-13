@@ -12,7 +12,7 @@ def parse_module_name(filepath):
 
     version may be None
     """
-    log.debug("Parsing %s.",  filepath)
+    log.debug("Parsing %s.", filepath)
     filepath = os.path.realpath(filepath)
     filepath = os.path.normpath(filepath)
     parts = filepath.split('/')

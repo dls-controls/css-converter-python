@@ -14,7 +14,6 @@ script again will make yet more widgets!
 """
 
 import xml.etree.ElementTree as et
-import sys
 import copy
 
 from utils import make_writeable, make_read_only
