@@ -34,7 +34,7 @@ import argparse
 
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
-LOG_LEVEL = log.DEBUG
+LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
@@ -108,7 +108,7 @@ class Converter(object):
 
         self.root_outdir = os.path.join(outdir, "%s_%s" % (self.module_name, self.version))
         if not os.path.exists(self.root_outdir):
-            log.info('Making new output directory %s' % self.root_outdir)
+            log.info('Making new output directory %s', self.root_outdir)
             os.makedirs(self.root_outdir)
 
         self._generate_project_file()
@@ -148,7 +148,7 @@ class Converter(object):
             # Currently can't handle relative directories.
             if datadir.startswith('.'):
                 continue
-            log.debug('EDM data file %s' % datadir)
+            log.debug('EDM data file %s', datadir)
             try:
                 module_name, version, rel_path = utils.parse_module_name(datadir)
             except ValueError:
@@ -157,9 +157,9 @@ class Converter(object):
 
             log.debug("%s %s %s", module_name, version, rel_path)
             if rel_path is None:
-                rel_path = ""
+                rel_path = ''
             module_name = module_name.split('/')[-1]
-            log.debug("The module name path is %s", module_name)
+            log.debug('The module name path is %s', module_name)
             entries = os.listdir(datadir)
             working_path = os.path.join(self.root_outdir, module_name, rel_path)
             for entry in entries:
@@ -208,7 +208,7 @@ class Converter(object):
         destination = os.path.join(outdir, opifile)
         try:
             if not force and self._already_converted(outdir, full_path):
-                log.info('Skipping existing file %s' % destination)
+                log.info('Skipping existing file %s', destination)
             elif self._is_symbol(full_path):
                 # symbols are not converted here; conversion is postponed
                 # until the end of the script to reduce focus-grabbing
@@ -217,10 +217,10 @@ class Converter(object):
                 log.info('Successfully stored symbol file %s' % destination)
             else:
                 convert_edl(full_path, destination)
-                log.info('Successfully converted %s' % destination)
+                log.info('Successfully converted %s', destination)
                 self.update_paths(destination, depth)
         except Exception as e:
-            log.warn('Conversion of %s unsuccessful.' % full_path)
+            log.warn('Conversion of %s unsuccessful.', full_path)
             log.warn(str(e))
 
     def _copy_one_file(self, full_path, outdir, force):
@@ -228,7 +228,7 @@ class Converter(object):
         name = os.path.basename(full_path)
         destination = os.path.join(outdir, name)
         if not force and os.path.isfile(destination):
-            log.info('Skipping existing file %s' % destination)
+            log.info('Skipping existing file %s', destination)
         else:
             # make sure we have write permissions on the destination
             try:
@@ -262,7 +262,7 @@ class Converter(object):
                 # directories, excluing 'hidden' ones (e.g. .svn) recurse
                 self._convert_dir(full_path, os.path.join(outdir, local), force)
             else:
-                log.info('Ignoring %s' % full_path)
+                log.info('Ignoring %s', full_path)
 
     def update_paths(self, filepath, depth):
         module = filepath.split('/')[1]
@@ -357,7 +357,7 @@ def run_conversion():
 
     # Parse configuration
     args = set_up_options()
-    log.debug("Config files supplied: %s", args.config)
+    log.debug('Config files supplied: %s', args.config)
 
     try:
         if not os.path.isdir(TMP_DIR):
