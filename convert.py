@@ -55,79 +55,11 @@ PROJECT_TEMPLATE = 'project.template'
 PROJECT_FILENAME = '.project'
 
 
-def convert_symbol(symbol_file, destinations):
+class ConfigurationError(Exception):
+    """ Customer exception to be raised in there is a config-file parse
+        error
     """
-    Convert an EDM symbol file into the png used by the CSS symbol widget.
-    This uses an external shell script.
-    """
-    log.debug("Converting symbol %s", symbol_file)
-    # compress.py returns an edited .edl file
-    command = COMPRESS_CMD + [symbol_file]
-    out = subprocess.check_output(" ".join(command), shell=True)
-    # copy png to right location
-    relfilename = out.strip()
-    filename = os.path.basename(relfilename)
-    source = os.path.join(os.getcwd(), relfilename)
-
-    # Copy the converted png to all specified destinations
-    for destination in destinations:
-        log.debug("... copy to %s", destination)
-        try:
-            utils.make_writeable(destination)
-            destdir = os.path.dirname(destination)
-            absfilename = os.path.join(destdir, filename)
-
-            utils.make_writeable(absfilename)
-            shutil.copyfile(source, absfilename)
-            utils.make_read_only(absfilename)
-        except Exception as e:
-            log.warn("Failed copying file" + str(e))
-            raise e
-
-
-def update_edl(filename):
-    """
-    Copy EDM file to temporary location.  Attempt to convert to
-    new format using EDM. Return location of converted file.
-    """
-    tmp_edm = os.path.join(TMP_DIR, os.path.basename(filename))
-    if os.path.exists(tmp_edm):
-        # make sure we have write permissions on the destination
-        utils.make_writeable(tmp_edm)
-    shutil.copyfile(filename, tmp_edm)
-    cmd = UPDATE_CMD + [tmp_edm]
-    x = subprocess.call(cmd, stdout=NULL_FILE, stderr=NULL_FILE)
-    if not x:
-        utils.make_writeable(tmp_edm)
-        return tmp_edm
-    else:
-        log.warn('EDM update failed with code %s' % x)
-
-
-def convert_edl(filename, destination):
-    """
-    Try to convert .edl file.  If it fails, try updating .edl file
-    using edm before converting again.
-    """
-    utils.make_writeable(destination)
-    # preprocess symbol files - Matt's symbol widget requires pngs
-    # instead of the OPIs from the converter.
-    # first try converting opi
-    log.debug("Converting %s" % filename)
-    command = CONVERT_CMD + [filename, destination]
-    returncode = subprocess.call(command)
-    utils.make_read_only(destination)
-    if returncode != 0:  # conversion failed
-        log.warn('Conversion failed with code %d; will try updating' % returncode)
-        new_edl = update_edl(filename)
-        if new_edl is not None:
-            log.warn('Updated to new-style edl %s' % new_edl)
-            command = CONVERT_CMD + [new_edl, destination]
-            returncode = subprocess.call(command)
-            log.info("Conversion return code: %s" % returncode)
-            utils.make_read_only(destination)
-
-    return returncode == 0
+    pass
 
 
 class Converter(object):
@@ -193,11 +125,14 @@ class Converter(object):
                                                version=self.version)
                 f.write(updated_content)
 
-    def process_file(self, datadir, entry, force, working_path):
+    def _process_one_directory(self, datadir, entry, force, working_path):
+        """ Process a single directory
+        """
         # ignore hidden directories
         if not entry.startswith('.'):
             full_path = os.path.join(datadir, entry)
             log.debug("New full path is %s", full_path)
+
             if os.path.isdir(full_path):
                 outpath = os.path.join(working_path, entry)
                 log.debug("New outdir is %s", outpath)
@@ -228,7 +163,7 @@ class Converter(object):
             entries = os.listdir(datadir)
             working_path = os.path.join(self.root_outdir, module_name, rel_path)
             for entry in entries:
-                self.process_file(datadir, entry, force, working_path)
+                self._process_one_directory(datadir, entry, force, working_path)
 
             self._convert_dir(datadir, working_path, force)
 
@@ -275,8 +210,10 @@ class Converter(object):
             if not force and self._already_converted(outdir, full_path):
                 log.info('Skipping existing file %s' % destination)
             elif self._is_symbol(full_path):
+                # symbols are not converted here; conversion is postponed
+                # until the end of the script to reduce focus-grabbing
+                # machine distruption
                 store_symbol(full_path, destination, self.symbol_files)
-                # convert_symbol(full_path, destination)
                 log.info('Successfully stored symbol file %s' % destination)
             else:
                 convert_edl(full_path, destination)
@@ -299,8 +236,8 @@ class Converter(object):
                 shutil.copyfile(full_path, destination)
                 utils.make_read_only(destination, executable)
                 log.info('Successfully copied %s' % destination)
-            except IOError:
-                log.warn('Copying file %s unsuccessful.' % full_path)
+            except Exception as e:
+                log.error("Failed copying file" + str(e))
 
     def _convert_dir(self, indir, outdir, force):
         """
@@ -329,20 +266,26 @@ class Converter(object):
         paths.update_opi_file(filepath, depth, self.file_index, module)
 
 
-def store_symbol(filename, destination, symbol_dictionary):
+# helper functions
+def store_symbol(source, destination, symbol_dictionary):
     """ Build a global dictionary of {fullname:<destinations>}
         for symbol files needing conversion.
 
-        If the passed fullname is already in the dictionary the destination is
-        added to the list, provided it is not already there.
-        If the passed fullname is not in the dictionary it is added.
+        If the passed source file is not in the dictionary it is added.
+        If the passed source file is already in the dictionary the destination
+        is added to the list, provided it is not already there.
+
+        Arguments:
+            source -> full path to file to be converted
+            destination -> full path to output file
     """
-    if filename in symbol_dictionary:
-        destinations = symbol_dictionary[filename]
+    log.debug("Adding %s: %s to symbol dictionary", source, destination)
+    if source in symbol_dictionary:
+        destinations = symbol_dictionary[source]
         if not destination in destinations:
             destinations.append(destination)
     else:
-        symbol_dictionary[filename] = [destination]
+        symbol_dictionary[source] = [destination]
 
 
 def set_up_options():
@@ -353,14 +296,25 @@ def set_up_options():
     created to avoid unwanted files...
     ''')
     parser.add_argument('-f', action='store_true', dest='force',
-            help='overwrite existing OPI files')
+                        help='overwrite existing OPI files')
     parser.add_argument('config', metavar='<config-file>', nargs='*',
-            help='config file specifying EDM paths and output dir')
+                        help='config file specifying EDM paths and output dir')
     args = parser.parse_args()
     return args
 
 
 def parse_config(cfg):
+    """ Parse a specified configuration file
+
+        Raises ConfigurationError if critical section is missing
+
+        Returns:
+            script_file,
+            script_args,
+            symbols,
+            outdir
+    """
+
     log.info('\n\nStarting config file %s.\n', cfg)
     cp = ConfigParser.ConfigParser()
     cp.read(cfg)
@@ -391,6 +345,9 @@ def parse_config(cfg):
 
 
 def run_conversion():
+    """ Perform the module conversion.
+        This is the entry point for the module
+    """
 
     symbol_dict = {}
 
@@ -411,16 +368,92 @@ def run_conversion():
         try:
             (script_file, script_args, symbols, outdir) = parse_config(cfg)
 
+            for sym in symbols:
+                print "Found symbol: " + sym
+
             c = Converter(script_file, script_args, symbols, outdir, symbol_dict)
             c.convert(args.force)
         except ConfigurationError:
             log.error('Please ensure %s is a valid config file' % args.config)
 
+    log.info("Post-processing symbol files")
     for path, destinations in symbol_dict.iteritems():
         convert_symbol(path, destinations)
 
-class ConfigurationError(Exception):
-    pass
+
+def convert_symbol(symbol_file, destinations):
+    """
+    Convert an EDM symbol file into the png used by the CSS symbol widget.
+    This uses an external shell script.
+    """
+    log.debug("Converting symbol %s", symbol_file)
+    # compress.py returns an edited .edl file
+    command = COMPRESS_CMD + [symbol_file]
+    out = subprocess.check_output(" ".join(command), shell=True)
+    # copy png to right location
+    relfilename = out.strip()
+    filename = os.path.basename(relfilename)
+    source = os.path.join(os.getcwd(), relfilename)
+
+    # Copy the converted png to all specified destinations
+    for destination in destinations:
+        log.debug("... copy to %s", destination)
+        try:
+            utils.make_writeable(destination)
+            destdir = os.path.dirname(destination)
+            absfilename = os.path.join(destdir, filename)
+
+            utils.make_writeable(absfilename)
+            shutil.copyfile(source, absfilename)
+            utils.make_read_only(absfilename)
+        except Exception as e:
+            log.error("Failed copying file" + str(e))
+
+
+def update_edl(filename):
+    """
+    Copy EDM file to temporary location.  Attempt to convert to
+    new format using EDM. Return location of converted file.
+    """
+    try:
+        tmp_edm = os.path.join(TMP_DIR, os.path.basename(filename))
+        # make sure we have write permissions on the destination
+        utils.make_writeable(tmp_edm)
+        shutil.copyfile(filename, tmp_edm)
+        cmd = UPDATE_CMD + [tmp_edm]
+        returncode = subprocess.call(cmd, stdout=NULL_FILE, stderr=NULL_FILE)
+        if returncode != 0:
+            utils.make_writeable(tmp_edm)
+            return tmp_edm
+        else:
+            log.warn('EDM update failed with code %s' % returncode)
+    except Exception as e:
+        log.error("Failed copying file" + str(e))
+
+    return None  # else and Exception cases
+
+def convert_edl(filename, destination):
+    """
+    Try to convert .edl file.  If it fails, try updating .edl file
+    using edm before converting again.
+    """
+    utils.make_writeable(destination)
+    # preprocess symbol files - Matt's symbol widget requires pngs
+    # instead of the OPIs from the converter.
+    # first try converting opi
+    log.debug("Converting %s" % filename)
+    command = CONVERT_CMD + [filename, destination]
+    returncode = subprocess.call(command)
+    utils.make_read_only(destination)
+    if returncode != 0:  # conversion failed
+        log.warn('Conversion failed with code %d; will try updating' % returncode)
+        new_edl = update_edl(filename)
+        if new_edl is not None:
+            log.warn('Updated to new-style edl %s' % new_edl)
+            command = CONVERT_CMD + [new_edl, destination]
+            returncode = subprocess.call(command)
+            log.info("Conversion return code: %s" % returncode)
+            utils.make_read_only(destination)
 
 if __name__ == '__main__':
     run_conversion()
