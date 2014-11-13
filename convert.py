@@ -46,12 +46,12 @@ OPI_EXT = 'opi'
 EDL_EXT = 'edl'
 
 # Commands in lists for subprocess
-CONVERT_CMD = ['java', '-jar', 'conv.jar']
+CONVERT_CMD = ['java', '-Dedm2xml.colorsFile=res/colors.list', '-jar', 'res/conv.jar']
 UPDATE_CMD = ['edm', '-convert']
 SYMB_SCRIPT = os.path.join(os.getcwd(), 'auto-symb.sh')
 COMPRESS_CMD = [SYMB_SCRIPT]
 
-PROJECT_TEMPLATE = 'project.template'
+PROJECT_TEMPLATE = 'res/project.template'
 PROJECT_FILENAME = '.project'
 
 
