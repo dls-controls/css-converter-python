@@ -249,14 +249,18 @@ class Converter(object):
         log.info('Starting directory %s' % indir)
         if not os.path.isdir(outdir):
             os.makedirs(outdir)
-        full_paths = [os.path.join(indir, f) for f in os.listdir(indir)]
 
-        for full_path in full_paths:
-            log.debug('Trying %s...' % full_path)
-            if full_path.endswith(EDL_EXT):
+        for local in os.listdir(indir):
+            full_path = os.path.join(indir, local)
+            if local.endswith(EDL_EXT):
+                # edl files
                 self._convert_one_file(full_path, outdir, force)
-            elif not os.path.isdir(full_path) and not full_path.endswith('~'):
+            elif not os.path.isdir(full_path) and not local.endswith('~'):
+                # files not ending in ~
                 self._copy_one_file(full_path, outdir, force)
+            elif os.path.isdir(full_path) and not local.startswith('.'):
+                # directories, excluing 'hidden' ones (e.g. .svn) recurse
+                self._convert_dir(full_path, os.path.join(outdir, local), force)
             else:
                 log.info('Ignoring %s' % full_path)
 
