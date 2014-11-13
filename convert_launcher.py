@@ -7,7 +7,7 @@ and convert each EDM instance it finds.
 import xml.etree.ElementTree as et
 import os
 
-from convert import Converter
+from convert import converter
 
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
@@ -36,6 +36,5 @@ for app, cmd, args in launcher_apps:
     print "cmd is", cmd
     if not os.path.isabs(cmd):
         cmd = os.path.join(LAUNCHER_DIR, cmd)
-    c = Converter(cmd, args, [], './project/opi2')
-    c.convert_opis(False)
-    c.copy_scripts(False)
+    c = converter.Converter(cmd, args, [], './project/opi2', {})
+    c.convert(False)
