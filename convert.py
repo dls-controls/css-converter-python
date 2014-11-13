@@ -294,12 +294,12 @@ class Converter(object):
             log.info('Skipping existing file %s' % destination)
         else:
             # make sure we have write permissions on the destination
-            if os.path.isfile(destination):
+            try:
                 utils.make_writeable(destination)
-            if not subprocess.call(['cp', full_path, destination]):
+                shutil.copyfile(full_path, destination)
                 utils.make_read_only(destination, executable)
                 log.info('Successfully copied %s' % destination)
-            else:
+            except IOError:
                 log.warn('Copying file %s unsuccessful.' % full_path)
 
     def _convert_dir(self, indir, outdir, force):
