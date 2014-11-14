@@ -30,3 +30,6 @@ class SymbolDictionaryTest(unittest.TestCase):
 
         self.assertDictEqual({"path": ["dest", "new_dest"]}, symbol_dict)
 
+
+if __name__ == '__main__':
+    unittest.main()

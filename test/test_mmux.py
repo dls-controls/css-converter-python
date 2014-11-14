@@ -218,3 +218,6 @@ class TryReplaceTest(unittest.TestCase):
 
         self.assertFalse(simple)
         self.assertEqual(expected, replaced)
+
+if __name__ == '__main__':
+    unittest.main()
