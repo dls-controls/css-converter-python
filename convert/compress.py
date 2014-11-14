@@ -110,13 +110,8 @@ def find_groups(filename):
 
     return groups
 
-
-if __name__ == '__main__':
-    if not len(sys.argv) == 2:
-        print "Usage: %s <symbol-file>" % sys.argv[0]
-        sys.exit()
-
-    filename = sys.argv[1]
+def parse(filename):
+    print 'Parsing', filename
     groups = find_groups(filename)
 
     print 'Found %s symbols.' % len(groups)
@@ -179,3 +174,12 @@ if __name__ == '__main__':
 
     print 'Wrote new EDM symbol to %s' % new_filename
 
+
+
+if __name__ == '__main__':
+    if not len(sys.argv) == 2:
+        print "Usage: %s <symbol-file>" % sys.argv[0]
+        sys.exit()
+
+    filename = sys.argv[1]
+    parse(filename)

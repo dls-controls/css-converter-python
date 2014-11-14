@@ -4,17 +4,6 @@ symbol_file=$1
 filename=`basename $symbol_file`
 symdir=tmp/symbols
 
-
-# Copy edl file
-cp -f $symbol_file $symdir/
-
-# Check if it's old style EDM
-if ! grep -q bgColor $symdir/$filename; then
-    edm -convert $symdir/$filename $symdir/$filename
-fi
-
-python compress.py $symdir/$filename > /dev/null 2>&1
-
 # compress.py appends pixel size to name (eg x-33.edl)
 nfilename=$(basename $(ls $symdir/${filename%.*}-*.edl))
 nbase=${nfilename%.*}
