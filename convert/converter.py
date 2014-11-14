@@ -23,6 +23,7 @@ Steps:
 
 import utils
 import paths
+import compress
 
 import os
 import glob
@@ -43,7 +44,7 @@ EDL_EXT = 'edl'
 # Commands in lists for subprocess
 CONVERT_CMD = ['java', '-Dedm2xml.colorsFile=res/colors.list', '-jar', 'res/conv.jar']
 UPDATE_CMD = ['edm', '-convert']
-SYMB_SCRIPT = os.path.join(os.getcwd(), 'auto-symb.sh')
+SYMB_SCRIPT = os.path.join(os.getcwd(), 'res/auto-symb.sh')
 COMPRESS_CMD = [SYMB_SCRIPT]
 
 PROJECT_TEMPLATE = 'res/project.template'
@@ -293,7 +294,14 @@ def convert_symbol(symbol_file, destinations):
     This uses an external shell script.
     """
     log.debug("Converting symbol %s", symbol_file)
-    # compress.py returns an edited .edl file
+    dest = os.path.join(SYMBOLS_DIR, os.path.basename(symbol_file))
+    utils.make_writeable(dest)
+    shutil.copyfile(symbol_file, dest)
+    # Update EDM file if necessary.
+    if is_old_edl(dest):
+        dest = update_edl(dest)
+    # Compress EDM symbol file to minimum rectangle.
+    compress.parse(dest)
     command = COMPRESS_CMD + [symbol_file]
     out = subprocess.check_output(" ".join(command), shell=True)
     # copy png to right location
@@ -316,19 +324,32 @@ def convert_symbol(symbol_file, destinations):
             log.error("Failed copying file: %s", str(e))
 
 
+def is_old_edl(filename):
+    """
+    Check version of .edl file.  Versions < 3 need updating.
+    """
+    with open(filename) as edm_file:
+        for line in edm_file.readlines():
+            if line.isspace() or line.strip().startswith('#'):
+                continue
+            return int(line.split()[0]) < 4
+
 def update_edl(filename):
     """
     Copy EDM file to temporary location.  Attempt to convert to
     new format using EDM. Return location of converted file.
     """
+    print 'updating', filename
     try:
         tmp_edm = os.path.join(TMP_DIR, os.path.basename(filename))
+        print 'dest is', tmp_edm
         # make sure we have write permissions on the destination
         utils.make_writeable(tmp_edm)
         shutil.copyfile(filename, tmp_edm)
         cmd = UPDATE_CMD + [tmp_edm]
+        print 'updated %s with %s' % (tmp_edm, cmd)
         returncode = subprocess.call(cmd, stdout=NULL_FILE, stderr=NULL_FILE)
-        if returncode != 0:
+        if returncode == 0:
             utils.make_writeable(tmp_edm)
             return tmp_edm
         else:
@@ -338,26 +359,19 @@ def update_edl(filename):
 
     return None  # else and Exception cases
 
+
 def convert_edl(filename, destination):
     """
     Try to convert .edl file.  If it fails, try updating .edl file
     using edm before converting again.
     """
+    if is_old_edl(filename):
+        filename = update_edl(filename)
     utils.make_writeable(destination)
-    # preprocess symbol files - Matt's symbol widget requires pngs
-    # instead of the OPIs from the converter.
-    # first try converting opi
     log.debug("Converting %s", filename)
     command = CONVERT_CMD + [filename, destination]
     returncode = subprocess.call(command)
     utils.make_read_only(destination)
     if returncode != 0:  # conversion failed
-        log.warn('Conversion failed with code %d; will try updating', returncode)
-        new_edl = update_edl(filename)
-        if new_edl is not None:
-            log.warn('Updated to new-style edl %s', new_edl)
-            command = CONVERT_CMD + [new_edl, destination]
-            returncode = subprocess.call(command)
-            log.info("Conversion return code: %s", returncode)
-            utils.make_read_only(destination)
+        log.warn('Conversion failed with code %d.', returncode)
 
