@@ -1,4 +1,4 @@
-from mmux import find_mm_symbols, try_replace
+from convert.mmux import find_mm_symbols, try_replace
 
 __author__ = 'xzl80115'
 import unittest
@@ -81,12 +81,13 @@ class FindSymbolTest(unittest.TestCase):
     def test_returns_target_value_for_one_mm_one_set(self):
         root = ET.fromstring(ONE_MMUX_ONE_SET)
 
+        target_nodes = root.findall('.//target0')
+
         symbols = find_mm_symbols(root)
 
         self.assertDictEqual(symbols, {"num": "val01"})
-        target_node = root.find('target0')
 
-        self.assertEqual("loc://$(DID)num", target_node.text)
+        self.assertEqual("loc://$(DID)num", target_nodes[0].text)
 
     def test_returns_target_value_for_one_mm_two_sets(self):
         root = ET.fromstring(ONE_MMUX_TWO_SET)
