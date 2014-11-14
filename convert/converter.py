@@ -77,7 +77,7 @@ class Converter(object):
         self.path_dirs = path_dirs
         self.path_dirs.append(working_dir)
 
-        self.file_index = paths.index_paths(self.edmdatafiles + self.path_dirs, True)
+        self.file_index = paths.index_paths(set(self.edmdatafiles + self.path_dirs), True)
 
         self.symbol_files = symbol_files
         self.symbol_files = symbol_dict

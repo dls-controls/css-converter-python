@@ -1,5 +1,6 @@
 
 import utils
+import compress
 
 import subprocess
 import shutil

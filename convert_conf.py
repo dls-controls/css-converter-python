@@ -24,6 +24,7 @@ Steps:
 from convert import utils
 from convert import paths
 from convert import converter
+from convert import files
 
 import os
 import glob
@@ -153,7 +154,7 @@ def run_conversion():
 
     log.info("Post-processing symbol files")
     for path, destinations in symbol_dict.iteritems():
-        converter.convert_symbol(path, destinations)
+        files.convert_symbol(path, destinations)
 
 
 if __name__ == '__main__':
