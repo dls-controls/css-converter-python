@@ -91,7 +91,7 @@ def index_paths(directories, recurse):
                     index[entry] = new_index[entry]
                 else:
                     log.warn('clash: %s in %s and %s',
-                            file, new_index[entry], index[entry])
+                            entry, new_index[entry], index[entry])
         except (OSError, ValueError) as e:
             log.warn('Skipping indexing for %s: %s', directory, e)
             continue
