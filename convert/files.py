@@ -94,6 +94,8 @@ def convert_edl(filename, destination):
     """
     Try to convert .edl file.  If it fails, try updating .edl file
     using edm before converting again.
+
+    Return the conversion return code.
     """
     if is_old_edl(filename):
         filename = update_edl(filename)
@@ -102,5 +104,4 @@ def convert_edl(filename, destination):
     command = CONVERT_CMD + [filename, destination]
     returncode = subprocess.call(command)
     utils.make_read_only(destination)
-    if returncode != 0:  # conversion failed
-        log.warn('Conversion failed with code %d.', returncode)
+    return returncode

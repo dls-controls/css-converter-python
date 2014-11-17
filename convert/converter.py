@@ -200,9 +200,13 @@ class Converter(object):
                 store_symbol(full_path, destination, self.symbol_dict)
                 log.info('Successfully stored symbol file %s', destination)
             else:
-                files.convert_edl(full_path, destination)
-                log.info('Successfully converted %s', destination)
-                self.update_paths(destination, depth)
+                returncode = files.convert_edl(full_path, destination)
+                if returncode == 0:
+                    log.info('Successfully converted %s', destination)
+                    self.update_paths(destination, depth)
+                else:
+                    log.warn('Conversion of %s failed with code %d.',
+                             full_path, returncode)
         except Exception as e:
             log.warn('Conversion of %s unsuccessful.', full_path)
             log.warn(str(e))
