@@ -1,5 +1,5 @@
 #!/usr/bin/env dls-python
-'''
+"""
 Menu mux widgets in EDM can't be automatically translated by the
 converter, because they rely on dynamic macros which do not exist
 in CSS.
@@ -13,7 +13,7 @@ Process:
 1. Find all the symbols used by a menu mux button.
 2. Find any references to these symbols.
 3. Replace the reference with the appropriate expression.
-'''
+"""
 
 import sys
 import subprocess
@@ -22,26 +22,25 @@ from convert import mmux
 
 
 def perform_postprocess():
+    """ Entry point for the MenuMux post-process code
+
+        Converts all mmux controls found under the search directory passed
+        as a command line argument (usually project/opi)
+    """
 
     try:
-        path_file = sys.argv[1]
+        search_path = sys.argv[1]
     except IndexError:
-        print 'Usage: ', sys.argv[0], '<path-file>'
+        print 'Usage: ', sys.argv[0], '<search-path>'
         sys.exit()
 
-    with open(path_file) as f:
-        lines = f.readlines()
-        lines = [line.strip() for line in lines if not line.startswith('#')]
-        search_paths = [line.strip() for line in lines if not line == '']
-
-    for base_dir in search_paths:
-        for filepath in build_filelist(base_dir):
-            try:
-                print 'Parsing file', filepath
-                mmux.parse(filepath)
-            except OSError as e:
-                print 'Update failed: %s' % e
-                continue
+    for filepath in build_filelist(search_path):
+        try:
+            print 'Parsing file', filepath
+            mmux.parse(filepath)
+        except OSError as e:
+            print 'Update failed: %s' % e
+            continue
 
 
 def build_filelist(basepath):
