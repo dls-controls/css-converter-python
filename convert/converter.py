@@ -76,7 +76,7 @@ class Converter(object):
         self.file_index = paths.index_paths(set(self.edmdatafiles + self.path_dirs), True)
 
         self.symbol_files = symbol_files
-        self.symbol_files = symbol_dict
+        self.symbol_dict = symbol_dict
 
         try:
             self.module_name, self.version, _ = utils.parse_module_name(working_dir)
@@ -197,7 +197,7 @@ class Converter(object):
                 # symbols are not converted here; conversion is postponed
                 # until the end of the script to reduce focus-grabbing
                 # machine distruption
-                store_symbol(full_path, destination, self.symbol_files)
+                store_symbol(full_path, destination, self.symbol_dict)
                 log.info('Successfully stored symbol file %s', destination)
             else:
                 files.convert_edl(full_path, destination)
