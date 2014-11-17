@@ -16,6 +16,7 @@ SYMBOLS_DIR = './tmp/symbols'
 SYMB_SCRIPT = os.path.join(os.getcwd(), 'res/auto-symb.sh')
 COMPRESS_CMD = [SYMB_SCRIPT]
 
+
 def convert_symbol(symbol_file, destinations):
     """
     Convert an EDM symbol file into the png used by the CSS symbol widget.
@@ -103,4 +104,3 @@ def convert_edl(filename, destination):
     utils.make_read_only(destination)
     if returncode != 0:  # conversion failed
         log.warn('Conversion failed with code %d.', returncode)
-

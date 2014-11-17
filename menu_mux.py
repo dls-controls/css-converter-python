@@ -14,7 +14,7 @@ Process:
 2. Find any references to these symbols.
 3. Replace the reference with the appropriate expression.
 '''
-import os
+
 import sys
 import subprocess
 

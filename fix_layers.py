@@ -13,7 +13,6 @@ that since the widgets it makes are clickable, running this
 script again will make yet more widgets!
 """
 
-import xml.etree.ElementTree as et
 import sys
 
 from convert import layers
@@ -31,7 +30,6 @@ if __name__ == '__main__':
         lines = f.readlines()
         lines = [line.strip() for line in lines if not line.startswith('#')]
         lines = [line.strip() for line in lines if not line == '']
-
 
     for filepath in lines:
         print "Parsing file ", filepath

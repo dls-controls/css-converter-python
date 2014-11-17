@@ -23,7 +23,6 @@ Steps:
 
 import utils
 import paths
-import compress
 import files
 
 import os
@@ -33,11 +32,8 @@ import string
 
 import logging as log
 
-
-
 OPI_EXT = 'opi'
 EDL_EXT = 'edl'
-
 
 PROJECT_TEMPLATE = 'res/project.template'
 PROJECT_FILENAME = '.project'
