@@ -36,6 +36,6 @@ if __name__ == '__main__':
         try:
             layers.parse(filepath)
         except (OSError, IOError) as e:
-            print "Failed to parse file %s: %s" % (file, e)
+            print "Failed to parse file %s: %s" % (filepath, e)
 
 

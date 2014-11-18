@@ -26,6 +26,10 @@ if __name__ == '__main__':
         lines = [line.strip() for line in lines if not line.startswith('#')]
         lines = [line.strip() for line in lines if not line == ''] 
 
-    for file in lines:
-        print "Parsing file ", file
-        groups.parse(file)
+    for filepath in lines:
+        print "Parsing file ", filepath
+        try:
+            groups.parse(filepath)
+        except (OSError, IOError) as e:
+            print "Failed to parse file %s: %s" % (filepath, e)
+
