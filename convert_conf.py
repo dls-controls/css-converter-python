@@ -130,9 +130,10 @@ def run_conversion():
         except ConfigurationError:
             log.error('Please ensure %s is a valid config file' % args.config)
 
-    log.info("Post-processing symbol files")
-    for path, destinations in symbol_dict.iteritems():
-        files.convert_symbol(path, destinations)
+    if symbol_dict:
+        log.info("Post-processing symbol files")
+        for path, destinations in symbol_dict.iteritems():
+            files.convert_symbol(path, destinations)
 
 
 if __name__ == '__main__':
