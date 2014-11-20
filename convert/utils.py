@@ -2,7 +2,11 @@
 import os
 import subprocess
 import logging as log
+import string
 
+
+PROJECT_TEMPLATE = 'res/project.template'
+PROJECT_FILENAME = '.project'
 
 def parse_module_name(filepath):
     """
@@ -54,6 +58,36 @@ def make_writeable(filename):
         os.chmod(filename, 0o777)
 
 
+def is_edm_script(filename):
+    try:
+        with open(filename) as f:
+            for line in f.readlines():
+                if line.strip().startswith('edm '):
+                    return True
+        return False
+    except IOError as e:
+        log.warn('Error opening %s: %s', filename, e)
+        return False
+
+
+def generate_project_file(outdir, module_name, version):
+    """
+    Create an Eclipse project file for this set of OPIs.
+    """
+    import os
+    try:
+        os.makedirs(outdir)
+    except OSError:
+        pass
+    with open(os.path.join(outdir, PROJECT_FILENAME), 'w') as f:
+        with open(PROJECT_TEMPLATE) as template:
+            content = template.read()
+            s = string.Template(content)
+            updated_content = s.substitute(module_name=module_name,
+                                           version=version)
+            f.write(updated_content)
+
+
 def spoof_edm(script_file, args=[]):
     """
     Use a dummy script called 'edm' to extract:
@@ -65,11 +99,15 @@ def spoof_edm(script_file, args=[]):
 
     Assume that the last four lines of output are those produced by this script.
     """
+
+    if not is_edm_script(script_file):
+        raise ValueError('Script file does not use EDM.')
     env = os.environ.copy()
     old_dir = os.getcwd()
     script_dir = os.path.dirname(script_file)
     # Change to directory of spoofed script.
     os.chdir(script_dir)
+
     this_dir = os.path.dirname(__file__)
     spoof_edm_dir = os.path.join(this_dir, '..', 'res')
     # Put spoof edm first on the path.
@@ -90,9 +128,9 @@ def spoof_edm(script_file, args=[]):
     os.chdir(old_dir)
     log.debug('Spoof EDM output:\n\n%s', out)
     lines = out.splitlines()
-    if lines[-1] != 'Spoof EDM complete.':
+    if len(lines) == 0 or lines[-1] != 'Spoof EDM complete.':
         log.warn('EDM spoof failed.')
-        return None
+        return [], [], "", []
 
     if len(lines) > 1:
         path = lines[-2]
@@ -112,3 +150,31 @@ def spoof_edm(script_file, args=[]):
     log.info('Script arguments: %s', args)
     return edmdatafiles, path, pwd, args
 
+
+def interpret_command(cmd, args, directory):
+    log.info('Launcher command: %s', cmd)
+    symbols = {}
+    if not os.path.isabs(cmd):
+        cmd = os.path.join(directory, cmd)
+    # Spoof EDM to find EDMDATAFILES and PATH
+    # Index these directories to find which modules
+    # relative paths may be in.
+    edmdatafiles, path_dirs, working_dir, args = spoof_edm(cmd, args)
+    try:
+        module_name, version, _ = parse_module_name(working_dir)
+    except ValueError:
+        log.warn("Didn't understand script's working directory!")
+        module_name = os.path.basename(cmd)
+        version = None
+
+    module_name = module_name.replace('/', '_')
+
+    if version is None:
+        version = 'no-version'
+
+    all_dirs = [f for f in edmdatafiles if f not in ('', '.')]
+    all_dirs.extend(path_dirs)
+    all_dirs.append(working_dir)
+    all_dirs = set(all_dirs)
+
+    return all_dirs, module_name, version

@@ -23,7 +23,8 @@ Steps:
 
 from convert import converter
 from convert import files
-from convert.files import SYMBOLS_DIR, TMP_DIR
+from convert import utils
+
 
 import os
 import ConfigParser
@@ -34,6 +35,7 @@ LOG_FORMAT = '%(levelname)s:  %(message)s'
 LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
+LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 
 class ConfigurationError(Exception):
     """ Customer exception to be raised in there is a config-file parse
@@ -110,22 +112,25 @@ def run_conversion():
     log.debug('Config files supplied: %s', args.config)
 
     try:
-        if not os.path.isdir(TMP_DIR):
-            os.makedirs(TMP_DIR)
-        if not os.path.isdir(SYMBOLS_DIR):
-            os.makedirs(SYMBOLS_DIR)
+        if not os.path.isdir(files.TMP_DIR):
+            os.makedirs(files.TMP_DIR)
+        if not os.path.isdir(files.SYMBOLS_DIR):
+            os.makedirs(files.SYMBOLS_DIR)
     except OSError:
         log.error('Could not create temporary directories %s and %s',
-                  (TMP_DIR, SYMBOLS_DIR))
+                  (files.TMP_DIR, files.SYMBOLS_DIR))
 
     for cfg in args.config:
         try:
             (script_file, script_args, symbols, outdir) = parse_config(cfg)
+            all_dirs, module_name, version = utils.interpret_command(script_file, script_args, LAUNCHER_DIR)
 
             for sym in symbols:
                 print "Found symbol: " + sym
 
-            c = converter.Converter(script_file, script_args, symbols, outdir, symbol_dict)
+            outdir = os.path.join(outdir, "%s_%s" % (module_name, version))
+            utils.generate_project_file(outdir, module_name, version)
+            c = converter.Converter(all_dirs, symbols, symbol_dict, outdir)
             c.convert(args.force)
         except ConfigurationError:
             log.error('Please ensure %s is a valid config file' % args.config)
