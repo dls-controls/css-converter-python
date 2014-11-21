@@ -53,7 +53,7 @@ class Converter(object):
     on creation.
     """
 
-    def __init__(self, dirs, symbol_files, symbol_dict, root_outdir):
+    def __init__(self, dirs, symbol_files, root_outdir):
         """
         Given the EDM entry script, deduce the paths to convert.
         A list of symbol files is stored to help when converting.
@@ -62,7 +62,7 @@ class Converter(object):
         self.file_index = paths.index_paths(dirs, True)
 
         self.symbol_files = symbol_files
-        self.symbol_dict = symbol_dict
+        self.symbol_dict = {}
 
         self.root_outdir = root_outdir
 
@@ -82,6 +82,9 @@ class Converter(object):
                 outpath = os.path.join(working_path, entry)
                 log.debug("New outdir is %s", outpath)
                 self._convert_dir(full_path, outpath, force)
+
+    def get_symbol_paths(self):
+        return self.symbol_dict
 
     def convert(self, force):
         """
@@ -234,9 +237,7 @@ def store_symbol(source, destination, symbol_dictionary):
     """
     log.debug("Adding %s: %s to symbol dictionary", source, destination)
     if source in symbol_dictionary:
-        destinations = symbol_dictionary[source]
-        if not destination in destinations:
-            destinations.append(destination)
+        symbol_dictionary[source].add(destination)
     else:
-        symbol_dictionary[source] = [destination]
+        symbol_dictionary[source] = set([destination])
 

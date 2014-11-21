@@ -105,7 +105,7 @@ def run_conversion():
         This is the entry point for the module
     """
 
-    symbol_dict = {}
+    symbol_paths = {}
 
     # Parse configuration
     args = set_up_options()
@@ -130,14 +130,20 @@ def run_conversion():
 
             outdir = os.path.join(outdir, "%s_%s" % (module_name, version))
             utils.generate_project_file(outdir, module_name, version)
-            c = converter.Converter(all_dirs, symbols, symbol_dict, outdir)
+            c = converter.Converter(all_dirs, symbols, outdir)
             c.convert(args.force)
+            new_symbol_paths = c.get_symbol_paths()
+            for symbol in new_symbol_paths:
+                if symbol in symbol_paths:
+                    symbol_paths[symbol].update(new_symbol_paths[symbol])
+                else:
+                    symbol_paths[symbol] = new_symbol_paths[symbol]
         except ConfigurationError:
             log.error('Please ensure %s is a valid config file' % args.config)
 
-    if symbol_dict:
+    if symbol_paths:
         log.info("Post-processing symbol files")
-        for path, destinations in symbol_dict.iteritems():
+        for path, destinations in symbol_path.iteritems():
             files.convert_symbol(path, destinations)
 
 

@@ -14,6 +14,7 @@ log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 from convert import converter
 from convert import utils
 from convert import spoof
+from convert import files
 
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
@@ -35,13 +36,10 @@ def get_apps(node):
             apps.extend(get_apps(child))
     return apps
 
-
-
-if __name__ == '__main__':
-
+def run_conversion():
     launcher_apps = get_apps(root)
 
-    symbols = {}
+    symbol_paths = {}
 
     for app, cmd, args in launcher_apps:
 
@@ -57,10 +55,27 @@ if __name__ == '__main__':
         outdir = os.path.join(outdir, "%s_%s" % (module_name, version))
         utils.generate_project_file(outdir, module_name, version)
         try:
-            c = converter.Converter(all_dirs, [], symbols, outdir)
+            c = converter.Converter(all_dirs, [], outdir)
             c.convert(False)
+            new_symbol_paths = c.get_symbol_paths()
+            for symbol in new_symbol_paths:
+                if symbol in symbol_paths:
+                    symbol_paths[symbol].update(new_symbol_paths[symbol])
+                else:
+                    symbol_paths[symbol] = new_symbol_paths[symbol]
         except OSError as e:
             log.warn('Exception converting %s: %s', cmd, e)
             continue
 
-    log.info('Symbol files found %s', symbols)
+    if symbol_paths:
+        log.info("Post-processing symbol files")
+        for path, destinations in symbol_paths.iteritems():
+            try:
+                files.convert_symbol(path, destinations)
+            except IndexError as e:
+                log.warn('Failed to convert symbol %s: %s', path, e)
+                continue
+
+
+if __name__ == '__main__':
+    run_conversion()
