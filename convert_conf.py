@@ -23,7 +23,8 @@ Steps:
 
 from convert import converter
 from convert import files
-from convert.files import SYMBOLS_DIR, TMP_DIR
+from convert import utils
+
 
 import os
 import ConfigParser
@@ -34,6 +35,7 @@ LOG_FORMAT = '%(levelname)s:  %(message)s'
 LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
+LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 
 class ConfigurationError(Exception):
     """ Customer exception to be raised in there is a config-file parse
@@ -90,8 +92,8 @@ def parse_config(cfg):
         raise ConfigurationError()
 
     try:
-        symbols = cp.get('edm', 'symbols')
-        symbols = symbols.split(':')
+        symbols_file = cp.get('edm', 'symbols_file')
+        symbols = utils.read_symbols_file(symbols_file)
     except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
         symbols = []
 
@@ -103,36 +105,47 @@ def run_conversion():
         This is the entry point for the module
     """
 
-    symbol_dict = {}
+    symbol_paths = {}
 
     # Parse configuration
     args = set_up_options()
     log.debug('Config files supplied: %s', args.config)
 
     try:
-        if not os.path.isdir(TMP_DIR):
-            os.makedirs(TMP_DIR)
-        if not os.path.isdir(SYMBOLS_DIR):
-            os.makedirs(SYMBOLS_DIR)
+        if not os.path.isdir(files.TMP_DIR):
+            os.makedirs(files.TMP_DIR)
+        if not os.path.isdir(files.SYMBOLS_DIR):
+            os.makedirs(files.SYMBOLS_DIR)
     except OSError:
         log.error('Could not create temporary directories %s and %s',
-                  (TMP_DIR, SYMBOLS_DIR))
+                  (files.TMP_DIR, files.SYMBOLS_DIR))
 
     for cfg in args.config:
         try:
             (script_file, script_args, symbols, outdir) = parse_config(cfg)
+            log.info('Symbols found: %s', symbols)
+            all_dirs, module_name, version = utils.interpret_command(script_file, script_args, LAUNCHER_DIR)
 
             for sym in symbols:
                 print "Found symbol: " + sym
 
-            c = converter.Converter(script_file, script_args, symbols, outdir, symbol_dict)
+            outdir = os.path.join(outdir, "%s_%s" % (module_name, version))
+            utils.generate_project_file(outdir, module_name, version)
+            c = converter.Converter(all_dirs, symbols, outdir)
             c.convert(args.force)
+            new_symbol_paths = c.get_symbol_paths()
+            for symbol in new_symbol_paths:
+                if symbol in symbol_paths:
+                    symbol_paths[symbol].update(new_symbol_paths[symbol])
+                else:
+                    symbol_paths[symbol] = new_symbol_paths[symbol]
         except ConfigurationError:
             log.error('Please ensure %s is a valid config file' % args.config)
 
-    log.info("Post-processing symbol files")
-    for path, destinations in symbol_dict.iteritems():
-        files.convert_symbol(path, destinations)
+    if symbol_paths:
+        log.info("Post-processing symbol files")
+        for path, destinations in symbol_paths.iteritems():
+            files.convert_symbol(path, destinations)
 
 
 if __name__ == '__main__':

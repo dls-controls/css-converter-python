@@ -35,9 +35,6 @@ import logging as log
 OPI_EXT = 'opi'
 EDL_EXT = 'edl'
 
-PROJECT_TEMPLATE = 'res/project.template'
-PROJECT_FILENAME = '.project'
-
 
 class ConfigurationError(Exception):
     """ Customer exception to be raised in there is a config-file parse
@@ -56,58 +53,22 @@ class Converter(object):
     on creation.
     """
 
-    def __init__(self, script_file, script_args, symbol_files, outdir, symbol_dict):
+    def __init__(self, dirs, symbol_files, root_outdir):
         """
         Given the EDM entry script, deduce the paths to convert.
         A list of symbol files is stored to help when converting.
         """
-        # Spoof EDM to find EDMDATAFILES and PATH
-        # Index these directories to find which modules
-        # relative paths may be in.
-        edmdatafiles, path_dirs, working_dir, args = utils.spoof_edm(
-            script_file, script_args)
-
-        self.edmdatafiles = [f for f in edmdatafiles if f not in ('', '.')]
-        self.edmdatafiles.append(working_dir)
-
-        self.path_dirs = path_dirs
-        self.path_dirs.append(working_dir)
-
-        self.file_index = paths.index_paths(set(self.edmdatafiles + self.path_dirs), True)
+        self.dirs = dirs
+        self.file_index = paths.index_paths(dirs, True)
 
         self.symbol_files = symbol_files
-        self.symbol_dict = symbol_dict
+        self.symbol_dict = {}
 
-        try:
-            self.module_name, self.version, _ = utils.parse_module_name(working_dir)
-        except ValueError:
-            log.warn("Didn't understand script's working directory!")
-            self.module_name = os.path.basename(script_file)
-            self.version = None
+        self.root_outdir = root_outdir
 
-        self.module_name = self.module_name.replace('/', '_')
-
-        if self.version is None:
-            self.version = 'no-version'
-
-        self.root_outdir = os.path.join(outdir, "%s_%s" % (self.module_name, self.version))
         if not os.path.exists(self.root_outdir):
             log.info('Making new output directory %s', self.root_outdir)
             os.makedirs(self.root_outdir)
-
-        self._generate_project_file()
-
-    def _generate_project_file(self):
-        """
-        Create an Eclipse project file for this set of OPIs.
-        """
-        with open(os.path.join(self.root_outdir, PROJECT_FILENAME), 'w') as f:
-            with open(PROJECT_TEMPLATE) as template:
-                content = template.read()
-                s = string.Template(content)
-                updated_content = s.substitute(module_name=self.module_name,
-                                               version=self.version)
-                f.write(updated_content)
 
     def _process_one_directory(self, datadir, entry, force, working_path):
         """ Process a single directory
@@ -122,13 +83,16 @@ class Converter(object):
                 log.debug("New outdir is %s", outpath)
                 self._convert_dir(full_path, outpath, force)
 
+    def get_symbol_paths(self):
+        return self.symbol_dict
+
     def convert(self, force):
         """
         Given the EDM datafiles and PATH lists, parse the directory and
         any subdirectories for edm/script files.  Create output in a similar
         directory structure.
         """
-        for datadir in self.edmdatafiles + self.path_dirs:
+        for datadir in self.dirs:
             # Currently can't handle relative directories.
             if datadir.startswith('.'):
                 continue
@@ -200,9 +164,13 @@ class Converter(object):
                 store_symbol(full_path, destination, self.symbol_dict)
                 log.info('Successfully stored symbol file %s', destination)
             else:
-                files.convert_edl(full_path, destination)
-                log.info('Successfully converted %s', destination)
-                self.update_paths(destination, depth)
+                returncode = files.convert_edl(full_path, destination)
+                if returncode == 0:
+                    log.info('Successfully converted %s', destination)
+                    self.update_paths(destination, depth)
+                else:
+                    log.warn('Conversion of %s failed with code %d.',
+                             full_path, returncode)
         except Exception as e:
             log.warn('Conversion of %s unsuccessful.', full_path)
             log.warn(str(e))
@@ -269,9 +237,7 @@ def store_symbol(source, destination, symbol_dictionary):
     """
     log.debug("Adding %s: %s to symbol dictionary", source, destination)
     if source in symbol_dictionary:
-        destinations = symbol_dictionary[source]
-        if not destination in destinations:
-            destinations.append(destination)
+        symbol_dictionary[source].add(destination)
     else:
-        symbol_dictionary[source] = [destination]
+        symbol_dictionary[source] = set([destination])
 

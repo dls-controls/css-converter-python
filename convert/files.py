@@ -10,7 +10,9 @@ import logging as log
 NULL_FILE = open(os.devnull, 'w')
 TMP_DIR = './tmp'
 # Commands in lists for subprocess
-CONVERT_CMD = ['java', '-Dedm2xml.colorsFile=res/colors.list', '-jar', 'res/conv.jar']
+COLORS_VARIABLE = '-Dedm2xml.colorsFile=res/colors.list'
+SYMBOLS_VARIABLE = '-Dedm2xml.symbolsFile=res/symbols.conf'
+CONVERT_CMD = ['java', COLORS_VARIABLE, SYMBOLS_VARIABLE, '-jar', 'res/conv.jar']
 UPDATE_CMD = ['edm', '-convert']
 SYMBOLS_DIR = './tmp/symbols'
 SYMB_SCRIPT = os.path.join(os.getcwd(), 'res/auto-symb.sh')
@@ -23,15 +25,15 @@ def convert_symbol(symbol_file, destinations):
     This uses an external shell script.
     """
     log.debug("Converting symbol %s", symbol_file)
-    dest = os.path.join(SYMBOLS_DIR, os.path.basename(symbol_file))
-    utils.make_writeable(dest)
-    shutil.copyfile(symbol_file, dest)
+    temp_file = os.path.join(SYMBOLS_DIR, os.path.basename(symbol_file))
+    utils.make_writeable(temp_file)
+    shutil.copyfile(symbol_file, temp_file)
     # Update EDM file if necessary.
-    if is_old_edl(dest):
-        dest = update_edl(dest)
+    if is_old_edl(temp_file):
+         update_edl(temp_file, in_place=True)
     # Compress EDM symbol file to minimum rectangle.
-    compress.parse(dest)
-    command = COMPRESS_CMD + [symbol_file]
+    compress.parse(temp_file)
+    command = COMPRESS_CMD + [temp_file]
     out = subprocess.check_output(" ".join(command), shell=True)
     # copy png to right location
     relfilename = out.strip()
@@ -64,24 +66,23 @@ def is_old_edl(filename):
             return int(line.split()[0]) < 4
 
 
-def update_edl(filename):
+def update_edl(filename, in_place=False):
     """
     Copy EDM file to temporary location.  Attempt to convert to
     new format using EDM. Return location of converted file.
     """
-    print 'updating', filename
     try:
-        tmp_edm = os.path.join(TMP_DIR, os.path.basename(filename))
-        print 'dest is', tmp_edm
+        if not in_place:
+            temp_file = os.path.join(TMP_DIR, os.path.basename(filename))
+            shutil.copyfile(filename, temp_file)
+            filename = temp_file
         # make sure we have write permissions on the destination
-        utils.make_writeable(tmp_edm)
-        shutil.copyfile(filename, tmp_edm)
-        cmd = UPDATE_CMD + [tmp_edm]
-        print 'updated %s with %s' % (tmp_edm, cmd)
+        utils.make_writeable(filename)
+        cmd = UPDATE_CMD + [filename]
         returncode = subprocess.call(cmd, stdout=NULL_FILE, stderr=NULL_FILE)
         if returncode == 0:
-            utils.make_writeable(tmp_edm)
-            return tmp_edm
+            utils.make_writeable(filename)
+            return filename
         else:
             log.warn('EDM update failed with code %s', returncode)
     except Exception as e:
@@ -94,6 +95,8 @@ def convert_edl(filename, destination):
     """
     Try to convert .edl file.  If it fails, try updating .edl file
     using edm before converting again.
+
+    Return the conversion return code.
     """
     if is_old_edl(filename):
         filename = update_edl(filename)
@@ -102,5 +105,4 @@ def convert_edl(filename, destination):
     command = CONVERT_CMD + [filename, destination]
     returncode = subprocess.call(command)
     utils.make_read_only(destination)
-    if returncode != 0:  # conversion failed
-        log.warn('Conversion failed with code %d.', returncode)
+    return returncode

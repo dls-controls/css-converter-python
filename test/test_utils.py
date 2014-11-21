@@ -76,5 +76,6 @@ class UtilsTest(unittest.TestCase):
         self.assertEquals(version, '1-7')
         self.assertEquals(rel_path, 'data/SCMPW.sh')
 
+
 if __name__ == '__main__':
     unittest.main()

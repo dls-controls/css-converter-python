@@ -1,0 +1,4 @@
+# Occasionally scripts use xmessage to allow you to choose 
+# which port EDM will run under.  We don't care, so return
+# the default value.
+return 101

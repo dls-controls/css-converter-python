@@ -1,8 +1,14 @@
 
+import spoof
+
 import os
 import subprocess
 import logging as log
+import string
 
+
+PROJECT_TEMPLATE = 'res/project.template'
+PROJECT_FILENAME = '.project'
 
 def parse_module_name(filepath):
     """
@@ -54,61 +60,60 @@ def make_writeable(filename):
         os.chmod(filename, 0o777)
 
 
-def spoof_edm(script_file, args=[]):
+def read_symbols_file(filename):
+    symbols = []
+    with open(filename) as f:
+        lines = f.readlines()
+        lines = [l.strip() for l in lines]
+        lines = [l for l in lines if l != "" and not l.startswith('#')]
+        for line in lines:
+            parts = line.split(':')
+            symbols.append(parts[0])
+    return symbols
+
+
+def generate_project_file(outdir, module_name, version):
     """
-    Use a dummy script called 'edm' to extract:
-     - the EDMDATAFILES variable
-     - the PATH variable
-     - the script's working directory
-     - the command-line arguments
-    from any script used to run edm.
-
-    Assume that the last four lines of output are those produced by this script.
+    Create an Eclipse project file for this set of OPIs.
     """
-    env = os.environ.copy()
-    old_dir = os.getcwd()
-    script_dir = os.path.dirname(script_file)
-    # Change to directory of spoofed script.
-    os.chdir(script_dir)
-    this_dir = os.path.dirname(__file__)
-    spoof_edm_dir = os.path.join(this_dir, '..', 'res')
-    # Put spoof edm first on the path.
-    env['PATH'] = '%s:%s:%s' % (spoof_edm_dir, script_dir, env['PATH'])
-    old_path = env['PATH'].split(':')
+    import os
+    try:
+        os.makedirs(outdir)
+    except OSError:
+        pass
+    with open(os.path.join(outdir, PROJECT_FILENAME), 'w') as f:
+        with open(PROJECT_TEMPLATE) as template:
+            content = template.read()
+            s = string.Template(content)
+            updated_content = s.substitute(module_name=module_name,
+                                           version=version)
+            f.write(updated_content)
 
-    edmdatafiles = None
-    path = None
 
-    args_string = " ".join(a for a in args)
-    args_string = args_string.replace('$PORT', '5064')
-    command_string = '%s %s' % (script_file, args_string)
-    log.debug('Spoofing script: %s', command_string)
+def interpret_command(cmd, args, directory):
+    log.info('Launcher command: %s', cmd)
+    if not os.path.isabs(cmd) and cmd in os.listdir(directory):
+        cmd = os.path.join(directory, cmd)
+    log.info('CMD now %s', cmd)
+    # Spoof EDM to find EDMDATAFILES and PATH
+    # Index these directories to find which modules
+    # relative paths may be in.
+    edmdatafiles, path_dirs, working_dir, args = spoof.spoof_edm(cmd, args)
+    try:
+        module_name, version, _ = parse_module_name(working_dir)
+    except ValueError:
+        log.warn("Didn't understand script's working directory!")
+        module_name = os.path.basename(cmd)
+        version = None
 
-    out = subprocess.check_output([command_string], shell=True, env=env)
+    module_name = module_name.replace('/', '_')
 
-    # Change back to original directory.
-    os.chdir(old_dir)
-    log.debug('Spoof EDM output:\n\n%s', out)
-    lines = out.splitlines()
-    if lines[-1] != 'Spoof EDM complete.':
-        log.warn('EDM spoof failed.')
-        return None
+    if version is None:
+        version = 'no-version'
 
-    if len(lines) > 1:
-        path = lines[-2]
-        path = path.strip().split(':')
-        path = [p for p in path if p not in old_path]
-    if len(lines) > 2:
-        edmdatafiles = lines[-3]
-        edmdatafiles = edmdatafiles.strip().split(':')
-        edmdatafiles = [e for e in edmdatafiles if e != '']
-    if len(lines) > 3:
-        pwd = lines[-4].strip()
-    if len(lines) > 4:
-        args = lines[-5].strip().split()
-    log.info('EDMDATAFILES: %s', edmdatafiles)
-    log.info('PATH: %s', path)
-    log.info('Script working directory: %s', pwd)
-    log.info('Script arguments: %s', args)
-    return edmdatafiles, path, pwd, args
+    all_dirs = [f for f in edmdatafiles if f not in ('', '.')]
+    all_dirs.extend(path_dirs)
+    all_dirs.append(working_dir)
+    all_dirs = set(all_dirs)
 
+    return all_dirs, module_name, version
