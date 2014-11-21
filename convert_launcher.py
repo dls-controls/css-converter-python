@@ -18,7 +18,7 @@ from convert import files
 
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
-#APPS_XML = '/home/hgs15624/code/converter/applications.xml'
+APPS_XML = '/home/hgs15624/code/converter/applications.xml'
 
 tree = et.parse(APPS_XML)
 
@@ -40,6 +40,8 @@ def run_conversion():
     launcher_apps = get_apps(root)
 
     symbol_paths = {}
+    symbols = utils.read_symbols_file('res/symbols.conf')
+    log.info('Symbols found: %s', symbols)
 
     for app, cmd, args in launcher_apps:
 
@@ -55,7 +57,7 @@ def run_conversion():
         outdir = os.path.join(outdir, "%s_%s" % (module_name, version))
         utils.generate_project_file(outdir, module_name, version)
         try:
-            c = converter.Converter(all_dirs, [], outdir)
+            c = converter.Converter(all_dirs, symbols, outdir)
             c.convert(False)
             new_symbol_paths = c.get_symbol_paths()
             for symbol in new_symbol_paths:

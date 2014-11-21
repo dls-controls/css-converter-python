@@ -10,7 +10,9 @@ import logging as log
 NULL_FILE = open(os.devnull, 'w')
 TMP_DIR = './tmp'
 # Commands in lists for subprocess
-CONVERT_CMD = ['java', '-Dedm2xml.colorsFile=res/colors.list', '-jar', 'res/conv.jar']
+COLORS_VARIABLE = '-Dedm2xml.colorsFile=res/colors.list'
+SYMBOLS_VARIABLE = '-Dedm2xml.symbolsFile=res/symbols.conf'
+CONVERT_CMD = ['java', COLORS_VARIABLE, SYMBOLS_VARIABLE, '-jar', 'res/conv.jar']
 UPDATE_CMD = ['edm', '-convert']
 SYMBOLS_DIR = './tmp/symbols'
 SYMB_SCRIPT = os.path.join(os.getcwd(), 'res/auto-symb.sh')

@@ -92,8 +92,8 @@ def parse_config(cfg):
         raise ConfigurationError()
 
     try:
-        symbols = cp.get('edm', 'symbols')
-        symbols = symbols.split(':')
+        symbols_file = cp.get('edm', 'symbols_file')
+        symbols = utils.read_symbols_file(symbols_file)
     except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
         symbols = []
 
@@ -123,6 +123,7 @@ def run_conversion():
     for cfg in args.config:
         try:
             (script_file, script_args, symbols, outdir) = parse_config(cfg)
+            log.info('Symbols found: %s', symbols)
             all_dirs, module_name, version = utils.interpret_command(script_file, script_args, LAUNCHER_DIR)
 
             for sym in symbols:
@@ -143,7 +144,7 @@ def run_conversion():
 
     if symbol_paths:
         log.info("Post-processing symbol files")
-        for path, destinations in symbol_path.iteritems():
+        for path, destinations in symbol_paths.iteritems():
             files.convert_symbol(path, destinations)
 
 

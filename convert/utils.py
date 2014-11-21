@@ -60,6 +60,18 @@ def make_writeable(filename):
         os.chmod(filename, 0o777)
 
 
+def read_symbols_file(filename):
+    symbols = []
+    with open(filename) as f:
+        lines = f.readlines()
+        lines = [l.strip() for l in lines]
+        lines = [l for l in lines if l != "" and not l.startswith('#')]
+        for line in lines:
+            parts = line.split(':')
+            symbols.append(parts[0])
+    return symbols
+
+
 def generate_project_file(outdir, module_name, version):
     """
     Create an Eclipse project file for this set of OPIs.
