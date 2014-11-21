@@ -38,6 +38,7 @@ def get_apps(node):
 
 def run_conversion():
     launcher_apps = get_apps(root)
+    log.info('Found %s commands in the Launcher', len(launcher_apps))
 
     symbol_paths = {}
     symbols = utils.read_symbols_file('res/symbols.conf')

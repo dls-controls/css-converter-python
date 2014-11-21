@@ -23,10 +23,13 @@ def _is_edm_script(filename):
 
 
 def _from_configure_ioc(key, relative_path=None):
-    output = subprocess.check_output([CONFIGURE_IOC, 's', '-p', key])
-    output = output.strip()
-    if relative_path is not None:
-        output = os.path.join(os.path.dirname(output), relative_path)
+    try:
+        output = subprocess.check_output([CONFIGURE_IOC, 's', '-p', key])
+        output = output.strip()
+        if relative_path is not None:
+            output = os.path.join(os.path.dirname(output), relative_path)
+    except subprocess.CalledProcessError:
+        output = None
     return output
 
 
@@ -48,6 +51,8 @@ def spoof_edm(script_file, args=[]):
     if os.path.basename(script_file) == CONFIGURE_IOC_SCRIPT:
         relative_path = args[2] if len(args) > 2 else None
         script_file = _from_configure_ioc(args[1], relative_path)
+    if script_file is None:
+        raise SpoofError('Error calling configure-ioc on script file %s.' % script_file)
     if not _is_edm_script(script_file):
         raise SpoofError('Script file %s does not use EDM.' % script_file)
     env = os.environ.copy()
