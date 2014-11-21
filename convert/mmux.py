@@ -19,7 +19,7 @@ import xml.etree.ElementTree as ET
 
 from utils import make_writeable, make_read_only
 
-MENU_MUX_ID = 'org.csstudio.opibuilder.widgets.edm.muxmenu'
+MENU_MUX_ID = 'org.csstudio.opibuilder.widgets.edm.menumux'
 MISSING = 'missing'
 LOC_PREFIX = 'loc://$(DID)'
 
@@ -32,7 +32,7 @@ EXCLUDED_TAGS = ['scriptText']
 
 
 def is_menumux(element):
-    """ Return true if the tree element is a widget with typeId muxmenu
+    """ Return true if the tree element is a widget with typeId menumux
     """
 
     return element.tag == 'widget' and \
