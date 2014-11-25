@@ -12,7 +12,7 @@ PROJECT_FILENAME = '.project'
 
 def parse_module_name(filepath):
     """
-    Return (module_name, version, relative_path)
+    Return (module_path, module_name, version, relative_path)
 
     If the path is not an ioc or a support module, raise ValueError.
 
@@ -39,11 +39,12 @@ def parse_module_name(filepath):
             version = p
             v = i
     module = '/'.join(parts[root_index+1:v])
+    module_path = '/'.join(parts[:root_index+1])
     if module == '':
         raise ValueError('No module found in %s' % filepath)
     relative_path = '/'.join(parts[v+1:])
 
-    return module, version, relative_path
+    return module_path, module, version, relative_path
 
 
 def make_read_only(filename, executable=False):
@@ -100,7 +101,7 @@ def interpret_command(cmd, args, directory):
     # relative paths may be in.
     edmdatafiles, path_dirs, working_dir, args = spoof.spoof_edm(cmd, args)
     try:
-        module_name, version, _ = parse_module_name(working_dir)
+        _, module_name, version, _ = parse_module_name(working_dir)
     except ValueError:
         log.warn("Didn't understand script's working directory!")
         module_name = os.path.basename(cmd)

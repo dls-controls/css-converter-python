@@ -30,7 +30,7 @@ def _index_dir(root, directory, recurse):
     log.debug('Indexing directory %s', directory)
     # path_within_module is always relative to root - the EDMDATAFILE
     # or path variable.
-    module, _, path_within_module = utils.parse_module_name(root)
+    _, module, _, path_within_module = utils.parse_module_name(root)
     if path_within_module is None:
         path_within_module = ''
     for entry in os.listdir(directory):

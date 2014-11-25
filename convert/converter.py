@@ -98,7 +98,7 @@ class Converter(object):
                 continue
             log.debug('EDM data file %s', datadir)
             try:
-                module_name, version, rel_path = utils.parse_module_name(datadir)
+                module_path, module_name, version, rel_path = utils.parse_module_name(datadir)
             except ValueError:
                 log.warn("Can't parse path %s", datadir)
                 continue
