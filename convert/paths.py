@@ -185,3 +185,10 @@ def update_opi_file(path, depth, file_index, module):
     tree.write(path, encoding='utf-8', xml_declaration=True)
     utils.make_read_only(path)
 
+
+def full_path(dirs, relative_path):
+    for directory in dirs:
+        full_path = os.path.join(directory, relative_path)
+        if os.path.exists(full_path):
+            return full_path
+    return None
