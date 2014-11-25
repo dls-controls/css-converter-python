@@ -77,7 +77,6 @@ def generate_project_file(outdir, module_name, version):
     """
     Create an Eclipse project file for this set of OPIs.
     """
-    import os
     try:
         os.makedirs(outdir)
     except OSError:
@@ -91,15 +90,34 @@ def generate_project_file(outdir, module_name, version):
             f.write(updated_content)
 
 
+def _get_macros(edm_args):
+    macro_dict = {}
+    try:
+        x_index = edm_args.index('-m')
+        macros_arg = edm_args[x_index + 1]
+        macros = macros_arg.split(',')
+        for macro in macros:
+            key, value = macro.split('=')
+            macro_dict[key] = value
+    except (ValueError, IndexError):
+        pass
+    return macro_dict
+
+
 def interpret_command(cmd, args, directory):
     log.info('Launcher command: %s', cmd)
     if not os.path.isabs(cmd) and cmd in os.listdir(directory):
         cmd = os.path.join(directory, cmd)
-    log.info('CMD now %s', cmd)
+    log.info('Command corrected to %s', cmd)
     # Spoof EDM to find EDMDATAFILES and PATH
     # Index these directories to find which modules
     # relative paths may be in.
     edmdatafiles, path_dirs, working_dir, args = spoof.spoof_edm(cmd, args)
+
+    macros = _get_macros(args)
+
+    edl_files = [a for a in args if a.endswith('edl')]
+    edl_file = edl_files[0] if len(edl_files) > 0 else None
     try:
         _, module_name, version, _ = parse_module_name(working_dir)
     except ValueError:
@@ -112,9 +130,9 @@ def interpret_command(cmd, args, directory):
     if version is None:
         version = 'no-version'
 
-    all_dirs = [f for f in edmdatafiles if f not in ('', '.')]
+    all_dirs = [os.path.realpath(f) for f in edmdatafiles if f not in ('', '.')]
     all_dirs.extend(path_dirs)
     all_dirs.append(working_dir)
     all_dirs = set(all_dirs)
 
-    return all_dirs, module_name, version
+    return all_dirs, module_name, version, edl_file, macros
