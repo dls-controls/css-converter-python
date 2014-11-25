@@ -36,6 +36,13 @@ class UtilsTest(unittest.TestCase):
         self.assertEquals(version, '6-7-1dls8')
         self.assertEquals(rel_path, 'motorApp/ACRSrc/Makefile')
 
+    def test_parse_module_name_module_version_directory(self):
+        path = '/dls_sw/prod/R3.14.12.3/support/motor/6-7-1dls8/motorApp/'
+        module_path, module, version, rel_path = parse_module_name(path)
+        self.assertEquals(module, 'motor')
+        self.assertEquals(version, '6-7-1dls8')
+        self.assertEquals(rel_path, 'motorApp')
+
     def test_parse_module_name_nested_module(self):
         path = '/dls_sw/prod/R3.14.12.3/ioc/ME09C/ME09C-EA-IOC-01/1-3'
         module_path, module, version, rel_path = parse_module_name(path)
@@ -60,7 +67,11 @@ class UtilsTest(unittest.TestCase):
 
     def test_parse_module_launcher(self):
         path = '/dls_sw/prod/etc/Launcher'
-        self.assertRaises(ValueError, parse_module_name, path)
+        module_path, module, version, rel_path = parse_module_name(path)
+        self.assertEquals(module_path, path)
+        self.assertEquals(module, '')
+        self.assertEquals(version, '')
+        self.assertEquals(rel_path, '')
 
     def test_parse_module_name_no_module(self):
         path = '/dls_sw/prod/R3.14.12.3/support/'
