@@ -83,8 +83,6 @@ class Converter(object):
         for root_dir in self.dirs:
             if directory.startswith(root_dir):
                 rel_path = os.path.relpath(root_dir, directory)
-                print "Trying to find", root_dir
-                print self.depths
                 return self.depths[root_dir] + len(rel_path.split('/'))
         raise ValueError('???')
 

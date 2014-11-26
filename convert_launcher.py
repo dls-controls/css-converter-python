@@ -21,7 +21,7 @@ from convert import paths
 
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
-APPS_XML = '/home/hgs15624/code/converter/applications.xml'
+APPS_XML = 'applications.xml'
 NEW_APPS = 'new_apps.xml'
 OUTDIR = '/home/hgs15624/code/converter/project/opi2'
 
@@ -33,7 +33,6 @@ def generate_run_script(script_path, module, project, relative_path, module_dict
         os.makedirs(os.path.dirname(script_path))
     except OSError:
         pass
-    print "pmr", project, module, relative_path
     links_strings = []
     for path, m in module_dict.iteritems():
         m = m.split('/')[-1]
@@ -80,12 +79,11 @@ def update_cmd(cmd, args, symbols, force):
     except spoof.SpoofError as e:
         log.warn('Could not understand launcher script %s', cmd)
         log.warn(e)
-        return "", []
+        return "", [], {}
 
     file_index = paths.index_paths(all_dirs, True)
     path_to_run = paths.full_path(all_dirs, file_to_run)
     path_to_run = os.path.realpath(path_to_run)
-    print "ptr", path_to_run
     module_path, module, version, rel_path = utils.parse_module_name(path_to_run)
     # For the purposes of the project name, use only the last directory of the module
     module = module.split('/')[-1]
@@ -102,57 +100,79 @@ def update_cmd(cmd, args, symbols, force):
     if file_to_run.endswith('edl'):
         file_to_run = file_to_run[:-3] + 'opi'
 
+    symbol_paths = {}
     try:
         c = converter.Converter(all_dirs, symbols, OUTDIR)
         c.convert(force)
-        """
-        new_symbol_paths = c.get_symbol_paths()
-        for symbol in new_symbol_paths:
-            if symbol in symbol_paths:
-                symbol_paths[symbol].update(new_symbol_paths[symbol])
-            else:
-                symbol_paths[symbol] = new_symbol_paths[symbol]
-        """
+        symbol_paths = c.get_symbol_paths()
     except OSError as e:
         log.warn('Exception converting %s: %s', cmd, e)
 
     launch_opi = os.path.join('/', project, module, rel_path)
-    return script_path, [launch_opi]
+    return script_path, [launch_opi], symbol_paths
 
-def update_apps(node, symbols, force):
-    # The recursion here is a little awkward.
+
+def get_apps(node):
+    apps = []
     if node.tag == 'button':
         name = node.get('text')
         cmd = node.get('command')
-        args = node.get('args', default="").split()
-        try:
-            new_cmd, new_args = update_cmd(cmd, args, symbols, force)
-        except AttributeError:
-            new_cmd = ""
-        if new_cmd != "":
+        args = node.get('args', default="")
+        apps.append((name, cmd, args))
+    else:
+        for child in node:
+            apps.extend(get_apps(child))
+    return apps
+
+
+def update_xml(node, apps_dict):
+    if node.tag == 'button':
+        name = node.get('text')
+        cmd = node.get('command')
+        args = node.get('args', default="")
+        if (name, cmd, args) in apps_dict:
+            new_cmd, new_args = apps_dict[(name, cmd, args)]
             node.set('command', new_cmd)
             node.set('args', ' '.join(new_args))
     else:
         for child in node:
-            update_apps(child, symbols, force)
+            update_xml(child, apps_dict)
+
+
+def merge_symbol_paths(paths_dict1, paths_dict2):
+    for symbol in paths_dict1:
+        if symbol in paths_dict2:
+            paths_dict2[symbol].update(paths_dict1[symbol])
+        else:
+            paths_dict2[symbol] = paths_dict1[symbol]
+    return paths_dict2
+
 
 def run_conversion(force):
 
     tree = et.parse(APPS_XML)
     root = tree.getroot()
 
+    apps = get_apps(root)
+    app_dict = {}
+
     symbols = utils.read_symbols_file('res/symbols.conf')
     log.info('Symbols found: %s', symbols)
-    update_apps(root, symbols, force)
+    symbol_paths = {}
+    for name, cmd, args in apps:
+        new_cmd, new_args, new_symbol_paths = update_cmd(cmd, args.split(), symbols, force)
+        symbol_paths = merge_symbol_paths(symbol_paths, new_symbol_paths)
+        app_dict[(name, cmd, args)] = (new_cmd, new_args)
+
+    update_xml(root, app_dict)
     tree.write(NEW_APPS, encoding='utf-8', xml_declaration=True)
 
-    symbol_paths = {}
     if symbol_paths:
         log.info("Post-processing symbol files")
         for path, destinations in symbol_paths.iteritems():
             try:
                 files.convert_symbol(path, destinations)
-            except IndexError as e:
+            except (IndexError, AssertionError) as e:
                 log.warn('Failed to convert symbol %s: %s', path, e)
                 continue
 
