@@ -22,6 +22,14 @@ class UtilsTest(unittest.TestCase):
         self.assertIsNone(version)
         self.assertEquals(rel_path, '')
 
+    def test_parse_module_name_full_path_in_work(self):
+        path = '/dls_sw/work/R3.14.12.3/support/RF/data/SR-RF-Overview.edl'
+        module_path, module, version, rel_path = parse_module_name(path)
+        self.assertEquals(module_path, '/dls_sw/work/R3.14.12.3/support')
+        self.assertEquals(module, 'RF')
+        self.assertIsNone(version)
+        self.assertEquals(rel_path, 'data/SR-RF-Overview.edl')
+
     def test_parse_module_name_module_and_version(self):
         path = '/dls_sw/prod/R3.14.12.3/support/motor/6-7-1dls8'
         module_path, module, version, rel_path = parse_module_name(path)

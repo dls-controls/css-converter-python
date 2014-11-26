@@ -32,18 +32,23 @@ def parse_module_name(filepath):
         log.warn('Module %s not understood', filepath)
         return filepath, '', '', ''
 
-    v = root_index + 2
+    v = None
     for i, p in enumerate(parts):
         if p == "":
             continue
         if p[0].isdigit() or p == 'Rx-y':
             version = p
             v = i
-    module = '/'.join(parts[root_index+1:v])
+    if v is None:
+        module = '/'.join(parts[root_index+1:root_index+2])
+        relative_path = '/'.join(parts[root_index+2:])
+    else:
+        module = '/'.join(parts[root_index+1:v])
+        relative_path = '/'.join(parts[v+1:])
+
     module_path = '/'.join(parts[:root_index+1])
     if module == '':
         raise ValueError('No module found in %s' % filepath)
-    relative_path = '/'.join(parts[v+1:])
 
     return module_path, module, version, relative_path
 
