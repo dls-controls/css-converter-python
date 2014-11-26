@@ -1,0 +1,10 @@
+#!/bin/bash
+
+CSSTUDIO=/dls_sw/work/common/CSS/CSS_4.0.x_nightly/cs-studio
+LAUNCH_OPI=$$1
+
+MACROS="${macros}"
+LINKS="${links}"
+
+echo $$CSSTUDIO -share_link "$$LINKS" --launcher.openFile "$$LAUNCH_OPI OPI_SHELL=true,$$MACROS;$$LINKS"
+$$CSSTUDIO -share_link "$$LINKS" --launcher.openFile "$$LAUNCH_OPI OPI_SHELL=true,$$MACROS¬$$LINKS"

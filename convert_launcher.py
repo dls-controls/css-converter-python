@@ -6,70 +6,147 @@ and convert EDM files referenced by each script it finds.
 
 import xml.etree.ElementTree as et
 import os
+import sys
+import string
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
-LOG_LEVEL = log.DEBUG
+LOG_LEVEL = log.WARN
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 from convert import converter
 from convert import utils
 from convert import spoof
 from convert import files
+from convert import paths
 
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
 APPS_XML = '/home/hgs15624/code/converter/applications.xml'
+NEW_APPS = 'new_apps.xml'
+OUTDIR = '/home/hgs15624/code/converter/project/opi2'
 
-tree = et.parse(APPS_XML)
 
-root = tree.getroot()
+ESCAPE_CHARS = ['.', ':']
 
-def get_apps(node):
-    apps = []
+def generate_run_script(script_path, module, project, relative_path, module_dict, macros):
+    try:
+        os.makedirs(os.path.dirname(script_path))
+    except OSError:
+        pass
+    print "pmr", project, module, relative_path
+    links_strings = []
+    for path, m in module_dict.iteritems():
+        m = m.split('/')[-1]
+        links_strings.append('%s=%s' % (path, os.path.join('/', project, m)))
+    links_string = ','.join(links_strings)
+    macros_strings = []
+    for key, value in macros.iteritems():
+        macros_strings.append('%s=%s' % (key, value))
+    macros_string = ','.join(macros_strings)
+    for c in ESCAPE_CHARS:
+        macros_string = macros_string.replace(c, '[\%d]' % ord(c))
+        links_string = links_string.replace(c, '[\%d]' % ord(c))
+    with open(script_path, 'w') as f:
+        with open('res/runcss.template') as template:
+            content = template.read()
+            s = string.Template(content)
+            updated_content = s.substitute(macros=macros_string,
+                                           links=links_string)
+            f.write(updated_content)
+
+
+def get_module_dict(dirs):
+    module_dict = {}
+    for directory in dirs:
+        log.warn('parsing %s', directory)
+        try:
+            module_path, module_name, mversion, _ = utils.parse_module_name(directory)
+            log.warn('name %s path %s version %s', module_name, module_path, mversion)
+            log.warn('outpath %s', OUTDIR)
+            if mversion is None:
+                mversion = ''
+            p = os.path.join(OUTDIR, module_path.lstrip('/'), module_name, mversion)
+            log.warn(p)
+            module_dict[p] = module_name
+        except ValueError:
+            continue
+    return module_dict
+
+
+def update_cmd(cmd, args, symbols, force):
+    try:
+        log.warn("%s, %s", cmd, args)
+        all_dirs, module_name, version, file_to_run, macros = utils.interpret_command(cmd, args, LAUNCHER_DIR)
+    except spoof.SpoofError as e:
+        log.warn('Could not understand launcher script %s', cmd)
+        log.warn(e)
+        return "", []
+
+    file_index = paths.index_paths(all_dirs, True)
+    path_to_run = paths.full_path(all_dirs, file_to_run)
+    path_to_run = os.path.realpath(path_to_run)
+    print "ptr", path_to_run
+    module_path, module, version, rel_path = utils.parse_module_name(path_to_run)
+    # For the purposes of the project name, use only the last directory of the module
+    module = module.split('/')[-1]
+    project = '%s_%s' % (module, version)
+    # Convert file extension
+    if rel_path.endswith('edl'):
+        rel_path = rel_path[:-3] + 'opi'
+
+    module_dict = get_module_dict(all_dirs)
+
+    script_path = os.path.join(OUTDIR, os.path.dirname(path_to_run.lstrip('/')), 'runcss.sh')
+    generate_run_script(script_path, module, project, rel_path, module_dict, macros)
+    # Convert file extension
+    if file_to_run.endswith('edl'):
+        file_to_run = file_to_run[:-3] + 'opi'
+
+    try:
+        c = converter.Converter(all_dirs, symbols, OUTDIR)
+        c.convert(force)
+        """
+        new_symbol_paths = c.get_symbol_paths()
+        for symbol in new_symbol_paths:
+            if symbol in symbol_paths:
+                symbol_paths[symbol].update(new_symbol_paths[symbol])
+            else:
+                symbol_paths[symbol] = new_symbol_paths[symbol]
+        """
+    except OSError as e:
+        log.warn('Exception converting %s: %s', cmd, e)
+
+    launch_opi = os.path.join('/', project, module, rel_path)
+    return script_path, [launch_opi]
+
+def update_apps(node, symbols, force):
+    # The recursion here is a little awkward.
     if node.tag == 'button':
         name = node.get('text')
         cmd = node.get('command')
         args = node.get('args', default="").split()
-        apps.append((name, cmd, args))
+        try:
+            new_cmd, new_args = update_cmd(cmd, args, symbols, force)
+        except AttributeError:
+            new_cmd = ""
+        if new_cmd != "":
+            node.set('command', new_cmd)
+            node.set('args', ' '.join(new_args))
     else:
         for child in node:
-            apps.extend(get_apps(child))
-    return apps
+            update_apps(child, symbols, force)
 
-def run_conversion():
-    launcher_apps = get_apps(root)
-    log.info('Found %s commands in the Launcher', len(launcher_apps))
+def run_conversion(force):
 
-    symbol_paths = {}
+    tree = et.parse(APPS_XML)
+    root = tree.getroot()
+
     symbols = utils.read_symbols_file('res/symbols.conf')
     log.info('Symbols found: %s', symbols)
+    update_apps(root, symbols, force)
+    tree.write(NEW_APPS, encoding='utf-8', xml_declaration=True)
 
-    for app, cmd, args in launcher_apps:
-
-        try:
-            log.warn("%s, %s", cmd, args)
-            all_dirs, module_name, version = utils.interpret_command(cmd, args, LAUNCHER_DIR)
-        except spoof.SpoofError as e:
-            log.warn('Could not understand launcher script %s', cmd)
-            log.warn(e)
-            continue
-
-        outdir = './project/opi2'
-        outdir = os.path.join(outdir, "%s_%s" % (module_name, version))
-        utils.generate_project_file(outdir, module_name, version)
-        try:
-            c = converter.Converter(all_dirs, symbols, outdir)
-            c.convert(False)
-            new_symbol_paths = c.get_symbol_paths()
-            for symbol in new_symbol_paths:
-                if symbol in symbol_paths:
-                    symbol_paths[symbol].update(new_symbol_paths[symbol])
-                else:
-                    symbol_paths[symbol] = new_symbol_paths[symbol]
-        except OSError as e:
-            log.warn('Exception converting %s: %s', cmd, e)
-            continue
-
+    symbol_paths = {}
     if symbol_paths:
         log.info("Post-processing symbol files")
         for path, destinations in symbol_paths.iteritems():
@@ -81,4 +158,5 @@ def run_conversion():
 
 
 if __name__ == '__main__':
-    run_conversion()
+    force = '-f' in sys.argv
+    run_conversion(force)
