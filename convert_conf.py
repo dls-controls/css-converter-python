@@ -124,7 +124,7 @@ def run_conversion():
         try:
             (script_file, script_args, symbols, outdir) = parse_config(cfg)
             log.info('Symbols found: %s', symbols)
-            all_dirs, module_name, version = utils.interpret_command(script_file, script_args, LAUNCHER_DIR)
+            all_dirs, module_name, version, _, _ = utils.interpret_command(script_file, script_args, LAUNCHER_DIR)
 
             for sym in symbols:
                 print "Found symbol: " + sym
