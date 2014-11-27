@@ -1,6 +1,7 @@
 
 from convert.converter import store_symbol, Converter
 import unittest
+import mock
 
 
 class SymbolDictionaryTest(unittest.TestCase):
@@ -30,6 +31,50 @@ class SymbolDictionaryTest(unittest.TestCase):
 
         self.assertDictEqual({"path": set(["dest", "new_dest"])}, symbol_dict)
 
+
+class DepthTest(unittest.TestCase):
+
+    def test_depths_data(self):
+        test_dir = '/dls_sw/prod/R3.14.12.3/ioc/SV/SV-CS-IOC-01/2-1-1/data'
+        from convert import paths
+        paths.index_paths = mock.MagicMock()
+        c = Converter([test_dir], [], '/tmp')
+        self.assertEqual(c._get_depth(test_dir), 2)
+
+    def test_depths_ops(self):
+        test_dir = '/home/ops/scripts/ops_edl/ResidualKick'
+        from convert import paths
+        paths.index_paths = mock.MagicMock()
+        c = Converter([test_dir], [], '/tmp')
+        self.assertEqual(c._get_depth(test_dir), 0)
+
+    def test_depths_tmbf(self):
+        test_dir = '/dls_sw/prod/R3.14.12.3/ioc/TMBF/2.8/opi/tmbf'
+        from convert import paths
+        paths.index_paths = mock.MagicMock()
+        c = Converter([test_dir], [], '/tmp')
+        self.assertEqual(c._get_depth(test_dir), 3)
+
+    def test_depths_diagOpi_shared(self):
+        test_dir = '/dls_sw/prod/R3.14.12.3/support/diagOpi/2-45/shared/'
+        from convert import paths
+        paths.index_paths = mock.MagicMock()
+        c = Converter([test_dir], [], '/tmp')
+        self.assertEqual(c._get_depth(test_dir), 2)
+
+    def test_depths_diagOpi_root(self):
+        test_dir = '/dls_sw/prod/R3.14.12.3/support/diagOpi/2-45'
+        from convert import paths
+        paths.index_paths = mock.MagicMock()
+        c = Converter([test_dir], [], '/tmp')
+        self.assertEqual(c._get_depth(test_dir), 1)
+
+    def test_depths_CS_CS(self):
+        test_dir = '/dls_sw/work/R3.14.12.3/ioc/CS/CS-TI-IOC-01/data'
+        from convert import paths
+        paths.index_paths = mock.MagicMock()
+        c = Converter([test_dir], [], '/tmp')
+        self.assertEqual(c._get_depth(test_dir), 2)
 
 if __name__ == '__main__':
     unittest.main()
