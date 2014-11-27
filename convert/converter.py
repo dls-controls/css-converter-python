@@ -52,13 +52,19 @@ class Converter(object):
     Since we can't easily determine symbol files, these may be specified
     on creation.
     """
+    converted_dirs = set()
 
     def __init__(self, dirs, symbol_files, root_outdir):
         """
         Given the EDM entry script, deduce the paths to convert.
         A list of symbol files is stored to help when converting.
         """
-        self.dirs = [os.path.realpath(d) for d in dirs]
+        self.dirs = []
+        for d in dirs:
+            if d not in Converter.converted_dirs:
+                self.dirs.append(os.path.realpath(d))
+        Converter.converted_dirs.update(self.dirs)
+        # Index directories including those already converted.
         self.file_index = paths.index_paths(dirs, True)
 
         self.symbol_files = symbol_files
