@@ -5,6 +5,6 @@
 tags
 # datafile directories
 edl/
-project/opi
+project/opi*
 tmp/
 symbols/
