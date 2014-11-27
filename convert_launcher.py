@@ -6,6 +6,7 @@ and convert EDM files referenced by each script it finds.
 
 import xml.etree.ElementTree as et
 import os
+import stat
 import sys
 import string
 import logging as log
@@ -37,7 +38,7 @@ def generate_run_script(script_path, module, project, relative_path, module_dict
     for path, m in module_dict.iteritems():
         m = m.split('/')[-1]
         links_strings.append('%s=%s' % (path, os.path.join('/', project, m)))
-    links_string = ','.join(links_strings)
+    links_string = ',\\\n'.join(links_strings)
     macros_strings = []
     for key, value in macros.iteritems():
         macros_strings.append('%s=%s' % (key, value))
@@ -52,6 +53,9 @@ def generate_run_script(script_path, module, project, relative_path, module_dict
             updated_content = s.substitute(macros=macros_string,
                                            links=links_string)
             f.write(updated_content)
+    # Give owner and group execute permissions.
+    st = os.stat(script_path)
+    os.chmod(script_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP)
 
 
 def get_module_dict(dirs):
@@ -60,8 +64,6 @@ def get_module_dict(dirs):
         log.warn('parsing %s', directory)
         try:
             module_path, module_name, mversion, _ = utils.parse_module_name(directory)
-            log.warn('name %s path %s version %s', module_name, module_path, mversion)
-            log.warn('outpath %s', OUTDIR)
             if mversion is None:
                 mversion = ''
             p = os.path.join(OUTDIR, module_path.lstrip('/'), module_name, mversion)
