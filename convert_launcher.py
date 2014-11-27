@@ -164,9 +164,14 @@ def run_conversion(force):
     log.info('Symbols found: %s', symbols)
     symbol_paths = {}
     for name, cmd, args in apps:
-        new_cmd, new_args, new_symbol_paths = update_cmd(cmd, args.split(), symbols, force)
-        symbol_paths = merge_symbol_paths(symbol_paths, new_symbol_paths)
-        app_dict[(name, cmd, args)] = (new_cmd, new_args)
+        try:
+            new_cmd, new_args, new_symbol_paths = update_cmd(cmd, args.split(), symbols, force)
+            symbol_paths = merge_symbol_paths(symbol_paths, new_symbol_paths)
+            app_dict[(name, cmd, args)] = (new_cmd, new_args)
+        except Exception as e:
+            log.fatal('Unexpected exception: %s', e)
+            log.fatal('Unexpected exception: %s', type(e))
+            continue
 
     update_xml(root, app_dict)
     tree.write(NEW_APPS, encoding='utf-8', xml_declaration=True)
