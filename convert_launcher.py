@@ -101,6 +101,8 @@ def update_cmd(cmd, args, symbols, force):
     # Convert file extension
     if file_to_run.endswith('edl'):
         file_to_run = file_to_run[:-3] + 'opi'
+    else:
+        file_to_run += '.opi'
 
     symbol_paths = {}
     try:

@@ -123,7 +123,7 @@ def interpret_command(cmd, args, directory):
     macros = _get_macros(args)
 
     edl_files = [a for a in args if a.endswith('edl')]
-    edl_file = edl_files[0] if len(edl_files) > 0 else None
+    edl_file = edl_files[0] if len(edl_files) > 0 else args[-1]
     try:
         _, module_name, version, _ = parse_module_name(working_dir)
     except ValueError:
