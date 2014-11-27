@@ -1,5 +1,5 @@
 
-from convert.converter import store_symbol
+from convert.converter import store_symbol, Converter
 import unittest
 
 
@@ -9,26 +9,26 @@ class SymbolDictionaryTest(unittest.TestCase):
         symbol_dict = {}
         store_symbol("path", "dest", symbol_dict)
         self.assertTrue(symbol_dict.has_key("path"))
-        self.assertListEqual(symbol_dict["path"], ["dest"])
+        self.assertEqual(symbol_dict["path"], set(["dest"]))
 
     def test_adds_new_path_dest_in_non_empty_dictionary(self):
-        symbol_dict = {"oldkey": ["oldval"]}
+        symbol_dict = {"oldkey": set(["oldval"])}
         store_symbol("path", "dest", symbol_dict)
 
-        self.assertDictEqual({"oldkey": ["oldval"], "path": ["dest"]},
+        self.assertDictEqual({"oldkey": set(["oldval"]), "path": set(["dest"])},
                              symbol_dict)
 
     def test_does_not_store_duplicate_if_same_path_dest(self):
-        symbol_dict = {"path": ["dest"]}
+        symbol_dict = {"path": set(["dest"])}
         store_symbol("path", "dest", symbol_dict)
 
-        self.assertDictEqual({"path": ["dest"]}, symbol_dict)
+        self.assertDictEqual({"path": set(["dest"])}, symbol_dict)
 
-    def test_does_appends_new_dest_for_existing_key(self):
-        symbol_dict = {"path": ["dest"]}
+    def test_does_append_new_dest_for_existing_key(self):
+        symbol_dict = {"path": set(["dest"])}
         store_symbol("path", "new_dest", symbol_dict)
 
-        self.assertDictEqual({"path": ["dest", "new_dest"]}, symbol_dict)
+        self.assertDictEqual({"path": set(["dest", "new_dest"])}, symbol_dict)
 
 
 if __name__ == '__main__':
