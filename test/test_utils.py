@@ -99,6 +99,18 @@ class UtilsTest(unittest.TestCase):
         self.assertEquals(version, '1-7')
         self.assertEquals(rel_path, 'data/SCMPW.sh')
 
+    def test_parse_module_name_CS_CS_in_work(self):
+        """
+        This test fails because I can't think of a way of
+        providing this functionality.
+        """
+        path = '/dls_sw/work/R3.14.12.3/ioc/CS/CS-TI-IOC-01/data'
+        module_path, module, version, rel_path = parse_module_name(path)
+        self.assertEquals(module, 'CS/CS-TI-IOC-01')
+        self.assertEquals(module_path, '/dls_sw/work/R3.14.12.3/ioc')
+        self.assertEquals(version, None)
+        self.assertEquals(rel_path, 'data')
+
     def test_get_macros_with_none(self):
         args = ['a', 'b', 'c']
         macros = _get_macros(args)
