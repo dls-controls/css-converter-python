@@ -11,7 +11,7 @@ import sys
 import string
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
-LOG_LEVEL = log.WARN
+LOG_LEVEL = log.DEBUG
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 from convert import converter
@@ -24,12 +24,12 @@ LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
 APPS_XML = 'applications.xml'
 NEW_APPS = 'new_apps.xml'
-OUTDIR = '/home/hgs15624/code/converter/project/opi2'
-
+OUTDIR = '/scratch/will/CSS/converter/project/opi3'
 
 ESCAPE_CHARS = ['.', ':']
 
-def generate_run_script(script_path, module, project, relative_path, module_dict, macros):
+
+def generate_run_script(script_path, project, module_dict):
     try:
         os.makedirs(os.path.dirname(script_path))
     except OSError:
@@ -39,19 +39,13 @@ def generate_run_script(script_path, module, project, relative_path, module_dict
         m = m.split('/')[-1]
         links_strings.append('%s=%s' % (path, os.path.join('/', project, m)))
     links_string = ',\\\n'.join(links_strings)
-    macros_strings = []
-    for key, value in macros.iteritems():
-        macros_strings.append('%s=%s' % (key, value))
-    macros_string = ','.join(macros_strings)
     for c in ESCAPE_CHARS:
-        macros_string = macros_string.replace(c, '[\%d]' % ord(c))
         links_string = links_string.replace(c, '[\%d]' % ord(c))
     with open(script_path, 'w') as f:
         with open('res/runcss.template') as template:
             content = template.read()
             s = string.Template(content)
-            updated_content = s.substitute(macros=macros_string,
-                                           links=links_string)
+            updated_content = s.substitute(links=links_string)
             f.write(updated_content)
     # Give owner and group execute permissions.
     st = os.stat(script_path)
@@ -83,26 +77,27 @@ def update_cmd(cmd, args, symbols, force):
         log.warn(e)
         return "", [], {}
 
-    file_index = paths.index_paths(all_dirs, True)
+
     path_to_run = paths.full_path(all_dirs, file_to_run)
     path_to_run = os.path.realpath(path_to_run)
+    if path_to_run.endswith('edl'):
+        path_to_run = path_to_run[:-3] + 'opi'
+    else:
+        path_to_run += '.opi'
     module_path, module, version, rel_path = utils.parse_module_name(path_to_run)
     # For the purposes of the project name, use only the last directory of the module
     module = module.split('/')[-1]
-    project = '%s_%s' % (module, version)
-    # Convert file extension
-    if rel_path.endswith('edl'):
-        rel_path = rel_path[:-3] + 'opi'
+    if module != '':
+        project = '%s_%s' % (module, version)
+        launch_opi = os.path.join('/', project, module, rel_path)
+    else:
+        project = os.path.basename(cmd)
+        launch_opi = os.path.join('/', project, os.path.basename(path_to_run))
 
     module_dict = get_module_dict(all_dirs)
 
     script_path = os.path.join(OUTDIR, os.path.dirname(path_to_run.lstrip('/')), 'runcss.sh')
-    generate_run_script(script_path, module, project, rel_path, module_dict, macros)
-    # Convert file extension
-    if file_to_run.endswith('edl'):
-        file_to_run = file_to_run[:-3] + 'opi'
-    else:
-        file_to_run += '.opi'
+    generate_run_script(script_path, project, module_dict)
 
     symbol_paths = {}
     try:
@@ -112,8 +107,15 @@ def update_cmd(cmd, args, symbols, force):
     except OSError as e:
         log.warn('Exception converting %s: %s', cmd, e)
 
-    launch_opi = os.path.join('/', project, module, rel_path)
-    return script_path, [launch_opi], symbol_paths
+    # Add OPI shell macro to those already there
+    macros['OPI_SHELL'] = 'true'
+    macros_strings = []
+    for key, value in macros.iteritems():
+        macros_strings.append('%s=%s' % (key, value))
+    macros_string = ','.join(macros_strings)
+    for c in ESCAPE_CHARS:
+        macros_string = macros_string.replace(c, '[\%d]' % ord(c))
+    return script_path, ['"%s %s"' % (launch_opi, macros_string)], symbol_paths
 
 
 def get_apps(node):
@@ -190,7 +192,7 @@ def run_conversion(force):
                 symbol_count += 1
                 log.info('Processed %s of %s symbol files.', symbol_count, len(symbol_paths))
                 try:
-                    files.convert_symbol(path, destinations, force)
+                    files.convert_symbol(path, destinations)
                 except (IndexError, AssertionError) as e:
                     log.warn('Failed to convert symbol %s: %s', path, e)
                     continue
