@@ -10,8 +10,7 @@ if [ -z $$LAUNCH_OPI ]; then
     exit 1
 fi
 
-MACROS="${macros}"
 LINKS="${links}"
 
-echo $$CSSTUDIO -share_link "$$LINKS" --launcher.openFile "$$LAUNCH_OPI OPI_SHELL=true,$$MACROS;$$LINKS"
-$$CSSTUDIO -share_link "$$LINKS" --launcher.openFile "$$LAUNCH_OPI OPI_SHELL=true,$$MACROS¬$$LINKS"
+echo $$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI}¬$$LINKS"
+$$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI}¬$$LINKS"
