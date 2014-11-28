@@ -166,6 +166,7 @@ def run_conversion(force):
     for name, cmd, args in apps:
         try:
             new_cmd, new_args, new_symbol_paths = update_cmd(cmd, args.split(), symbols, force)
+            log.warn('%s gave these symbols: %s', cmd, new_symbol_paths)
             symbol_paths = merge_symbol_paths(symbol_paths, new_symbol_paths)
             app_dict[(name, cmd, args)] = (new_cmd, new_args)
         except Exception as e:
@@ -177,13 +178,26 @@ def run_conversion(force):
     tree.write(NEW_APPS, encoding='utf-8', xml_declaration=True)
 
     if symbol_paths:
-        log.info("Post-processing symbol files")
-        for path, destinations in symbol_paths.iteritems():
-            try:
-                files.convert_symbol(path, destinations)
-            except (IndexError, AssertionError) as e:
-                log.warn('Failed to convert symbol %s: %s', path, e)
-                continue
+        input = ""
+        while input.lower() not in ('y', 'n'):
+            log.warn('About to process %s symbol files.', len(symbol_paths))
+            log.warn('Press y to continue, n to quit')
+            input = raw_input()
+        if input.lower() == 'y':
+            log.info('Post-processing %s symbol files', len(symbol_paths))
+            symbol_count = 0
+            for path, destinations in symbol_paths.iteritems():
+                symbol_count += 1
+                log.info('Processed %s of %s symbol files.', symbol_count, len(symbol_paths))
+                try:
+                    files.convert_symbol(path, destinations, force)
+                except (IndexError, AssertionError) as e:
+                    log.warn('Failed to convert symbol %s: %s', path, e)
+                    continue
+        else:
+            log.warn('Not processing symbol files.')
+
+    log.warn('Conversion finished.')
 
 
 if __name__ == '__main__':
