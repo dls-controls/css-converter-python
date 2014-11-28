@@ -151,7 +151,7 @@ def merge_symbol_paths(paths_dict1, paths_dict2):
     return paths_dict2
 
 
-def run_conversion(force):
+def run_conversion(force, convert_symbols):
 
     tree = et.parse(APPS_XML)
     root = tree.getroot()
@@ -182,7 +182,7 @@ def run_conversion(force):
     tree.write(NEW_APPS, encoding='utf-8', xml_declaration=True)
 
     if symbol_paths:
-        input = ""
+        input = "y" if convert_symbols else ""
         while input.lower() not in ('y', 'n'):
             log.warn('About to process %s symbol files.', len(symbol_paths))
             log.warn('Press y to continue, n to quit')
@@ -206,4 +206,5 @@ def run_conversion(force):
 
 if __name__ == '__main__':
     force = '-f' in sys.argv
-    run_conversion(force)
+    convert_symbols = "-y" in sys.argv
+    run_conversion(force, convert_symbols)
