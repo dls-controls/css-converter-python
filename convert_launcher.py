@@ -73,10 +73,7 @@ def update_cmd(cmd, args, symbols, force):
         log.warn("%s, %s", cmd, args)
         all_dirs, module_name, version, file_to_run, macros = utils.interpret_command(cmd, args, LAUNCHER_DIR)
     except spoof.SpoofError as e:
-        log.warn('Could not understand launcher script %s', cmd)
-        log.warn(e)
-        return "", [], {}
-
+        raise e
 
     path_to_run = paths.full_path(all_dirs, file_to_run)
     path_to_run = os.path.realpath(path_to_run)
@@ -168,9 +165,14 @@ def run_conversion(force):
     for name, cmd, args in apps:
         try:
             new_cmd, new_args, new_symbol_paths = update_cmd(cmd, args.split(), symbols, force)
+            log.warn('%s gave new command %s %s', cmd, new_cmd, new_args)
             log.warn('%s gave these symbols: %s', cmd, new_symbol_paths)
             symbol_paths = merge_symbol_paths(symbol_paths, new_symbol_paths)
             app_dict[(name, cmd, args)] = (new_cmd, new_args)
+        except spoof.SpoofError as e:
+            log.warn('Could not understand launcher script %s', cmd)
+            log.warn(e)
+            continue
         except Exception as e:
             log.fatal('Unexpected exception: %s', e)
             log.fatal('Unexpected exception: %s', type(e))
