@@ -78,8 +78,16 @@ class Converter(object):
 
         self.depths = {}
         for datadir in self.dirs:
-            _, _, _, rel_path = utils.parse_module_name(datadir)
-            self.depths[datadir] = len(rel_path.split('/'))
+            _, module, _, rel_path = utils.parse_module_name(datadir)
+            log.warn("module %s, rel_path %s", module, rel_path)
+            if module == '':
+                self.depths[datadir] = 0
+            elif rel_path == '':
+                self.depths[datadir] = 1
+            else:
+                self.depths[datadir] = len(rel_path.split('/')) + 1
+            log.warn("depth %s", self.depths[datadir])
+        log.warn("all depths: %s", self.depths)
 
 
     def _get_depth(self, directory):
@@ -87,8 +95,12 @@ class Converter(object):
         Each directory converted must be relative to one in self.dirs.
         """
         for root_dir in self.dirs:
-            if directory.startswith(root_dir):
-                rel_path = os.path.relpath(root_dir, directory)
+            if os.path.normpath(directory) == root_dir:
+                return self.depths[root_dir]
+            elif directory.startswith(root_dir):
+                log.warn("getting rel_path for %s", directory)
+                rel_path = os.path.relpath(directory, root_dir)
+                log.warn("rel_path is %s; returning %s", rel_path, self.depths[root_dir] + len(rel_path.split('/')))
                 return self.depths[root_dir] + len(rel_path.split('/'))
         raise ValueError('???')
 
@@ -241,7 +253,7 @@ def store_symbol(source, destination, symbol_dictionary):
 
         If the passed source file is not in the dictionary it is added.
         If the passed source file is already in the dictionary the destination
-        is added to the list, provided it is not already there.
+        is added to the set, provided it is not already there.
 
         Arguments:
             source -> full path to file to be converted
