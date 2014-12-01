@@ -23,8 +23,8 @@ from convert import paths
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
 APPS_XML = 'applications.xml'
-NEW_APPS = 'new_apps.xml'
-OUTDIR = '/scratch/will/CSS/converter/project/opi3'
+OUTDIR = 'output'
+NEW_APPS = os.path.join(OUTDIR, 'css_apps.xml')
 
 ESCAPE_CHARS = ['.', ':']
 
