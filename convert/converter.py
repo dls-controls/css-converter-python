@@ -79,15 +79,13 @@ class Converter(object):
         self.depths = {}
         for datadir in self.dirs:
             _, module, _, rel_path = utils.parse_module_name(datadir)
-            log.warn("module %s, rel_path %s", module, rel_path)
             if module == '':
                 self.depths[datadir] = 0
             elif rel_path == '':
                 self.depths[datadir] = 1
             else:
                 self.depths[datadir] = len(rel_path.split('/')) + 1
-            log.warn("depth %s", self.depths[datadir])
-        log.warn("all depths: %s", self.depths)
+        log.info("Path depths: %s", self.depths)
 
 
     def _get_depth(self, directory):
@@ -98,9 +96,7 @@ class Converter(object):
             if os.path.normpath(directory) == root_dir:
                 return self.depths[root_dir]
             elif directory.startswith(root_dir):
-                log.warn("getting rel_path for %s", directory)
                 rel_path = os.path.relpath(directory, root_dir)
-                log.warn("rel_path is %s; returning %s", rel_path, self.depths[root_dir] + len(rel_path.split('/')))
                 return self.depths[root_dir] + len(rel_path.split('/'))
         raise ValueError('???')
 

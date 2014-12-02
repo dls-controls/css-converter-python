@@ -11,7 +11,7 @@ import sys
 import string
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
-LOG_LEVEL = log.DEBUG
+LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 from convert import converter
@@ -50,18 +50,17 @@ def generate_run_script(script_path, project, module_dict):
     # Give owner and group execute permissions.
     st = os.stat(script_path)
     os.chmod(script_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP)
+    log.info('Run script written to %s', script_path)
 
 
 def get_module_dict(dirs):
     module_dict = {}
     for directory in dirs:
-        log.warn('parsing %s', directory)
         try:
             module_path, module_name, mversion, _ = utils.parse_module_name(directory)
             if mversion is None:
                 mversion = ''
             p = os.path.join(OUTDIR, module_path.lstrip('/'), module_name, mversion)
-            log.warn(p)
             module_dict[p] = module_name
         except ValueError:
             continue
@@ -69,8 +68,8 @@ def get_module_dict(dirs):
 
 
 def update_cmd(cmd, args, symbols, force):
+    log.info("Updating command: %s, %s", cmd, args)
     try:
-        log.warn("%s, %s", cmd, args)
         all_dirs, module_name, version, file_to_run, macros = utils.interpret_command(cmd, args, LAUNCHER_DIR)
     except spoof.SpoofError as e:
         raise e
