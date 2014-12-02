@@ -25,11 +25,21 @@ APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
 APPS_XML = 'applications.xml'
 OUTDIR = 'output'
 NEW_APPS = os.path.join(OUTDIR, 'css_apps.xml')
+SCRIPT_TEMPLATE = 'res/runcss.template'
 
 ESCAPE_CHARS = ['.', ':']
 
 
 def generate_run_script(script_path, project, module_dict):
+    '''
+    Generate a wrapper script which updates the appropriate
+    links before opening a CSS window.
+
+    Arguments:
+        - script_path - the location of the script to write
+        - project - the Eclipse project any links are contained by
+        - module_dict - the mapping from module path to its name
+    '''
     try:
         os.makedirs(os.path.dirname(script_path))
     except OSError:
@@ -42,7 +52,7 @@ def generate_run_script(script_path, project, module_dict):
     for c in ESCAPE_CHARS:
         links_string = links_string.replace(c, '[\%d]' % ord(c))
     with open(script_path, 'w') as f:
-        with open('res/runcss.template') as template:
+        with open(SCRIPT_TEMPLATE) as template:
             content = template.read()
             s = string.Template(content)
             updated_content = s.substitute(links=links_string)
@@ -54,6 +64,9 @@ def generate_run_script(script_path, project, module_dict):
 
 
 def get_module_dict(dirs):
+    '''
+    Create a mapping from output path to module name.
+    '''
     module_dict = {}
     for directory in dirs:
         try:
@@ -68,6 +81,16 @@ def get_module_dict(dirs):
 
 
 def update_cmd(cmd, args, symbols, force):
+    '''
+    Given a command and arguments from the launcher, determine
+    the appropriate command for running CSS.
+    If the command was not an EDM script, raise SpoofError.
+
+    Returns:
+        - script_path - path to the generated CSS wrapper script
+        - launch command - command including any macros
+        - symbols_path - dict with cached symbols for conversion
+    '''
     log.info("Updating command: %s, %s", cmd, args)
     try:
         all_dirs, module_name, version, file_to_run, macros = utils.interpret_command(cmd, args, LAUNCHER_DIR)
@@ -115,6 +138,12 @@ def update_cmd(cmd, args, symbols, force):
 
 
 def get_apps(node):
+    '''
+    Recursively retrieve all commands and arguments from the specified
+    node in the launcher XML file.
+
+    Return a list of tuples (name, cmd, args).
+    '''
     apps = []
     if node.tag == 'button':
         name = node.get('text')
@@ -128,6 +157,10 @@ def get_apps(node):
 
 
 def update_xml(node, apps_dict):
+    '''
+    Given updated commands in apps_dict, recursively update the
+    launcher XML file.
+    '''
     if node.tag == 'button':
         name = node.get('text')
         cmd = node.get('command')
@@ -151,7 +184,11 @@ def merge_symbol_paths(paths_dict1, paths_dict2):
 
 
 def run_conversion(force, convert_symbols):
-
+    '''
+    Iterate over the launcher XML file and fetch each command.
+    Convert files referenced by EDM scripts.
+    If the command is an EDM script, update XML with new command.
+    '''
     tree = et.parse(APPS_XML)
     root = tree.getroot()
 
@@ -177,9 +214,11 @@ def run_conversion(force, convert_symbols):
             log.fatal('Unexpected exception: %s', type(e))
             continue
 
+    # Update applications.xml and write out to a new file.
     update_xml(root, app_dict)
     tree.write(NEW_APPS, encoding='utf-8', xml_declaration=True)
 
+    # Process symbol files at end.
     if symbol_paths:
         input = "y" if convert_symbols else ""
         while input.lower() not in ('y', 'n'):
