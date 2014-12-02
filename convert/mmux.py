@@ -16,6 +16,7 @@ Process:
 '''
 import os
 import xml.etree.ElementTree as ET
+import logging as log
 
 from utils import make_writeable, make_read_only
 
@@ -59,7 +60,7 @@ def find_mm_symbols(node):
                         values = child.find("values%d" % set_idx)
 
                         if LOC_PREFIX in target.text:
-                            print "Skipping already updated target ", target.text
+                            log.info("Skipping already updated target %s", target.text)
                         else:
                             first_value = values.find('s')
                             symbols[target.text] = first_value.text
@@ -67,7 +68,7 @@ def find_mm_symbols(node):
                             # Update the target text to be a (private) locPV
                             target.text = create_loc_pv(target.text)
                 except AttributeError as e:
-                    print "Error parsing MenuMux: ", e
+                    log.warn("Error parsing MenuMux: ", e)
             else:
                 symbols.update(find_mm_symbols(child))
 
@@ -143,7 +144,7 @@ def try_replace(text, symbols):
             substituted = substituted.replace('"", ', '')
 
     if not text == substituted:
-        print "Converted %s to %s" % (text, substituted)
+        log.info("Converted %s to %s" % (text, substituted))
 
     return substituted, simple_match
 
@@ -180,17 +181,17 @@ def parse(filepath):
         root = tree.getroot()
 
         mm_symbols = find_mm_symbols(root)
-        print 'There are %s mm_symbols:' % len(mm_symbols)
-        print mm_symbols
+        log.info('There are %s mm_symbols:', len(mm_symbols))
+        log.info('%s', mm_symbols)
 
         warning = replace_symbols(root, mm_symbols)
         if warning:
-            print ">>> Manual post-processing required: '%s' contains Label with PV-value text <<<" % filepath
+            log.warn(">>> Manual post-processing required: '%s' contains Label with PV-value text <<<", filepath)
 
         # write the new tree out to the same file
         make_writeable(filepath)
         tree.write(filepath, encoding='utf-8', xml_declaration=True)
         make_read_only(filepath)
     else:
-        print "Skipping %s, file not found" % filepath
+        log.warn("Skipping %s, file not found", filepath)
 
