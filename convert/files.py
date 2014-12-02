@@ -1,6 +1,6 @@
 
 import utils
-import compress
+import symbols
 
 import subprocess
 import shutil
@@ -15,8 +15,8 @@ SYMBOLS_VARIABLE = '-Dedm2xml.symbolsFile=res/symbols.conf'
 CONVERT_CMD = ['java', COLORS_VARIABLE, SYMBOLS_VARIABLE, '-jar', 'res/conv.jar']
 UPDATE_CMD = ['edm', '-convert']
 SYMBOLS_DIR = './tmp/symbols'
-SYMB_SCRIPT = os.path.join(os.getcwd(), 'res/auto-symb.sh')
-COMPRESS_CMD = [SYMB_SCRIPT]
+SYMBOL_SCRIPT = os.path.join(os.getcwd(), 'res/auto-symb.sh')
+SYMBOL_TO_PNG_CMD = [SYMBOL_SCRIPT]
 
 
 def convert_symbol(symbol_file, destinations):
@@ -32,8 +32,13 @@ def convert_symbol(symbol_file, destinations):
     if is_old_edl(temp_file):
          update_edl(temp_file, in_place=True)
     # Compress EDM symbol file to minimum rectangle.
-    compress.parse(temp_file)
-    command = COMPRESS_CMD + [temp_file]
+    try:
+        symbols.compress(temp_file)
+    except symbols.SymbolError as e:
+        log.error(e)
+        return
+
+    command = SYMBOL_TO_PNG_CMD + [temp_file]
     out = subprocess.check_output(" ".join(command), shell=True)
     # copy png to right location
     relfilename = out.strip()

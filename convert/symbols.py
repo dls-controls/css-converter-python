@@ -6,6 +6,10 @@ GROUP_START = 'beginGroup'
 GROUP_END = 'endGroup'
 
 
+class SymbolError(Exception):
+    pass
+
+
 def find_groups(filename):
     groups = []
     current_group = []
@@ -111,7 +115,7 @@ def find_groups(filename):
 
     return groups
 
-def parse(filename):
+def compress(filename):
     log.info('Parsing %s', filename)
     groups = find_groups(filename)
 
@@ -126,12 +130,15 @@ def parse(filename):
     start_x = 0
     moved_groups = []
 
-    for group in groups:
-        x, y, w, h = locate_group(group)
-        assert w == width
-        assert h == height
-        moved_groups.append(move_group(group, start_x - x, 0 - y))
-        start_x += width
+    try:
+        for group in groups:
+            x, y, w, h = locate_group(group)
+            assert w == width
+            assert h == height
+            moved_groups.append(move_group(group, start_x - x, 0 - y))
+            start_x += width
+    except AssertionError:
+        raise SymbolError('Could not parse EDM symbol file.')
 
     # Create new file by passing through every line
     i = 0
@@ -183,4 +190,7 @@ if __name__ == '__main__':
         sys.exit()
 
     filename = sys.argv[1]
-    parse(filename)
+    try:
+        compress(filename)
+    except SymbolError as e:
+        log.warn('Failed to parse symbol file: %s', e)
