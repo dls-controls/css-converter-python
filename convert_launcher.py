@@ -24,7 +24,8 @@ LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
 APPS_XML = 'applications.xml'
 OUTDIR = 'output'
-NEW_APPS = os.path.join(OUTDIR, 'css_apps.xml')
+OUTPATH = os.path.abspath(os.path.join(os.path.dirname(__file__), OUTDIR))
+NEW_APPS = os.path.join(OUTPATH, 'css_apps.xml')
 SCRIPT_TEMPLATE = 'res/runcss.template'
 
 ESCAPE_CHARS = ['.', ':']
@@ -73,7 +74,7 @@ def get_module_dict(dirs):
             module_path, module_name, mversion, _ = utils.parse_module_name(directory)
             if mversion is None:
                 mversion = ''
-            p = os.path.join(OUTDIR, module_path.lstrip('/'), module_name, mversion)
+            p = os.path.join(OUTPATH, module_path.lstrip('/'), module_name, mversion)
             module_dict[p] = module_name
         except ValueError:
             continue
@@ -115,12 +116,12 @@ def update_cmd(cmd, args, symbols, force):
 
     module_dict = get_module_dict(all_dirs)
 
-    script_path = os.path.join(OUTDIR, os.path.dirname(path_to_run.lstrip('/')), 'runcss.sh')
+    script_path = os.path.join(OUTPATH, os.path.dirname(path_to_run.lstrip('/')), 'runcss.sh')
     generate_run_script(script_path, project, module_dict)
 
     symbol_paths = {}
     try:
-        c = converter.Converter(all_dirs, symbols, OUTDIR)
+        c = converter.Converter(all_dirs, symbols, OUTPATH)
         c.convert(force)
         symbol_paths = c.get_symbol_paths()
     except OSError as e:
