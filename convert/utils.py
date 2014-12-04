@@ -136,9 +136,9 @@ def interpret_command(cmd, args, directory):
     if version is None:
         version = 'no-version'
 
-    all_dirs = [os.path.realpath(f) for f in edmdatafiles if f not in ('', '.')]
-    all_dirs.extend(path_dirs)
+    all_dirs = edmdatafiles + path_dirs
     all_dirs.append(working_dir)
+    all_dirs = [os.path.realpath(f) for f in all_dirs if f not in ('', '.')]
     all_dirs = set(all_dirs)
 
     return all_dirs, module_name, version, edl_file, macros
