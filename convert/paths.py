@@ -125,13 +125,9 @@ def _update_opi_path(filename, depth, file_index, module):
     if pair is not None:
         (file_module, path_in_module) = pair
         if file_module != module:
-            log.info('Correcting filename %s', filename)
-            # we only need the last part of the path
-            # i.e. CS/CS-DI-IOC-09  ->  CS-DI-IOC-09
-            module_path = file_module
-            collapsed_path = module_path.split('/')[-1]
+            log.info('Correcting filename %s depth %s', filename, depth)
             down = '/'.join(['..'] * depth)
-            rel = os.path.join(down, collapsed_path, path_in_module, filename)
+            rel = os.path.join(down, file_module, path_in_module, filename)
         else:
             rel = os.path.join(path_in_module, filename)
     else:

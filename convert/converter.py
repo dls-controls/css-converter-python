@@ -79,12 +79,13 @@ class Converter(object):
         self.depths = {}
         for datadir in self.dirs:
             _, module, _, rel_path = utils.parse_module_name(datadir)
+            mparts = module.strip('/').split('/')
             if module == '':
                 self.depths[datadir] = 0
             elif rel_path == '':
-                self.depths[datadir] = 1
+                self.depths[datadir] = len(mparts)
             else:
-                self.depths[datadir] = len(rel_path.split('/')) + 1
+                self.depths[datadir] = len(rel_path.split('/')) + len(mparts)
         log.info("Path depths: %s", self.depths)
 
 

@@ -47,7 +47,6 @@ def generate_run_script(script_path, project, module_dict):
         pass
     links_strings = []
     for path, m in module_dict.iteritems():
-        m = m.split('/')[-1]
         links_strings.append('%s=%s' % (path, os.path.join('/', project, m)))
     links_string = ',\\\n'.join(links_strings)
     for c in ESCAPE_CHARS:
@@ -105,10 +104,10 @@ def update_cmd(cmd, args, symbols, force):
     else:
         path_to_run += '.opi'
     module_path, module, version, rel_path = utils.parse_module_name(path_to_run)
-    # For the purposes of the project name, use only the last directory of the module
-    module = module.split('/')[-1]
     if module != '':
-        project = '%s_%s' % (module, version)
+        # Project name example: LI_TI_5-2 - i.e. replace / with _
+        module_name = '_'.join(module.split('/'))
+        project = '%s_%s' % (module_name, version)
         launch_opi = os.path.join('/', project, module, rel_path)
     else:
         project = os.path.basename(cmd)
