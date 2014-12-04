@@ -11,6 +11,8 @@ nbase=${nfilename%.*}
 # Replace background color with bright pink
 sed -i -r '1,23 s/bgColor\s+index\s+[0-9]+/bgColor index 45/' $symdir/$nfilename
 
+# Ensure png files in symbols directory are available to EDM
+export EDMDATAFILES=.:$symdir
 
 # Wait for file to open with EDM, screenshot, then kill it
 edm -x $symdir/$nfilename &

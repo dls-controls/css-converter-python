@@ -1,6 +1,7 @@
 
 import utils
 import symbols
+import glob
 
 import subprocess
 import shutil
@@ -28,6 +29,9 @@ def convert_symbol(symbol_file, destinations):
     temp_file = os.path.join(SYMBOLS_DIR, os.path.basename(symbol_file))
     utils.make_writeable(temp_file)
     shutil.copyfile(symbol_file, temp_file)
+    png_files = glob.glob(os.path.join(os.path.dirname(symbol_file), '*.png'))
+    for png_file in png_files:
+        shutil.copyfile(png_file, os.path.join(SYMBOLS_DIR, os.path.basename(png_file)))
     # Update EDM file if necessary.
     if is_old_edl(temp_file):
          update_edl(temp_file, in_place=True)
