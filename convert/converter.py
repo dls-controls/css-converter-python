@@ -205,8 +205,8 @@ class Converter(object):
             # make sure we have write permissions on the destination
             try:
                 utils.make_writeable(destination)
-                shutil.copyfile(full_path, destination)
-                utils.make_read_only(destination, executable)
+                # copy2: preserve permissions of original file.
+                shutil.copy2(full_path, destination)
                 log.info('Successfully copied %s', destination)
             except Exception as e:
                 log.error("Failed copying file %s: %s", full_path, str(e))

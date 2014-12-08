@@ -2,6 +2,7 @@
 import spoof
 
 import os
+import stat
 import subprocess
 import logging as log
 import string
@@ -54,17 +55,25 @@ def parse_module_name(filepath):
 
 
 def make_read_only(filename, executable=False):
-    if executable:
-        perms = 0o555
-    else:
-        perms = 0o444
-    if os.path.exists(filename):
-        os.chmod(filename, perms)
+    """
+    Remove write permissions from the file for everyone.
+    """
+    try:
+        st = os.stat(filename)
+        os.chmod(filename, st.st_mode & ~stat.S_IWUSR & ~stat.S_IWGRP & ~stat.S_IWOTH)
+    except OSError:
+        pass
 
 
 def make_writeable(filename):
-    if os.path.exists(filename):
-        os.chmod(filename, 0o777)
+    """
+    Make the file writeable by the owner.
+    """
+    try:
+        st = os.stat(filename)
+        os.chmod(filename, st.st_mode | stat.S_IWUSR)
+    except OSError:
+        pass
 
 
 def read_symbols_file(filename):
