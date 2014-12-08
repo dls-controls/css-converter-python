@@ -13,7 +13,7 @@ TMP_DIR = './tmp'
 # Commands in lists for subprocess
 COLORS_VARIABLE = '-Dedm2xml.colorsFile=res/colors.list'
 SYMBOLS_VARIABLE = '-Dedm2xml.symbolsFile=res/symbols.conf'
-CONVERT_CMD = ['java', COLORS_VARIABLE, SYMBOLS_VARIABLE, '-jar', 'res/conv.jar']
+CONVERT_CMD = ['/usr/lib/jvm/jre-1.7.0-oracle.x86_64/bin/java', COLORS_VARIABLE, SYMBOLS_VARIABLE, '-jar', 'res/conv.jar']
 UPDATE_CMD = ['edm', '-convert']
 SYMBOLS_DIR = './tmp/symbols'
 SYMBOL_SCRIPT = os.path.join(os.getcwd(), 'res/auto-symb.sh')
@@ -110,7 +110,7 @@ def convert_edl(filename, destination):
     if is_old_edl(filename):
         filename = update_edl(filename)
     utils.make_writeable(destination)
-    log.debug("Converting %s", filename)
+    log.debug('Converting %s to %s', filename, destination)
     command = CONVERT_CMD + [filename, destination]
     returncode = subprocess.call(command)
     utils.make_read_only(destination)
