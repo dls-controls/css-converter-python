@@ -16,7 +16,10 @@ Process:
 """
 
 import sys
-import subprocess
+import logging as log
+LOG_FORMAT = '%(levelname)s:  %(message)s'
+LOG_LEVEL = log.DEBUG
+log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 from convert import mmux
 
@@ -34,31 +37,15 @@ def perform_postprocess():
         print 'Usage: ', sys.argv[0], '<search-path>'
         sys.exit()
 
-    for filepath in build_filelist(search_path):
+    for filepath in mmux.build_filelist(search_path):
         try:
-            print 'Parsing file', filepath
+            log.info('Parsing file %s', filepath)
             mmux.parse(filepath)
         except OSError as e:
-            print 'Update failed: %s' % e
+            log.warn('Menu mux update failed: %s', e)
             continue
 
 
-def build_filelist(basepath):
-    """ Execute a grep on the basepath to find all files that contain a menumux
-        control
-
-        Arguments:
-            basepath - root of search
-        Returns:
-            iterator over relative filepaths
-    """
-    proc = subprocess.Popen("find " + basepath + " | xargs grep -sl " + mmux.MENU_MUX_ID,
-                            stdout=subprocess.PIPE,
-                            shell=True)
-
-    for line in iter(proc.stdout.readline, ''):
-        filepath = line.rstrip()
-        yield filepath
 
 if __name__ == '__main__':
     perform_postprocess()
