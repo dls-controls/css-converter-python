@@ -165,11 +165,6 @@ class Converter(object):
         Apppropriately convert one edl file, including updating
         any relative paths using the file_index dict.
         """
-        # Figure out the 'depth' of the file.  This is how many 
-        # nested directories any relative path must descend before
-        # adding the relative path back on.
-        relative_dir = os.path.relpath(outdir, self.root_outdir)
-        #depth = len(relative_dir.strip('/').split('/'))
         # change extension
         name = os.path.basename(full_path)
         opifile = name[:-len(EDL_EXT)] + OPI_EXT
