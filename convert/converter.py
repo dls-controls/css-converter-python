@@ -54,7 +54,7 @@ class Converter(object):
     """
     converted_dirs = set()
 
-    def __init__(self, dirs, symbol_files, root_outdir):
+    def __init__(self, dirs, symbol_files, root_outdir, pp_functions):
         """
         Given the EDM entry script, deduce the paths to convert.
         A list of symbol files is stored to help when converting.
@@ -67,6 +67,7 @@ class Converter(object):
         # Index directories including those already converted.
         self.file_index = paths.index_paths(dirs, True)
 
+        self._post_process_functions = pp_functions
         self.symbol_files = symbol_files
         self.symbol_dict = {}
 
@@ -160,6 +161,16 @@ class Converter(object):
             destination = os.path.join(outdir, opifile)
             return os.path.exists(destination)
 
+    def _post_process(self, destination):
+        """
+        Perform any post-process steps required on the converted opi
+        file.
+        """
+        log.debug('Post processing %s', destination)
+        for pp_fn, paths in self._post_process_functions.iteritems():
+            if destination in paths:
+                pp_fn(destination)
+
     def _convert_one_file(self, full_path, outdir, force, depth):
         """
         Apppropriately convert one edl file, including updating
@@ -183,6 +194,8 @@ class Converter(object):
                 if returncode == 0:
                     log.info('Successfully converted %s', destination)
                     self.update_paths(destination, depth)
+                    log.info('About to post process %s', destination)
+                    self._post_process(destination)
                 else:
                     log.warn('Conversion of %s failed with code %d.',
                              full_path, returncode)
