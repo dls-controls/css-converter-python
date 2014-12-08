@@ -1,8 +1,13 @@
 import sys
+import logging as log
 
 GROUP_HEADER = 'object activeGroupClass'
 GROUP_START = 'beginGroup'
 GROUP_END = 'endGroup'
+
+
+class SymbolError(Exception):
+    pass
 
 
 def find_groups(filename):
@@ -110,11 +115,11 @@ def find_groups(filename):
 
     return groups
 
-def parse(filename):
-    print 'Parsing', filename
+def compress(filename):
+    log.info('Parsing %s', filename)
     groups = find_groups(filename)
 
-    print 'Found %s symbols.' % len(groups)
+    log.info('Found %s symbols.', len(groups))
     x, y, width, height = locate_group(groups[0])
 
     # We'll later resize to the exact size
@@ -125,12 +130,15 @@ def parse(filename):
     start_x = 0
     moved_groups = []
 
-    for group in groups:
-        x, y, w, h = locate_group(group)
-        assert w == width
-        assert h == height
-        moved_groups.append(move_group(group, start_x - x, 0 - y))
-        start_x += width
+    try:
+        for group in groups:
+            x, y, w, h = locate_group(group)
+            assert w == width
+            assert h == height
+            moved_groups.append(move_group(group, start_x - x, 0 - y))
+            start_x += width
+    except AssertionError:
+        raise SymbolError('Could not parse EDM symbol file.')
 
     # Create new file by passing through every line
     i = 0
@@ -164,7 +172,7 @@ def parse(filename):
             if not in_group:
                 new_file.append(line)
 
-    print 'New file length: %s' % len(new_file)
+    log.info('New file length: %s', len(new_file))
 
     new_filename = new_name(filename, width)
     # Write out the new file
@@ -172,7 +180,7 @@ def parse(filename):
         for line in new_file:
             f.write(line)
 
-    print 'Wrote new EDM symbol to %s' % new_filename
+    log.info('Wrote new EDM symbol to %s', new_filename)
 
 
 
@@ -182,4 +190,7 @@ if __name__ == '__main__':
         sys.exit()
 
     filename = sys.argv[1]
-    parse(filename)
+    try:
+        compress(filename)
+    except SymbolError as e:
+        log.warn('Failed to parse symbol file: %s', e)

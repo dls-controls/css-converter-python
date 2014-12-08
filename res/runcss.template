@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Generated run script for cs-studio.
+
+CSSTUDIO=/dls_sw/work/common/CSS/CSS_4.0.x_nightly/cs-studio
+LAUNCH_OPI=$$1
+
+if [ -z $$LAUNCH_OPI ]; then
+    echo "No OPI specified to launch!"
+    exit 1
+fi
+
+LINKS="${links}"
+
+echo $$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI}¬$$LINKS"
+$$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI}¬$$LINKS"

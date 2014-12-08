@@ -2,6 +2,7 @@
 import spoof
 
 import os
+import stat
 import subprocess
 import logging as log
 import string
@@ -12,7 +13,7 @@ PROJECT_FILENAME = '.project'
 
 def parse_module_name(filepath):
     """
-    Return (module_name, version, relative_path)
+    Return (module_path, module_name, version, relative_path)
 
     If the path is not an ioc or a support module, raise ValueError.
 
@@ -29,35 +30,50 @@ def parse_module_name(filepath):
     elif 'ioc' in parts:
         root_index = parts.index('ioc')
     else:
-        raise ValueError('Module %s not understood' % filepath)
+        log.warn('Module %s not understood', filepath)
+        return filepath, '', '', ''
 
-    v = root_index + 2
+    v = None
     for i, p in enumerate(parts):
         if p == "":
             continue
         if p[0].isdigit() or p == 'Rx-y':
             version = p
             v = i
-    module = '/'.join(parts[root_index+1:v])
+    if v is None:
+        module = '/'.join(parts[root_index+1:root_index+2])
+        relative_path = '/'.join(parts[root_index+2:])
+    else:
+        module = '/'.join(parts[root_index+1:v])
+        relative_path = '/'.join(parts[v+1:])
+
+    module_path = '/'.join(parts[:root_index+1])
     if module == '':
         raise ValueError('No module found in %s' % filepath)
-    relative_path = '/'.join(parts[v+1:])
 
-    return module, version, relative_path
+    return module_path, module, version, relative_path
 
 
 def make_read_only(filename, executable=False):
-    if executable:
-        perms = 0o555
-    else:
-        perms = 0o444
-    if os.path.exists(filename):
-        os.chmod(filename, perms)
+    """
+    Remove write permissions from the file for everyone.
+    """
+    try:
+        st = os.stat(filename)
+        os.chmod(filename, st.st_mode & ~stat.S_IWUSR & ~stat.S_IWGRP & ~stat.S_IWOTH)
+    except OSError:
+        pass
 
 
 def make_writeable(filename):
-    if os.path.exists(filename):
-        os.chmod(filename, 0o777)
+    """
+    Make the file writeable by the owner.
+    """
+    try:
+        st = os.stat(filename)
+        os.chmod(filename, st.st_mode | stat.S_IWUSR)
+    except OSError:
+        pass
 
 
 def read_symbols_file(filename):
@@ -76,7 +92,6 @@ def generate_project_file(outdir, module_name, version):
     """
     Create an Eclipse project file for this set of OPIs.
     """
-    import os
     try:
         os.makedirs(outdir)
     except OSError:
@@ -90,17 +105,36 @@ def generate_project_file(outdir, module_name, version):
             f.write(updated_content)
 
 
+def _get_macros(edm_args):
+    macro_dict = {}
+    try:
+        x_index = edm_args.index('-m')
+        macros_arg = edm_args[x_index + 1]
+        macros = macros_arg.split(',')
+        for macro in macros:
+            key, value = macro.split('=')
+            macro_dict[key] = value
+    except (ValueError, IndexError):
+        pass
+    return macro_dict
+
+
 def interpret_command(cmd, args, directory):
     log.info('Launcher command: %s', cmd)
     if not os.path.isabs(cmd) and cmd in os.listdir(directory):
         cmd = os.path.join(directory, cmd)
-    log.info('CMD now %s', cmd)
+    log.info('Command corrected to %s', cmd)
     # Spoof EDM to find EDMDATAFILES and PATH
     # Index these directories to find which modules
     # relative paths may be in.
     edmdatafiles, path_dirs, working_dir, args = spoof.spoof_edm(cmd, args)
+
+    macros = _get_macros(args)
+
+    edl_files = [a for a in args if a.endswith('edl')]
+    edl_file = edl_files[0] if len(edl_files) > 0 else args[-1]
     try:
-        module_name, version, _ = parse_module_name(working_dir)
+        _, module_name, version, _ = parse_module_name(working_dir)
     except ValueError:
         log.warn("Didn't understand script's working directory!")
         module_name = os.path.basename(cmd)
@@ -111,9 +145,9 @@ def interpret_command(cmd, args, directory):
     if version is None:
         version = 'no-version'
 
-    all_dirs = [f for f in edmdatafiles if f not in ('', '.')]
-    all_dirs.extend(path_dirs)
+    all_dirs = edmdatafiles + path_dirs
     all_dirs.append(working_dir)
+    all_dirs = [os.path.realpath(f) for f in all_dirs if f not in ('', '.')]
     all_dirs = set(all_dirs)
 
-    return all_dirs, module_name, version
+    return all_dirs, module_name, version, edl_file, macros

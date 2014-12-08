@@ -1,5 +1,7 @@
 
 # OPI files whose layers need rearranging
+./project/opi/diagOpi_2-44/diagOpi/beamloss/sr_pin_overview.opi
+./project/opi/diagOpi_2-44/diagOpi/beamloss/pmt_linac.opi
 ./project/opi/diagOpi_2-44/diagOpi/shared/overview.opi
 ./project/opi/diagOpi_2-44/diagOpi/shared/fan_overview.opi
 ./project/opi/diagOpi_2-44/diagOpi/sr/best.opi

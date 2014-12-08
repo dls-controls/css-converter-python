@@ -52,23 +52,57 @@ class Converter(object):
     Since we can't easily determine symbol files, these may be specified
     on creation.
     """
+    converted_dirs = set()
 
     def __init__(self, dirs, symbol_files, root_outdir):
         """
         Given the EDM entry script, deduce the paths to convert.
         A list of symbol files is stored to help when converting.
         """
-        self.dirs = dirs
+        self.dirs = []
+        for d in dirs:
+            if d not in Converter.converted_dirs:
+                self.dirs.append(os.path.realpath(d))
+        Converter.converted_dirs.update(self.dirs)
+        # Index directories including those already converted.
         self.file_index = paths.index_paths(dirs, True)
 
         self.symbol_files = symbol_files
         self.symbol_dict = {}
 
-        self.root_outdir = root_outdir
+        self.root_outdir = os.path.realpath(root_outdir)
 
         if not os.path.exists(self.root_outdir):
             log.info('Making new output directory %s', self.root_outdir)
             os.makedirs(self.root_outdir)
+
+        self.depths = {}
+        for datadir in self.dirs:
+            _, module, _, rel_path = utils.parse_module_name(datadir)
+            mparts = module.strip('/').split('/')
+            if module == '':
+                self.depths[datadir] = 0
+            elif rel_path == '':
+                self.depths[datadir] = len(mparts)
+            else:
+                self.depths[datadir] = len(rel_path.split('/')) + len(mparts)
+        log.info("Path depths: %s", self.depths)
+
+
+    def _get_depth(self, directory):
+        """
+        Each directory converted must be relative to one in self.dirs.
+        """
+        for root_dir in self.dirs:
+            if os.path.normpath(directory) == root_dir:
+                return self.depths[root_dir]
+            elif directory.startswith(root_dir):
+                rel_path = os.path.relpath(directory, root_dir)
+                return self.depths[root_dir] + len(rel_path.split('/'))
+        raise ValueError('???')
+
+    def get_symbol_paths(self):
+        return self.symbol_dict
 
     def _process_one_directory(self, datadir, entry, force, working_path):
         """ Process a single directory
@@ -83,12 +117,9 @@ class Converter(object):
                 log.debug("New outdir is %s", outpath)
                 self._convert_dir(full_path, outpath, force)
 
-    def get_symbol_paths(self):
-        return self.symbol_dict
-
     def convert(self, force):
         """
-        Given the EDM datafiles and PATH lists, parse the directory and
+        Given the list of directories to parse, parse each and
         any subdirectories for edm/script files.  Create output in a similar
         directory structure.
         """
@@ -97,19 +128,8 @@ class Converter(object):
             if datadir.startswith('.'):
                 continue
             log.debug('EDM data file %s', datadir)
-            try:
-                module_name, version, rel_path = utils.parse_module_name(datadir)
-            except ValueError:
-                log.warn("Can't parse path %s", datadir)
-                continue
-
-            log.debug("%s %s %s", module_name, version, rel_path)
-            if rel_path is None:
-                rel_path = ''
-            module_name = module_name.split('/')[-1]
-            log.debug('The module name path is %s', module_name)
             entries = os.listdir(datadir)
-            working_path = os.path.join(self.root_outdir, module_name, rel_path)
+            working_path = os.path.join(self.root_outdir, datadir.lstrip('/'))
             for entry in entries:
                 self._process_one_directory(datadir, entry, force, working_path)
 
@@ -140,7 +160,7 @@ class Converter(object):
             destination = os.path.join(outdir, opifile)
             return os.path.exists(destination)
 
-    def _convert_one_file(self, full_path, outdir, force):
+    def _convert_one_file(self, full_path, outdir, force, depth):
         """
         Apppropriately convert one edl file, including updating
         any relative paths using the file_index dict.
@@ -149,7 +169,7 @@ class Converter(object):
         # nested directories any relative path must descend before
         # adding the relative path back on.
         relative_dir = os.path.relpath(outdir, self.root_outdir)
-        depth = len(relative_dir.strip('/').split('/'))
+        #depth = len(relative_dir.strip('/').split('/'))
         # change extension
         name = os.path.basename(full_path)
         opifile = name[:-len(EDL_EXT)] + OPI_EXT
@@ -185,8 +205,8 @@ class Converter(object):
             # make sure we have write permissions on the destination
             try:
                 utils.make_writeable(destination)
-                shutil.copyfile(full_path, destination)
-                utils.make_read_only(destination, executable)
+                # copy2: preserve permissions of original file.
+                shutil.copy2(full_path, destination)
                 log.info('Successfully copied %s', destination)
             except Exception as e:
                 log.error("Failed copying file %s: %s", full_path, str(e))
@@ -198,7 +218,8 @@ class Converter(object):
          - if the file ends with 'edl', convert
          - otherwise, copy the file
         """
-        log.info('Starting directory %s', indir)
+        depth = self._get_depth(indir)
+        log.info('Starting directory %s; depth %s', indir, depth)
         if not os.path.isdir(outdir):
             os.makedirs(outdir)
 
@@ -206,7 +227,7 @@ class Converter(object):
             full_path = os.path.join(indir, local)
             if local.endswith(EDL_EXT):
                 # edl files
-                self._convert_one_file(full_path, outdir, force)
+                self._convert_one_file(full_path, outdir, force, depth)
             elif not os.path.isdir(full_path) and not local.endswith('~'):
                 # files not ending in ~
                 self._copy_one_file(full_path, outdir, force)
@@ -229,7 +250,7 @@ def store_symbol(source, destination, symbol_dictionary):
 
         If the passed source file is not in the dictionary it is added.
         If the passed source file is already in the dictionary the destination
-        is added to the list, provided it is not already there.
+        is added to the set, provided it is not already there.
 
         Arguments:
             source -> full path to file to be converted

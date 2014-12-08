@@ -15,6 +15,7 @@ script again will make yet more widgets!
 
 import xml.etree.ElementTree as et
 import copy
+import logging as log
 
 from utils import make_writeable, make_read_only
 
@@ -106,7 +107,7 @@ def parse(path):
     root = tree.getroot()
 
     clickables = find_clickables(root, 0, 0)
-    print "There are %s clickables." % len(clickables)
+    log.info("There are %s clickables.", len(clickables))
 
     newcs = []
     for clicker in clickables:

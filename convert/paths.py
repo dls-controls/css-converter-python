@@ -30,7 +30,7 @@ def _index_dir(root, directory, recurse):
     log.debug('Indexing directory %s', directory)
     # path_within_module is always relative to root - the EDMDATAFILE
     # or path variable.
-    module, _, path_within_module = utils.parse_module_name(root)
+    _, module, _, path_within_module = utils.parse_module_name(root)
     if path_within_module is None:
         path_within_module = ''
     for entry in os.listdir(directory):
@@ -125,13 +125,9 @@ def _update_opi_path(filename, depth, file_index, module):
     if pair is not None:
         (file_module, path_in_module) = pair
         if file_module != module:
-            log.info('Correcting filename %s', filename)
-            # we only need the last part of the path
-            # i.e. CS/CS-DI-IOC-09  ->  CS-DI-IOC-09
-            module_path = file_module
-            collapsed_path = module_path.split('/')[-1]
+            log.info('Correcting filename %s depth %s', filename, depth)
             down = '/'.join(['..'] * depth)
-            rel = os.path.join(down, collapsed_path, path_in_module, filename)
+            rel = os.path.join(down, file_module, path_in_module, filename)
         else:
             rel = os.path.join(path_in_module, filename)
     else:
@@ -185,3 +181,10 @@ def update_opi_file(path, depth, file_index, module):
     tree.write(path, encoding='utf-8', xml_declaration=True)
     utils.make_read_only(path)
 
+
+def full_path(dirs, relative_path):
+    for directory in dirs:
+        full_path = os.path.join(directory, relative_path)
+        if os.path.exists(full_path):
+            return full_path
+    return None
