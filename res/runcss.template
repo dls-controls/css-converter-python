@@ -2,7 +2,7 @@
 
 # Generated run script for cs-studio.
 
-CSSTUDIO=/dls_sw/work/common/CSS/CSS_4.0.x_nightly/cs-studio
+CSSTUDIO=/dls_sw/work/common/CSS/CSS_4.0_dls-alpha2/cs-studio
 LAUNCH_OPI=$$1
 
 if [ -z $$LAUNCH_OPI ]; then
