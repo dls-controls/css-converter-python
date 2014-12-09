@@ -27,6 +27,7 @@ def patch_file(file_to_patch, patch_file):
 
 
 patches = [p for p in os.listdir(PATCH_DIR) if '.patch' in p]
+patches = [os.path.join(PATCH_DIR, p) for p in patches]
 print 'Patch files:\n', patches
 
 for patch in patches:
