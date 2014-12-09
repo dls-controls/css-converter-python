@@ -1,0 +1,192 @@
+From 544068341479df0429b42a55750cf475855177a1 Mon Sep 17 00:00:00 2001
+From: Nick Battam <nicholas.battam@diamond.ac.uk>
+Date: Mon, 3 Nov 2014 15:14:01 +0000
+Subject: [PATCH] Post-process IOT_BARS.opi / IOTbars.opi
+
+- Note values have been updated from '1' to '1:' to work around toString formatting them as 1.0
+---
+ project/opi/rf/IOT_BARS.opi | 24 ++++++++++++------------
+ project/opi/rf/IOTbars.opi  | 24 ++++++++++++------------
+ 2 files changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/project/opi/rf/IOT_BARS.opi b/project/opi/rf/IOT_BARS.opi
+index 70038e4..9aff5fb 100644
+--- a/project/opi/rf/IOT_BARS.opi
++++ b/project/opi/rf/IOT_BARS.opi
+@@ -43,7 +43,7 @@
+     <border_color>
+       <color blue="0" green="0" name="Black" red="0" />
+     </border_color>
+-    <pv_name>=pv(concat("SR17S-RF-TB-$(unit)", toString('loc://$(DID)iot("1")'), ":PKF-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-TB-$(unit)", toString('loc://$(DID)iot("1:")'), "PKF-C"))</pv_name>
+     <fill_color>
+       <color blue="0" green="0" name="Monitor: MAJOR" red="224" />
+     </fill_color>
+@@ -115,7 +115,7 @@
+       <color blue="205" green="220" name="LINAC canvas" red="206" />
+     </background_color>
+     <name>EDM meter Hulei</name>
+-    <pv_name>=pv(concat("SR17S-RF-GRID-$(unit)", toString('loc://$(DID)iot("1")'), ":I-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-GRID-$(unit)", toString('loc://$(DID)iot("1:")'), "I-C"))</pv_name>
+     <needle_color>
+       <color blue="255" green="0" name="Controller" red="0" />
+     </needle_color>
+@@ -233,7 +233,7 @@
+     <border_color>
+       <color blue="0" green="0" name="Black" red="0" />
+     </border_color>
+-    <pv_name>=pv(concat("SR17S-RF-TB-$(unit)", toString('loc://$(DID)iot("1")'), ":PKR-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-TB-$(unit)", toString('loc://$(DID)iot("1:")'), "PKR-C"))</pv_name>
+     <fill_color>
+       <color blue="0" green="0" name="Monitor: MAJOR" red="224" />
+     </fill_color>
+@@ -273,10 +273,10 @@
+     </items>
+     <target0>loc://$(DID)iot</target0>
+     <values0>
+-      <s>1</s>
+-      <s>2</s>
+-      <s>3</s>
+-      <s>4</s>
++      <s>1:</s>
++      <s>2:</s>
++      <s>3:</s>
++      <s>4:</s>
+     </values0>
+     <num_sets>1</num_sets>
+   </widget>
+@@ -293,7 +293,7 @@
+       <color blue="205" green="220" name="LINAC canvas" red="206" />
+     </background_color>
+     <name>EDM meter Hulei</name>
+-    <pv_name>=pv(concat("SR17S-RF-TB-$(unit)", toString('loc://$(DID)iot("1")'), ":ICOLL"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-TB-$(unit)", toString('loc://$(DID)iot("1:")'), "ICOLL"))</pv_name>
+     <needle_color>
+       <color blue="255" green="0" name="Controller" red="0" />
+     </needle_color>
+@@ -318,7 +318,7 @@
+       <color blue="205" green="220" name="LINAC canvas" red="206" />
+     </background_color>
+     <name>EDM meter Hulei</name>
+-    <pv_name>=pv(concat("SR17S-RF-TB-$(unit)", toString('loc://$(DID)iot("1")'), ":EFF-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-TB-$(unit)", toString('loc://$(DID)iot("1:")'), "EFF-C"))</pv_name>
+     <needle_color>
+       <color blue="255" green="0" name="Controller" red="0" />
+     </needle_color>
+@@ -346,7 +346,7 @@
+       <fontdata fontName="arial" height="21" style="1" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-TB-$(unit)", toString('loc://$(DID)iot("1")'), ":PKF-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-TB-$(unit)", toString('loc://$(DID)iot("1:")'), "PKF-C"))</pv_name>
+     <precision_from_pv>true</precision_from_pv>
+     <show_units>true</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -372,7 +372,7 @@
+       <fontdata fontName="arial" height="12" style="1" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-TB-$(unit)", toString('loc://$(DID)iot("1")'), ":ICOLL"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-TB-$(unit)", toString('loc://$(DID)iot("1:")'), "ICOLL"))</pv_name>
+     <precision_from_pv>true</precision_from_pv>
+     <show_units>true</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -382,4 +382,4 @@
+     <border_style>None</border_style>
+     <transparent>true</transparent>
+   </widget>
+-</display>
+\ No newline at end of file
++</display>
+diff --git a/project/opi/rf/IOTbars.opi b/project/opi/rf/IOTbars.opi
+index 45e5397..b5b0ab9 100644
+--- a/project/opi/rf/IOTbars.opi
++++ b/project/opi/rf/IOTbars.opi
+@@ -44,7 +44,7 @@
+     <border_color>
+       <color blue="0" green="0" name="Black" red="0" />
+     </border_color>
+-    <pv_name>=pv(concat("SR17S-RF-TB-$(psu)", toString('loc://$(DID)iot("1")'), ":PKF-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-TB-$(psu)", toString('loc://$(DID)iot("1:")'), "PKF-C"))</pv_name>
+     <fill_color>
+       <color blue="0" green="0" name="Monitor: MAJOR" red="224" />
+     </fill_color>
+@@ -116,7 +116,7 @@
+       <color blue="205" green="220" name="LINAC canvas" red="206" />
+     </background_color>
+     <name>EDM meter Hulei</name>
+-    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)iot("1")'), ":I-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)iot("1:")'), "I-C"))</pv_name>
+     <needle_color>
+       <color blue="255" green="0" name="Controller" red="0" />
+     </needle_color>
+@@ -234,7 +234,7 @@
+     <border_color>
+       <color blue="0" green="0" name="Black" red="0" />
+     </border_color>
+-    <pv_name>=pv(concat("SR17S-RF-TB-$(psu)", toString('loc://$(DID)iot("1")'), ":PKR-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-TB-$(psu)", toString('loc://$(DID)iot("1:")'), "PKR-C"))</pv_name>
+     <fill_color>
+       <color blue="0" green="0" name="Monitor: MAJOR" red="224" />
+     </fill_color>
+@@ -274,10 +274,10 @@
+     </items>
+     <target0>loc://$(DID)iot</target0>
+     <values0>
+-      <s>1</s>
+-      <s>2</s>
+-      <s>3</s>
+-      <s>4</s>
++      <s>1:</s>
++      <s>2:</s>
++      <s>3:</s>
++      <s>4:</s>
+     </values0>
+     <num_sets>1</num_sets>
+   </widget>
+@@ -294,7 +294,7 @@
+       <color blue="205" green="220" name="LINAC canvas" red="206" />
+     </background_color>
+     <name>EDM meter Hulei</name>
+-    <pv_name>=pv(concat("SR17S-RF-TB-$(psu)", toString('loc://$(DID)iot("1")'), ":ICOLL"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-TB-$(psu)", toString('loc://$(DID)iot("1:")'), "ICOLL"))</pv_name>
+     <needle_color>
+       <color blue="255" green="0" name="Controller" red="0" />
+     </needle_color>
+@@ -319,7 +319,7 @@
+       <color blue="205" green="220" name="LINAC canvas" red="206" />
+     </background_color>
+     <name>EDM meter Hulei</name>
+-    <pv_name>=pv(concat("SR17S-RF-TB-$(psu)", toString('loc://$(DID)iot("1")'), ":EFF-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-TB-$(psu)", toString('loc://$(DID)iot("1:")'), "EFF-C"))</pv_name>
+     <needle_color>
+       <color blue="255" green="0" name="Controller" red="0" />
+     </needle_color>
+@@ -347,7 +347,7 @@
+       <fontdata fontName="arial" height="21" style="1" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-TB-$(psu)", toString('loc://$(DID)iot("1")'), ":PKF-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-TB-$(psu)", toString('loc://$(DID)iot("1:")'), "PKF-C"))</pv_name>
+     <precision_from_pv>true</precision_from_pv>
+     <show_units>true</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -373,7 +373,7 @@
+       <fontdata fontName="arial" height="12" style="1" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-TB-$(psu)", toString('loc://$(DID)iot("1")'), ":ICOLL"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-TB-$(psu)", toString('loc://$(DID)iot("1:")'), "ICOLL"))</pv_name>
+     <precision_from_pv>true</precision_from_pv>
+     <show_units>true</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -383,4 +383,4 @@
+     <border_style>None</border_style>
+     <transparent>true</transparent>
+   </widget>
+-</display>
+\ No newline at end of file
++</display>
+-- 
+1.9.0
+

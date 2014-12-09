@@ -1,0 +1,54 @@
+From 5d2890d3f21c0ff9c04caadce2bd0c5aa18c66b9 Mon Sep 17 00:00:00 2001
+From: Nick Battam <nicholas.battam@diamond.ac.uk>
+Date: Fri, 31 Oct 2014 11:15:49 +0000
+Subject: [PATCH] Post-process tune.opi
+
+- add mmux driven locPV to script
+---
+ project/opi/diag/tmbf/tune.opi | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/project/opi/diag/tmbf/tune.opi b/project/opi/diag/tmbf/tune.opi
+index 835831a..46e7d9a 100644
+--- a/project/opi/diag/tmbf/tune.opi
++++ b/project/opi/diag/tmbf/tune.opi
+@@ -1804,16 +1804,21 @@
+     <scripts>
+       <path checkConnect="true" pathString="EmbeddedJs" seoe="false" sfe="false">
+         <scriptName>OPIFileScript</scriptName>
+-        <scriptText>importPackage(Packages.org.csstudio.opibuilder.scriptUtil);
+-var pv0 = PVUtil.getLong(pvs[0]);
+-if(pv0==0){
++<scriptText><![CDATA[importPackage(Packages.org.csstudio.opibuilder.scriptUtil);
++
++if (pvs[0].getValue() != null && pvs[1].getValue() != null) {
++
++var x_axis = PVUtil.getString(pvs[0]);
++var y_axis = PVUtil.getString(pvs[1]);
++
++
+ var macroInput = DataUtil.createMacrosInput(true);
+-macroInput.put("x_axis", "$(x_axis)");
++macroInput.put("x_axis", x_axis);
+ widget.setPropertyValue("macros", macroInput);
+-widget.setPropertyValue("opi_file","tmbf/tune_waveform_$(y_axis).opi");
+-}
+-</scriptText>
+-        <pv trig="true">loc://menu0(0)</pv>
++widget.setPropertyValue("opi_file","tmbf/tune_waveform_" + y_axis + ".opi");
++}]]></scriptText>
++        <pv trig="true">loc://$(DID)x_axis("SCALE")</pv>
++        <pv trig="true">loc://$(DID)y_axis("linear")</pv>
+       </path>
+     </scripts>
+   </widget>
+@@ -2216,4 +2221,4 @@ widget.setPropertyValue("opi_file","tmbf/tune_waveform_$(y_axis).opi");
+     <border_style>None</border_style>
+     <transparent>true</transparent>
+   </widget>
+-</display>
+\ No newline at end of file
++</display>
+-- 
+1.9.0
+
