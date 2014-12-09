@@ -36,13 +36,6 @@ for patch in patches:
     file_paths = find_file(find_path)
     if len(file_paths) == 0:
         print 'Error: Could not find file to patch:', patch, ":",  find_path
-    elif len(file_paths) > 1:
-        print 'Which file would you like to patch:'
-        for i, f in enumerate(file_paths):
-            print i, f
-        print 'Get some user input here....'
-        i = 0  # TODO: Get user command
-        patch_file(file_paths[i], patch)
-    else:
-        print 'Patching file', file_paths[0]
-        patch_file(file_paths[0], patch)
+    for file_path in file_paths:
+        print 'Patching file', file_path, 'with patch', patch
+        patch_file(file_path, patch)
