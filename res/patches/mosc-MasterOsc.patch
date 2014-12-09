@@ -7,10 +7,10 @@ Subject: [PATCH] Post-process mosc/MasterOsc.opi
  project/opi/mosc/MasterOsc.opi | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/project/opi/mosc/MasterOsc.opi b/project/opi/mosc/MasterOsc.opi
+diff --git a/MasterOsc.opi b/MasterOsc.opi
 index dd194d1..7f6aef3 100644
---- a/project/opi/mosc/MasterOsc.opi
-+++ b/project/opi/mosc/MasterOsc.opi
+--- a/MasterOsc.opi
++++ b/MasterOsc.opi
 @@ -1821,7 +1821,7 @@
        <fontdata fontName="courier" height="9" style="0" />
      </font>

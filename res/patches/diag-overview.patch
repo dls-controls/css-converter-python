@@ -8,10 +8,10 @@ Subject: [PATCH] Post-process diag/shared/overview
  project/opi/diag/shared/overview.opi | 20 +++++++++-----------
  1 file changed, 9 insertions(+), 11 deletions(-)
 
-diff --git a/project/opi/diag/shared/overview.opi b/project/opi/diag/shared/overview.opi
+diff --git a/shared/overview.opi b/shared/overview.opi
 index 355eb73..0e950e9 100644
---- a/project/opi/diag/shared/overview.opi
-+++ b/project/opi/diag/shared/overview.opi
+--- a/shared/overview.opi
++++ b/shared/overview.opi
 @@ -38014,7 +38014,8 @@
        <s>0</s>
        <s>1</s>

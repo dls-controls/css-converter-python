@@ -8,10 +8,10 @@ Subject: [PATCH] Post-process diag/motor-all.opi
  project/opi/diag/motor-all.opi | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/project/opi/diag/motor-all.opi b/project/opi/diag/motor-all.opi
+diff --git a/motor-all.opi b/motor-all.opi
 index a9fdd3d..64817f6 100644
---- a/project/opi/diag/motor-all.opi
-+++ b/project/opi/diag/motor-all.opi
+--- a/motor-all.opi
++++ b/motor-all.opi
 @@ -2770,7 +2770,7 @@
          <exp bool_exp="true">
            <value>true</value>

@@ -8,10 +8,10 @@ Subject: [PATCH] Post-process tune.opi
  project/opi/diag/tmbf/tune.opi | 23 ++++++++++++++---------
  1 file changed, 14 insertions(+), 9 deletions(-)
 
-diff --git a/project/opi/diag/tmbf/tune.opi b/project/opi/diag/tmbf/tune.opi
+diff --git a/tmbf/tune.opi b/tmbf/tune.opi
 index 835831a..46e7d9a 100644
---- a/project/opi/diag/tmbf/tune.opi
-+++ b/project/opi/diag/tmbf/tune.opi
+--- a/tmbf/tune.opi
++++ b/tmbf/tune.opi
 @@ -1804,16 +1804,21 @@
      <scripts>
        <path checkConnect="true" pathString="EmbeddedJs" seoe="false" sfe="false">

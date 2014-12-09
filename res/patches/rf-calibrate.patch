@@ -8,10 +8,10 @@ Subject: [PATCH] Post-process rf/Calibrate.opi
  project/opi/rf/Calibrate.opi | 199 ++++++++++++++++++++++++++++++++++++-------
  1 file changed, 166 insertions(+), 33 deletions(-)
 
-diff --git a/project/opi/rf/Calibrate.opi b/project/opi/rf/Calibrate.opi
+diff --git a/Calibrate.opi b/Calibrate.opi
 index 7b127cc..b9cbc57 100644
---- a/project/opi/rf/Calibrate.opi
-+++ b/project/opi/rf/Calibrate.opi
+--- a/Calibrate.opi
++++ b/Calibrate.opi
 @@ -4346,7 +4346,7 @@
        <fontdata fontName="courier" height="9" style="0" />
      </font>

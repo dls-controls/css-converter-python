@@ -7,10 +7,10 @@ Subject: [PATCH] Post-process LN2.opi
  project/opi/rf/LN2.opi | 67 +++++++++++++++++++++++++++++++++++++++-----------
  1 file changed, 52 insertions(+), 15 deletions(-)
 
-diff --git a/project/opi/rf/LN2.opi b/project/opi/rf/LN2.opi
+diff --git a/LN2.opi b/LN2.opi
 index dd9a363..d20a0a9 100644
---- a/project/opi/rf/LN2.opi
-+++ b/project/opi/rf/LN2.opi
+--- a/LN2.opi
++++ b/LN2.opi
 @@ -2436,21 +2436,6 @@
      </actions>
      <text>StripTool Temp</text>
