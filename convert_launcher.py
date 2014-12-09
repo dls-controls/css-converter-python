@@ -22,7 +22,6 @@ from convert import paths
 
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
-APPS_XML = 'applications.xml'
 OUTDIR = 'output'
 OUTPATH = os.path.abspath(os.path.join(os.path.dirname(__file__), OUTDIR))
 NEW_APPS = os.path.join(OUTPATH, 'css_apps.xml')
