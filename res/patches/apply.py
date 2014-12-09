@@ -18,7 +18,8 @@ def find_file(part_name):
 
 def patch_file(file_to_patch, patch_file):
     abs_patch = os.path.join(PATCH_DIR, patch_file)
-    command = 'patch -d ' + os.path.dirname(file_to_patch) + ' <' + abs_patch
+    command = ('patch -r - -d ' +
+            os.path.dirname(file_to_patch) + ' <' + abs_patch)
     print os.popen(command).read()
 
 
@@ -37,7 +38,7 @@ for patch in patches:
             print i, f
         print 'Get some user input here....'
         i = 0  # TODO: Get user command
-        patch(file_paths[i], patch)
+        patch_file(file_paths[i], patch)
     else:
         print 'Patching file', file_paths[0]
         patch_file(file_paths[0], patch)
