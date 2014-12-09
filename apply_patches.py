@@ -1,41 +1,24 @@
 #!/bin/env dls-python
+'''
+Sometimes it isn't pratically possible to correctly convert
+files programmatically. For a subset of files we have to apply
+a patch to them manually.
+
+These functions provide the ability to determine where a file is
+in the output structure and patch it, assuming the patch has
+been contributed to the converter/res/patchs directory.
+'''
 
 
-import os
+import sys
+from convert import patches
 
 
-FIND_DIR = '/scratch/css/converter/output'
-PATCH_DIR = '/scratch/css/converter/res/patches'
+if __name__ == '__main__':
+    try:
+        find_dir = sys.argv[1]
+    except KeyError:
+        print 'Usage: ', sys.argv[0], '<root dir>'
+        sys.exit(-1)
 
-
-def paths_from_patch_file(file_path):
-    MATCH = '+++ b'
-    contents = [line.strip() for line in open(file_path)]
-    return [l[len(MATCH):] for l in contents if l.startswith(MATCH)]
-
-
-def find_file(part_name):
-    command = 'find ' + FIND_DIR + ' -wholename "*' + part_name + '"'
-    return [x for x in os.popen(command).read().split('\n') if x]
-
-
-def patch_file(file_to_patch, patch_file):
-    abs_patch = os.path.join(PATCH_DIR, patch_file)
-    command = ('patch -r - -d ' +
-            os.path.dirname(file_to_patch) + ' <' + abs_patch)
-    print os.popen(command).read()
-
-
-patches = [p for p in os.listdir(PATCH_DIR) if '.patch' in p]
-patches = [os.path.join(PATCH_DIR, p) for p in patches]
-print 'Patch files:\n', patches
-
-for patch in patches:
-    paths = paths_from_patch_file(patch)
-    find_path = paths[0]
-    file_paths = find_file(find_path)
-    if len(file_paths) == 0:
-        print 'Error: Could not find file to patch:', patch, ":",  find_path
-    for file_path in file_paths:
-        print 'Patching file', file_path, 'with patch', patch
-        patch_file(file_path, patch)
+    patches.apply_patches_to_directory(find_dir)
