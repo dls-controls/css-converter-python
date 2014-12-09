@@ -1,0 +1,25 @@
+From 5342207b049521aeba8d43c0dc8deaa4e7b5fbd8 Mon Sep 17 00:00:00 2001
+From: Matthew Furseman <matthew.furseman@diamond.ac.uk>
+Date: Tue, 9 Dec 2014 14:57:34 +0000
+Subject: [PATCH] Added unisgned commands to intensity graph
+
+---
+ .../R3.14.12.3/support/diagOpi/2-45/sr/best.opi    |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/sr/best.opi b/sr/best.opi
+index 38cef52..3b06580 100644
+--- a/sr/best.opi
++++ b/sr/best.opi
+@@ -763,6 +763,8 @@
+     <transparent>true</transparent>
+   </widget>
+   <widget typeId="org.csstudio.opibuilder.widgets.intensityGraph" version="1.0">
++    <unsigned_bits>8</unsigned_bits>
++    <unsigned>true</unsigned>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+     <x>16</x>
+     <y>80</y>
+-- 
+1.7.1
+
