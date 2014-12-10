@@ -72,3 +72,4 @@ def apply_patches_to_directory(root_dir):
         for file_path in file_paths:
             print 'Patching file', file_path, 'with patch', patch
             patch_file(file_path, patch)
+

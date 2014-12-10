@@ -16,9 +16,9 @@ from convert import patches
 
 if __name__ == '__main__':
     try:
-        find_dir = sys.argv[1]
-    except KeyError:
-        print 'Usage: ', sys.argv[0], '<root dir>'
+        root_dir = sys.argv[1]
+    except IndexError:
+        print 'Usage:', sys.argv[0], '<root dir>'
         sys.exit(-1)
 
-    patches.apply_patches_to_directory(find_dir)
+    patches.apply_patches_to_directory(root_dir)
