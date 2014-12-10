@@ -42,7 +42,9 @@ def patch_file(file_to_patch, patch_file):
     '''
     command = ('patch -r - -d ' +
             os.path.dirname(file_to_patch) + ' <' + patch_file)
+    make_writeable(file_to_patch)
     print os.popen(command).read()
+    make_read_only(file_to_patch)
 
 
 def get_patch_files():
