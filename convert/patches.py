@@ -1,4 +1,3 @@
-#!/usr/bin/env dls-python
 '''
 Sometimes it isn't pratically possible to correctly convert
 files programmatically. For a subset of files we have to apply
