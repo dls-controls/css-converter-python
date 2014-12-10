@@ -23,6 +23,7 @@ from convert import paths
 from convert import layers
 from convert import groups
 from convert import mmux
+from convert import patches
 
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
@@ -256,6 +257,9 @@ def run_conversion(force, convert_symbols):
     # Update applications.xml and write out to a new file.
     update_xml(root, app_dict)
     tree.write(NEW_APPS, encoding='utf-8', xml_declaration=True)
+
+    # Apply any relevant patches.
+    patches.apply_patches_to_directory(OUTPATH)
 
     # Process symbol files at end.
     if symbol_paths:
