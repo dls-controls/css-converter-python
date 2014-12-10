@@ -9,6 +9,7 @@ import os
 import stat
 import sys
 import string
+import collections
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
 LOG_LEVEL = log.DEBUG
@@ -214,9 +215,9 @@ def get_pp_paths():
     layers_paths = [os.path.abspath(p) for p in utils.read_conf_file(LAYERS_CONF)]
     group_paths = [os.path.abspath(p) for p in utils.read_conf_file(GROUPS_CONF)]
     mmux_paths = [os.path.abspath(p) for p in mmux.build_filelist(OUTDIR)]
-    pp_dict = {layers.parse: layers_paths,
+    pp_dict = collections.OrderedDict({layers.parse: layers_paths,
                 groups.parse: group_paths,
-                mmux.parse: mmux_paths}
+                mmux.parse: mmux_paths})
     return pp_dict
 
 

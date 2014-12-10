@@ -32,6 +32,7 @@ from convert import mmux
 import os
 import ConfigParser
 import argparse
+import collections
 
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
@@ -141,9 +142,9 @@ def run_conversion():
             layers_paths = [os.path.abspath(p) for p in utils.read_conf_file(LAYERS_CONF)]
             group_paths = [os.path.abspath(p) for p in utils.read_conf_file(GROUPS_CONF)]
             mmux_paths = [os.path.abspath(p) for p in mmux.build_filelist(outdir)]
-            pp_files = {layers.parse: layers_paths,
+            pp_files = collections.OrderedDict({layers.parse: layers_paths,
                         groups.parse: group_paths,
-                        mmux.parse: mmux_paths}
+                        mmux.parse: mmux_paths})
 
             utils.generate_project_file(outdir, module_name, version)
             c = converter.Converter(all_dirs, symbols, outdir, pp_files)
