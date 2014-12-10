@@ -10,6 +10,7 @@ been contributed to the ./res directory.
 
 
 import os
+from subprocess import Popen, PIPE
 from utils import make_writeable, make_read_only
 
 
@@ -31,7 +32,8 @@ def find_file(part_name, root_dir):
     root directory match the provided part file path.
     '''
     command = 'find ' + root_dir + ' -wholename "*' + part_name + '"'
-    return [x for x in os.popen(command).read().split('\n') if x]
+    output = Popen(command, shell=True, stdout=PIPE).stdout.read().split('\n')
+    return [x for x in output if x]  # Remove empty strings
 
 
 def patch_file(file_to_patch, patch_file):
@@ -42,7 +44,7 @@ def patch_file(file_to_patch, patch_file):
     command = ('patch -r - -d ' +
             os.path.dirname(file_to_patch) + ' <' + patch_file)
     make_writeable(file_to_patch)
-    print os.popen(command).read()
+    print Popen(command, shell=True, stdout=PIPE).stdout.read()
     make_read_only(file_to_patch)
 
 
