@@ -1,9 +1,0 @@
-# Files to update layers on.
-output/dls_sw/prod/R3.14.12.3/support/vacuum/3-47/data/diamondVacIlks.opi
-output/dls_sw/prod/R3.14.12.3/support/vacuum/3-41/data/diamondVacIlks.opi
-output/dls_sw/prod/R3.14.12.3/support/vacuum/3-35/data/diamondVacIlks.opi
-output/dls_sw/prod/R3.14.12.3/support/vacuum/3-38/data/diamondVacIlks.opi
-output/dls_sw/prod/R3.14.11/support/vacuum/3-20/data/diamondVacIlks.opi
-output/dls_sw/prod/R3.14.11/support/vacuum/3-35/data/diamondVacIlks.opi
-output/dls_sw/prod/R3.14.11/support/vacuum/3-48/data/diamondVacIlks.opi
-output/dls_sw/prod/R3.14.12.3/support/psc/4-3-15/data/pscL5adc.opi

@@ -32,8 +32,8 @@ NEW_APPS = os.path.join(OUTPATH, 'css_apps.xml')
 SCRIPT_TEMPLATE = 'res/runcss.template'
 
 SYMBOLS_CONF = 'res/symbols.conf'
-LAYERS_CONF = 'conf/layers2.path'
-GROUPS_CONF = 'conf/groups2.path'
+LAYERS_CONF = 'conf/layers.path'
+GROUPS_CONF = 'conf/groups.path'
 
 ESCAPE_CHARS = ['.', ':']
 
