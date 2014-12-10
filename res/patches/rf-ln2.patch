@@ -1,0 +1,96 @@
+From 68f4b5c3b1506b39ea0610d998f0a8032dd9beaa Mon Sep 17 00:00:00 2001
+From: Nick Battam <nicholas.battam@diamond.ac.uk>
+Date: Mon, 3 Nov 2014 11:18:59 +0000
+Subject: [PATCH] Post-process LN2.opi
+
+---
+ project/opi/rf/LN2.opi | 67 +++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 52 insertions(+), 15 deletions(-)
+
+diff --git a/LN2.opi b/LN2.opi
+index dd9a363..d20a0a9 100644
+--- a/LN2.opi
++++ b/LN2.opi
+@@ -2436,21 +2436,6 @@
+     </actions>
+     <text>StripTool Temp</text>
+   </widget>
+-  <widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0">
+-    <border_alarm_sensitive>false</border_alarm_sensitive>
+-    <x>365</x>
+-    <y>45</y>
+-    <width>376</width>
+-    <height>376</height>
+-    <foreground_color>
+-      <color blue="0" green="0" name="Black" red="0" />
+-    </foreground_color>
+-    <background_color>
+-      <color blue="255" green="255" name="Disconn/Invalid" red="255" />
+-    </background_color>
+-    <name>EDM linkingContainer</name>
+-    <opi_file>=pv(concat(toString('loc://$(DID)P("Image1")'), ".opi"))</opi_file>
+-  </widget>
+   <widget typeId="org.csstudio.opibuilder.widgets.edm.menumux" version="1.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+     <x>365</x>
+@@ -2478,4 +2463,56 @@
+     </values0>
+     <num_sets>1</num_sets>
+   </widget>
++  <widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
++    <macros>
++      <include_parent_macros>true</include_parent_macros>
++    </macros>
++    <visible>true</visible>
++    <wuid>1b29052b:149754ae8ab:-7ac4</wuid>
++    <auto_size>false</auto_size>
++    <scripts>
++      <path pathString="EmbeddedJs" checkConnect="true" sfe="false" seoe="false">
++        <scriptName>OpiScript</scriptName>
++        <scriptText><![CDATA[importPackage(Packages.org.csstudio.opibuilder.scriptUtil);
++
++if (pvs[0].getValue() != null) {
++var image = PVUtil.getString(pvs[0]);
++widget.setPropertyValue("opi_file", image + ".opi");
++}]]></scriptText>
++        <pv trig="true">loc://$(DID)P("Image1")</pv>
++      </path>
++    </scripts>
++    <zoom_to_fit>true</zoom_to_fit>
++    <height>376</height>
++    <name>EDM linkingContainer</name>
++    <scale_options>
++      <width_scalable>true</width_scalable>
++      <height_scalable>true</height_scalable>
++      <keep_wh_ratio>false</keep_wh_ratio>
++    </scale_options>
++    <opi_file></opi_file>
++    <foreground_color>
++      <color name="Black" red="0" green="0" blue="0" />
++    </foreground_color>
++    <background_color>
++      <color name="Disconn/Invalid" red="255" green="255" blue="255" />
++    </background_color>
++    <group_name></group_name>
++    <enabled>true</enabled>
++    <widget_type>Linking Container</widget_type>
++    <font>
++      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
++    </font>
++    <width>376</width>
++    <border_style>3</border_style>
++    <rules />
++    <border_width>1</border_width>
++    <border_color>
++      <color red="0" green="128" blue="255" />
++    </border_color>
++    <y>45</y>
++    <actions hook="false" hook_all="false" />
++    <x>365</x>
++    <tooltip></tooltip>
++  </widget>
+ </display>
+\ No newline at end of file
+-- 
+1.9.0
+

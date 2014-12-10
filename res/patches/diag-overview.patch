@@ -1,0 +1,56 @@
+From 4b54b76147e0a653ec71b925747c0bf1983dc339 Mon Sep 17 00:00:00 2001
+From: Nick Battam <nicholas.battam@diamond.ac.uk>
+Date: Fri, 31 Oct 2014 11:15:17 +0000
+Subject: [PATCH] Post-process diag/shared/overview
+
+- correct show-required as overview.edl does not define symbol0
+---
+ project/opi/diag/shared/overview.opi | 20 +++++++++-----------
+ 1 file changed, 9 insertions(+), 11 deletions(-)
+
+diff --git a/shared/overview.opi b/shared/overview.opi
+index 355eb73..0e950e9 100644
+--- a/shared/overview.opi
++++ b/shared/overview.opi
+@@ -38014,7 +38014,8 @@
+       <s>0</s>
+       <s>1</s>
+     </values0>
+-    <num_sets>0</num_sets>
++    <target0>loc://$(DID)show-required</target0>
++    <num_sets>1</num_sets>
+   </widget>
+   <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -51207,15 +51208,12 @@
+     <width>572</width>
+     <height>188</height>
+     <rules>
+-      <rule name="visibleRule" out_exp="false" prop_id="visible">
+-        <exp bool_exp="pv0&gt;=1.0&amp;&amp; pv0&lt;2.0">
+-          <value>true</value>
+-        </exp>
+-        <exp bool_exp="true">
+-          <value>false</value>
+-        </exp>
+-        <pv trig="true">loc://show-required</pv>
+-      </rule>
++        <rule name="visibleRule" prop_id="visible" out_exp="false">
++            <exp bool_exp="pv0 == 0">
++                <value>false</value>
++            </exp>
++            <pv trig="true">loc://$(DID)show-required(0)</pv>
++        </rule>
+     </rules>
+     <name>10</name>
+     <lock_children>true</lock_children>
+@@ -55643,4 +55641,4 @@
+     </actions>
+     <x>12</x><x>12</x><y>44</y><y>44</y><width>53</width>
+     <height>25</height>
+-    </widget></display>
+\ No newline at end of file
++    </widget></display>
+-- 
+1.9.0
+

@@ -1,0 +1,461 @@
+From bea69d6052d5caad6bc11a08e7b6631be6bbecf1 Mon Sep 17 00:00:00 2001
+From: Nick Battam <nicholas.battam@diamond.ac.uk>
+Date: Mon, 3 Nov 2014 15:07:22 +0000
+Subject: [PATCH] Post-process rf/Calibrate.opi
+
+- Note values have been updated from '1' to '1:' to work around toString formatting them as 1.0
+---
+ project/opi/rf/Calibrate.opi | 199 ++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 166 insertions(+), 33 deletions(-)
+
+diff --git a/Calibrate.opi b/Calibrate.opi
+index 7b127cc..b9cbc57 100644
+--- a/Calibrate.opi
++++ b/Calibrate.opi
+@@ -4346,7 +4346,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)toaster("1")'), ":V-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)toaster("1:")'), "V-C"))</pv_name>
+     <precision_from_pv>true</precision_from_pv>
+     <show_units>true</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4372,7 +4372,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)toaster("1")'), ":VW-S"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)toaster("1:")'), "VW-S"))</pv_name>
+     <precision_from_pv>true</precision_from_pv>
+     <show_units>true</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4398,7 +4398,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)toaster("1")'), ":VW-ADJ.B"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)toaster("1:")'), "VW-ADJ.B"))</pv_name>
+     <precision_from_pv>false</precision_from_pv>
+     <show_units>false</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4425,7 +4425,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)toaster("1")'), ":V-C.B"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)toaster("1:")'), "V-C.B"))</pv_name>
+     <precision_from_pv>false</precision_from_pv>
+     <show_units>false</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4436,7 +4436,7 @@
+     <transparent>false</transparent>
+     <name>EDM TextInput</name>
+   </widget>
+-  <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0">
++  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+     <x>616</x>
+     <y>264</y>
+@@ -4452,7 +4452,8 @@
+       <fontdata fontName="arial" height="9" style="1" />
+     </font>
+     <name>EDM Label</name>
+-    <text>=concat("T", toString('loc://$(DID)toaster("1")'), " Grid:V Read")</text>
++    <text>######</text>
++    <pv_name>=concat("T", toString('loc://$(DID)toaster("1:")'), " Grid:V Read")</pv_name>
+     <auto_size>false</auto_size>
+     <border_style>0</border_style>
+     <border_color>
+@@ -4466,8 +4467,26 @@
+     </foreground_color>
+     <transparent>true</transparent>
+     <horizontal_alignment>0</horizontal_alignment>
++    <widget_type>Text Update</widget_type>
++    <actions hook="false" hook_all="false" />
++    <visible>true</visible>
++    <format_type>0</format_type>
++    <enabled>true</enabled>
++    <precision>0</precision>
++    <tooltip />
++    <scale_options>
++      <width_scalable>true</width_scalable>
++      <height_scalable>true</height_scalable>
++      <keep_wh_ratio>false</keep_wh_ratio>
++    </scale_options>
++    <wrap_words>false</wrap_words>
++    <precision_from_pv>false</precision_from_pv>
++    <show_units>false</show_units>
++    <alarm_pulsing>false</alarm_pulsing>
++    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
++    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+   </widget>
+-  <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0">
++  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+     <x>616</x>
+     <y>232</y>
+@@ -4483,7 +4502,8 @@
+       <fontdata fontName="arial" height="9" style="1" />
+     </font>
+     <name>EDM Label</name>
+-    <text>=concat("T", toString('loc://$(DID)toaster("1")'), " Grid:V Set")</text>
++    <text>######</text>
++    <pv_name>=concat("T", toString('loc://$(DID)toaster("1:")'), " Grid:V Set")</pv_name>
+     <auto_size>false</auto_size>
+     <border_style>0</border_style>
+     <border_color>
+@@ -4497,6 +4517,24 @@
+     </foreground_color>
+     <transparent>true</transparent>
+     <horizontal_alignment>0</horizontal_alignment>
++    <widget_type>Text Update</widget_type>
++    <actions hook="false" hook_all="false" />
++    <visible>true</visible>
++    <format_type>0</format_type>
++    <enabled>true</enabled>
++    <precision>0</precision>
++    <tooltip />
++    <scale_options>
++      <width_scalable>true</width_scalable>
++      <height_scalable>true</height_scalable>
++      <keep_wh_ratio>false</keep_wh_ratio>
++    </scale_options>
++    <wrap_words>false</wrap_words>
++    <precision_from_pv>false</precision_from_pv>
++    <show_units>false</show_units>
++    <alarm_pulsing>false</alarm_pulsing>
++    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
++    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+   </widget>
+   <widget typeId="org.csstudio.opibuilder.widgets.edm.menumux" version="1.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4523,10 +4561,10 @@
+     </items>
+     <target0>loc://$(DID)toaster</target0>
+     <values0>
+-      <s>1</s>
+-      <s>2</s>
+-      <s>3</s>
+-      <s>4</s>
++      <s>1:</s>
++      <s>2:</s>
++      <s>3:</s>
++      <s>4:</s>
+     </values0>
+     <num_sets>1</num_sets>
+   </widget>
+@@ -4546,7 +4584,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1")'), ":IW-S"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1:")'), "IW-S"))</pv_name>
+     <precision_from_pv>true</precision_from_pv>
+     <show_units>true</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4572,7 +4610,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1")'), ":I-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1:")'), "I-C"))</pv_name>
+     <precision_from_pv>true</precision_from_pv>
+     <show_units>true</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4582,7 +4620,7 @@
+     <border_style>None</border_style>
+     <transparent>false</transparent>
+   </widget>
+-  <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0">
++  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+     <x>616</x>
+     <y>136</y>
+@@ -4598,7 +4636,8 @@
+       <fontdata fontName="arial" height="9" style="1" />
+     </font>
+     <name>EDM Label</name>
+-    <text>=concat("T", toString('loc://$(DID)toaster("1")'), " Fil:I Read")</text>
++    <text>######</text>
++    <pv_name>=concat("T", toString('loc://$(DID)toaster("1:")'), " Fil:I Read")</pv_name>
+     <auto_size>false</auto_size>
+     <border_style>0</border_style>
+     <border_color>
+@@ -4612,6 +4651,24 @@
+     </foreground_color>
+     <transparent>true</transparent>
+     <horizontal_alignment>0</horizontal_alignment>
++    <widget_type>Text Update</widget_type>
++    <actions hook="false" hook_all="false" />
++    <visible>true</visible>
++    <format_type>0</format_type>
++    <enabled>true</enabled>
++    <precision>0</precision>
++    <tooltip />
++    <scale_options>
++      <width_scalable>true</width_scalable>
++      <height_scalable>true</height_scalable>
++      <keep_wh_ratio>false</keep_wh_ratio>
++    </scale_options>
++    <wrap_words>false</wrap_words>
++    <precision_from_pv>false</precision_from_pv>
++    <show_units>false</show_units>
++    <alarm_pulsing>false</alarm_pulsing>
++    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
++    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+   </widget>
+   <widget typeId="org.csstudio.opibuilder.widgets.TextInput" version="1.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4629,7 +4686,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1")'), ":I-C.B"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1:")'), "I-C.B"))</pv_name>
+     <precision_from_pv>false</precision_from_pv>
+     <show_units>false</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4656,7 +4713,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1")'), ":IW-ADJ.B"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1:")'), "IW-ADJ.B"))</pv_name>
+     <precision_from_pv>false</precision_from_pv>
+     <show_units>false</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4667,7 +4724,7 @@
+     <transparent>false</transparent>
+     <name>EDM TextInput</name>
+   </widget>
+-  <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0">
++  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+     <x>616</x>
+     <y>104</y>
+@@ -4683,7 +4740,8 @@
+       <fontdata fontName="arial" height="9" style="1" />
+     </font>
+     <name>EDM Label</name>
+-    <text>=concat("T", toString('loc://$(DID)toaster("1")'), " Fil:I Set")</text>
++    <text>######</text>
++    <pv_name>=concat("T", toString('loc://$(DID)toaster("1:")'), " Fil:V Read")</pv_name>
+     <auto_size>false</auto_size>
+     <border_style>0</border_style>
+     <border_color>
+@@ -4697,6 +4755,24 @@
+     </foreground_color>
+     <transparent>true</transparent>
+     <horizontal_alignment>0</horizontal_alignment>
++    <widget_type>Text Update</widget_type>
++    <actions hook="false" hook_all="false" />
++    <visible>true</visible>
++    <format_type>0</format_type>
++    <enabled>true</enabled>
++    <precision>0</precision>
++    <tooltip />
++    <scale_options>
++    <width_scalable>true</width_scalable>
++    <height_scalable>true</height_scalable>
++    <keep_wh_ratio>false</keep_wh_ratio>
++    </scale_options>
++    <wrap_words>false</wrap_words>
++    <precision_from_pv>false</precision_from_pv>
++    <show_units>false</show_units>
++    <alarm_pulsing>false</alarm_pulsing>
++    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
++    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+   </widget>
+   <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4714,7 +4790,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1")'), ":V-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1:")'), "V-C"))</pv_name>
+     <precision_from_pv>true</precision_from_pv>
+     <show_units>true</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4740,7 +4816,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1")'), ":VW-S"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1:")'), "VW-S"))</pv_name>
+     <precision_from_pv>true</precision_from_pv>
+     <show_units>true</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4766,7 +4842,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1")'), ":VW-ADJ.B"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1:")'), "VW-ADJ.B"))</pv_name>
+     <precision_from_pv>false</precision_from_pv>
+     <show_units>false</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4793,7 +4869,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1")'), ":V-C.B"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-FIL-$(psu)", toString('loc://$(DID)toaster("1:")'), "V-C.B"))</pv_name>
+     <precision_from_pv>false</precision_from_pv>
+     <show_units>false</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4804,7 +4880,7 @@
+     <transparent>false</transparent>
+     <name>EDM TextInput</name>
+   </widget>
+-  <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0">
++  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+     <x>616</x>
+     <y>200</y>
+@@ -4820,7 +4896,8 @@
+       <fontdata fontName="arial" height="9" style="1" />
+     </font>
+     <name>EDM Label</name>
+-    <text>=concat("T", toString('loc://$(DID)toaster("1")'), " Fil:V Read")</text>
++    <text>######</text>
++    <pv_name>=concat("T", toString('loc://$(DID)toaster("1:")'), " Fil:V Read")</pv_name>
+     <auto_size>false</auto_size>
+     <border_style>0</border_style>
+     <border_color>
+@@ -4834,8 +4911,26 @@
+     </foreground_color>
+     <transparent>true</transparent>
+     <horizontal_alignment>0</horizontal_alignment>
++    <widget_type>Text Update</widget_type>
++    <actions hook="false" hook_all="false" />
++    <visible>true</visible>
++    <format_type>0</format_type>
++    <enabled>true</enabled>
++    <precision>0</precision>
++    <tooltip />
++    <scale_options>
++    <width_scalable>true</width_scalable>
++    <height_scalable>true</height_scalable>
++    <keep_wh_ratio>false</keep_wh_ratio>
++    </scale_options>
++    <wrap_words>false</wrap_words>
++    <precision_from_pv>false</precision_from_pv>
++    <show_units>false</show_units>
++    <alarm_pulsing>false</alarm_pulsing>
++    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
++    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+   </widget>
+-  <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0">
++  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+     <x>616</x>
+     <y>168</y>
+@@ -4851,7 +4946,8 @@
+       <fontdata fontName="arial" height="9" style="1" />
+     </font>
+     <name>EDM Label</name>
+-    <text>=concat("T", toString('loc://$(DID)toaster("1")'), " Fil:V Set")</text>
++    <text>######</text>
++    <pv_name>=concat("T", toString('loc://$(DID)toaster("1:")'), " Fil:V Set")</pv_name>
+     <auto_size>false</auto_size>
+     <border_style>0</border_style>
+     <border_color>
+@@ -4865,6 +4961,24 @@
+     </foreground_color>
+     <transparent>true</transparent>
+     <horizontal_alignment>0</horizontal_alignment>
++    <widget_type>Text Update</widget_type>
++    <actions hook="false" hook_all="false" />
++    <visible>true</visible>
++    <format_type>0</format_type>
++    <enabled>true</enabled>
++    <precision>0</precision>
++    <tooltip />
++    <scale_options>
++      <width_scalable>true</width_scalable>
++      <height_scalable>true</height_scalable>
++      <keep_wh_ratio>false</keep_wh_ratio>
++    </scale_options>
++    <wrap_words>false</wrap_words>
++    <precision_from_pv>false</precision_from_pv>
++    <show_units>false</show_units>
++    <alarm_pulsing>false</alarm_pulsing>
++    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
++    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+   </widget>
+   <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4882,7 +4996,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)toaster("1")'), ":I-C"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)toaster("1:")'), "I-C"))</pv_name>
+     <precision_from_pv>true</precision_from_pv>
+     <show_units>true</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4908,7 +5022,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)toaster("1")'), ":I-C.B"))</pv_name>
++    <pv_name>=pv(concat("SR17S-RF-GRID-$(psu)", toString('loc://$(DID)toaster("1:")'), "I-C.B"))</pv_name>
+     <precision_from_pv>false</precision_from_pv>
+     <show_units>false</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -4919,7 +5033,7 @@
+     <transparent>false</transparent>
+     <name>EDM TextInput</name>
+   </widget>
+-  <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0">
++  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+     <x>616</x>
+     <y>296</y>
+@@ -4935,7 +5049,8 @@
+       <fontdata fontName="arial" height="9" style="1" />
+     </font>
+     <name>EDM Label</name>
+-    <text>=concat("T", toString('loc://$(DID)toaster("1")'), " Grid:I Read")</text>
++    <text>######</text>
++    <pv_name>=concat("T", toString('loc://$(DID)toaster("1:")'), " Grid:I Read")</pv_name>
+     <auto_size>false</auto_size>
+     <border_style>0</border_style>
+     <border_color>
+@@ -4949,6 +5064,24 @@
+     </foreground_color>
+     <transparent>true</transparent>
+     <horizontal_alignment>0</horizontal_alignment>
++    <widget_type>Text Update</widget_type>
++    <actions hook="false" hook_all="false" />
++    <visible>true</visible>
++    <format_type>0</format_type>
++    <enabled>true</enabled>
++    <precision>0</precision>
++    <tooltip />
++    <scale_options>
++      <width_scalable>true</width_scalable>
++      <height_scalable>true</height_scalable>
++      <keep_wh_ratio>false</keep_wh_ratio>
++    </scale_options>
++    <wrap_words>false</wrap_words>
++    <precision_from_pv>false</precision_from_pv>
++    <show_units>false</show_units>
++    <alarm_pulsing>false</alarm_pulsing>
++    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
++    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+   </widget>
+   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="1.0">
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+@@ -5717,4 +5850,4 @@
+     <transparent>false</transparent>
+     <name>EDM TextInput</name>
+   </widget>
+-</display>
+\ No newline at end of file
++</display>
+-- 
+1.9.0
+

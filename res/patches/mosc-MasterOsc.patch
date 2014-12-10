@@ -1,0 +1,25 @@
+From 39c92dfa311de9e707ac94d6c137457a624dc9d3 Mon Sep 17 00:00:00 2001
+From: Nick Battam <nicholas.battam@diamond.ac.uk>
+Date: Mon, 3 Nov 2014 11:36:41 +0000
+Subject: [PATCH] Post-process mosc/MasterOsc.opi
+
+---
+ project/opi/mosc/MasterOsc.opi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/MasterOsc.opi b/MasterOsc.opi
+index dd194d1..7f6aef3 100644
+--- a/MasterOsc.opi
++++ b/MasterOsc.opi
+@@ -1821,7 +1821,7 @@
+       <fontdata fontName="courier" height="9" style="0" />
+     </font>
+     <name>EDM TextInput</name>
+-    <pv_name>loc://$(DID)d("LI-RF-DASU-01:DIODE")</pv_name>
++    <pv_name>=pv('loc://$(DID)d("LI-RF-DASU-01:DIODE")')</pv_name>
+     <precision_from_pv>false</precision_from_pv>
+     <show_units>false</show_units>
+     <border_alarm_sensitive>false</border_alarm_sensitive>
+-- 
+1.9.0
+

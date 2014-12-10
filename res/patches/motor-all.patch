@@ -1,0 +1,60 @@
+From 1389b5b4a790b3eb5eb017f1d736321b9e8770d0 Mon Sep 17 00:00:00 2001
+From: Nick Battam <nicholas.battam@diamond.ac.uk>
+Date: Fri, 31 Oct 2014 11:14:36 +0000
+Subject: [PATCH] Post-process diag/motor-all.opi
+
+- correct double '=pv'
+---
+ project/opi/diag/motor-all.opi | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/motor-all.opi b/motor-all.opi
+index a9fdd3d..64817f6 100644
+--- a/motor-all.opi
++++ b/motor-all.opi
+@@ -2770,7 +2770,7 @@
+         <exp bool_exp="true">
+           <value>true</value>
+         </exp>
+-        <pv trig="true">=pv(concat("=(pv("$(P)$(M).", toString('loc://$(DID)ACCL("ACCL")'))&lt;100000000)"))</pv>
++        <pv trig="true">=(pv(concat("$(P)$(M).", toString('loc://$(DID)ACCL("ACCL")')))&lt;100000000)</pv>
+       </rule>
+     </rules>
+     <name>4</name>
+@@ -2893,7 +2893,7 @@
+         <exp bool_exp="true">
+           <value>true</value>
+         </exp>
+-        <pv trig="true">=pv(concat("=(pv("$(P)$(M).", toString('loc://$(DID)VMAX("VMAX")'))&lt;100000000)"))</pv>
++        <pv trig="true">=(pv(concat("$(P)$(M).", toString('loc://$(DID)VMAX("VMAX")')))&lt;100000000)</pv>
+       </rule>
+     </rules>
+     <name>5</name>
+@@ -3005,7 +3005,7 @@
+         <exp bool_exp="true">
+           <value>true</value>
+         </exp>
+-        <pv trig="true">=pv(concat("=(pv("$(P)$(M).", toString('loc://$(DID)VELO("VELO")'))&lt;100000000)"))</pv>
++        <pv trig="true">=(pv(concat("$(P)$(M).", toString('loc://$(DID)VELO("VELO")')))&lt;100000000)</pv>
+       </rule>
+     </rules>
+     <name>6</name>
+@@ -3117,7 +3117,7 @@
+         <exp bool_exp="true">
+           <value>true</value>
+         </exp>
+-        <pv trig="true">=pv(concat("=(pv("$(P)$(M).", toString('loc://$(DID)VBAS("VBAS")'))&lt;100000000)"))</pv>
++        <pv trig="true">=(pv(concat("$(P)$(M).", toString('loc://$(DID)VBAS("VBAS")')))&lt;100000000)</pv>
+       </rule>
+     </rules>
+     <name>7</name>
+@@ -4667,4 +4667,4 @@
+     <transparent>true</transparent>
+     <horizontal_alignment>0</horizontal_alignment>
+   </widget>
+-</display>
+\ No newline at end of file
++</display>
+-- 
+1.9.0
+
