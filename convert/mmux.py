@@ -15,6 +15,8 @@ Process:
 3. Replace the reference with the appropriate expression.
 '''
 import os
+import subprocess
+import mmux
 import xml.etree.ElementTree as ET
 import logging as log
 
@@ -195,3 +197,20 @@ def parse(filepath):
     else:
         log.warn("Skipping %s, file not found", filepath)
 
+
+def build_filelist(basepath):
+    """ Execute a grep on the basepath to find all files that contain a menumux
+        control
+
+        Arguments:
+            basepath - root of search
+        Returns:
+            iterator over relative filepaths
+    """
+    proc = subprocess.Popen("find " + basepath + " | xargs grep -sl " + mmux.MENU_MUX_ID,
+                            stdout=subprocess.PIPE,
+                            shell=True)
+
+    for line in iter(proc.stdout.readline, ''):
+        filepath = line.rstrip()
+        yield filepath

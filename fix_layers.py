@@ -14,8 +14,13 @@ script again will make yet more widgets!
 """
 
 import sys
+import logging as log
+LOG_FORMAT = '%(levelname)s:  %(message)s'
+LOG_LEVEL = log.DEBUG
+log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 from convert import layers
+from convert import utils
 
 
 if __name__ == '__main__':
@@ -31,11 +36,13 @@ if __name__ == '__main__':
         lines = [line.strip() for line in lines if not line.startswith('#')]
         lines = [line.strip() for line in lines if not line == '']
 
+    lines = utils.read_conf_file(path_file)
+
     for filepath in lines:
-        print "Parsing file ", filepath
+        log.info("Parsing file %s", filepath)
         try:
             layers.parse(filepath)
         except (OSError, IOError) as e:
-            print "Failed to parse file %s: %s" % (filepath, e)
+            log.warn("Failed to parse file %s: %s", filepath, e)
 
 

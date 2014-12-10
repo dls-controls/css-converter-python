@@ -9,9 +9,10 @@ import os
 import stat
 import sys
 import string
+import collections
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
-LOG_LEVEL = log.INFO
+LOG_LEVEL = log.DEBUG
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 from convert import converter
@@ -19,6 +20,9 @@ from convert import utils
 from convert import spoof
 from convert import files
 from convert import paths
+from convert import layers
+from convert import groups
+from convert import mmux
 
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
@@ -26,6 +30,10 @@ OUTDIR = 'output'
 OUTPATH = os.path.abspath(os.path.join(os.path.dirname(__file__), OUTDIR))
 NEW_APPS = os.path.join(OUTPATH, 'css_apps.xml')
 SCRIPT_TEMPLATE = 'res/runcss.template'
+
+SYMBOLS_CONF = 'res/symbols.conf'
+LAYERS_CONF = 'conf/layers2.path'
+GROUPS_CONF = 'conf/groups2.path'
 
 ESCAPE_CHARS = ['.', ':']
 
@@ -79,7 +87,7 @@ def get_module_dict(dirs):
     return module_dict
 
 
-def update_cmd(cmd, args, symbols, force):
+def update_cmd(cmd, args, symbols, pp_dict, force):
     '''
     Given a command and arguments from the launcher, determine
     the appropriate command for running CSS.
@@ -119,7 +127,7 @@ def update_cmd(cmd, args, symbols, force):
 
     symbol_paths = {}
     try:
-        c = converter.Converter(all_dirs, symbols, OUTPATH)
+        c = converter.Converter(all_dirs, symbols, OUTPATH, pp_dict)
         c.convert(force)
         symbol_paths = c.get_symbol_paths()
     except OSError as e:
@@ -182,6 +190,37 @@ def merge_symbol_paths(paths_dict1, paths_dict2):
     return paths_dict2
 
 
+def process_symbol_files(symbol_paths, convert_symbols):
+    input = "y" if convert_symbols else ""
+    while input.lower() not in ('y', 'n'):
+        log.warn('About to process %s symbol files.', len(symbol_paths))
+        log.warn('Press y to continue, n to quit')
+        input = raw_input()
+    if input.lower() == 'y':
+        log.info('Post-processing %s symbol files', len(symbol_paths))
+        symbol_count = 0
+        for path, destinations in symbol_paths.iteritems():
+            symbol_count += 1
+            log.info('Processed %s of %s symbol files.', symbol_count, len(symbol_paths))
+            try:
+                files.convert_symbol(path, destinations)
+            except (IndexError, AssertionError) as e:
+                log.warn('Failed to convert symbol %s: %s', path, e)
+                continue
+    else:
+        log.warn('Not processing symbol files.')
+
+
+def get_pp_paths():
+    layers_paths = [os.path.abspath(p) for p in utils.read_conf_file(LAYERS_CONF)]
+    group_paths = [os.path.abspath(p) for p in utils.read_conf_file(GROUPS_CONF)]
+    mmux_paths = [os.path.abspath(p) for p in mmux.build_filelist(OUTDIR)]
+    pp_dict = collections.OrderedDict({layers.parse: layers_paths,
+                groups.parse: group_paths,
+                mmux.parse: mmux_paths})
+    return pp_dict
+
+
 def run_conversion(force, convert_symbols):
     '''
     Iterate over the launcher XML file and fetch each command.
@@ -192,14 +231,15 @@ def run_conversion(force, convert_symbols):
     root = tree.getroot()
 
     apps = get_apps(root)
+    pp_dict = get_pp_paths()
     app_dict = {}
 
-    symbols = utils.read_symbols_file('res/symbols.conf')
+    symbols = utils.read_symbols_file(SYMBOLS_CONF)
     log.info('Symbols found: %s', symbols)
     symbol_paths = {}
     for name, cmd, args in apps:
         try:
-            new_cmd, new_args, new_symbol_paths = update_cmd(cmd, args.split(), symbols, force)
+            new_cmd, new_args, new_symbol_paths = update_cmd(cmd, args.split(), symbols, pp_dict, force)
             log.warn('%s gave new command %s %s', cmd, new_cmd, new_args)
             log.warn('%s gave these symbols: %s', cmd, new_symbol_paths)
             symbol_paths = merge_symbol_paths(symbol_paths, new_symbol_paths)
@@ -219,24 +259,7 @@ def run_conversion(force, convert_symbols):
 
     # Process symbol files at end.
     if symbol_paths:
-        input = "y" if convert_symbols else ""
-        while input.lower() not in ('y', 'n'):
-            log.warn('About to process %s symbol files.', len(symbol_paths))
-            log.warn('Press y to continue, n to quit')
-            input = raw_input()
-        if input.lower() == 'y':
-            log.info('Post-processing %s symbol files', len(symbol_paths))
-            symbol_count = 0
-            for path, destinations in symbol_paths.iteritems():
-                symbol_count += 1
-                log.info('Processed %s of %s symbol files.', symbol_count, len(symbol_paths))
-                try:
-                    files.convert_symbol(path, destinations)
-                except (IndexError, AssertionError) as e:
-                    log.warn('Failed to convert symbol %s: %s', path, e)
-                    continue
-        else:
-            log.warn('Not processing symbol files.')
+        process_symbol_files(symbol_paths, convert_symbols)
 
     log.warn('Conversion finished.')
 

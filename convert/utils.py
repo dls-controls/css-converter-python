@@ -76,15 +76,26 @@ def make_writeable(filename):
         pass
 
 
-def read_symbols_file(filename):
-    symbols = []
+def read_conf_file(filename):
+    """
+    Read generic config file into list of lines.
+    """
     with open(filename) as f:
         lines = f.readlines()
-        lines = [l.strip() for l in lines]
-        lines = [l for l in lines if l != "" and not l.startswith('#')]
-        for line in lines:
-            parts = line.split(':')
-            symbols.append(parts[0])
+        lines = [line.strip() for line in lines if not line.startswith('#')]
+        lines = [line.strip() for line in lines if not line == '']
+    return lines
+
+
+def read_symbols_file(filename):
+    """
+    Read config file consisting of lines of the form:
+    key: value
+    Return a list of keys.  This is specifically useful for parsing
+    our symbols configuration.
+    """
+    lines = read_conf_file(filename)
+    symbols = [l.split(':')[0] for l in lines]
     return symbols
 
 

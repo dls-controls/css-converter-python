@@ -24,11 +24,15 @@ Steps:
 from convert import converter
 from convert import files
 from convert import utils
+from convert import layers
+from convert import groups
+from convert import mmux
 
 
 import os
 import ConfigParser
 import argparse
+import collections
 
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
@@ -36,6 +40,9 @@ LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
+
+LAYERS_CONF = 'conf/layers.path'
+GROUPS_CONF = 'conf/groups.path'
 
 class ConfigurationError(Exception):
     """ Customer exception to be raised in there is a config-file parse
@@ -130,8 +137,17 @@ def run_conversion():
                 print "Found symbol: " + sym
 
             outdir = os.path.join(outdir, "%s_%s" % (module_name, version))
+
+            # Set up post-processing.
+            layers_paths = [os.path.abspath(p) for p in utils.read_conf_file(LAYERS_CONF)]
+            group_paths = [os.path.abspath(p) for p in utils.read_conf_file(GROUPS_CONF)]
+            mmux_paths = [os.path.abspath(p) for p in mmux.build_filelist(outdir)]
+            pp_files = collections.OrderedDict({layers.parse: layers_paths,
+                        groups.parse: group_paths,
+                        mmux.parse: mmux_paths})
+
             utils.generate_project_file(outdir, module_name, version)
-            c = converter.Converter(all_dirs, symbols, outdir)
+            c = converter.Converter(all_dirs, symbols, outdir, pp_files)
             c.convert(args.force)
             new_symbol_paths = c.get_symbol_paths()
             for symbol in new_symbol_paths:
