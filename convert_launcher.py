@@ -215,10 +215,8 @@ def process_symbol_files(symbol_paths, convert_symbols):
 def get_pp_paths():
     layers_paths = [os.path.abspath(p) for p in utils.read_conf_file(LAYERS_CONF)]
     group_paths = [os.path.abspath(p) for p in utils.read_conf_file(GROUPS_CONF)]
-    mmux_paths = [os.path.abspath(p) for p in mmux.build_filelist(OUTDIR)]
     pp_dict = collections.OrderedDict({layers.parse: layers_paths,
-                groups.parse: group_paths,
-                mmux.parse: mmux_paths})
+                groups.parse: group_paths})
     return pp_dict
 
 
@@ -257,6 +255,12 @@ def run_conversion(force, convert_symbols):
     # Update applications.xml and write out to a new file.
     update_xml(root, app_dict)
     tree.write(NEW_APPS, encoding='utf-8', xml_declaration=True)
+
+    # Post-process menu-mux files
+    mmux_paths = [os.path.abspath(p) for p in mmux.build_filelist(OUTDIR)]
+    for path in sorted(mmux_paths):
+        log.debug('mmpath: %s', path)
+        mmux.parse(path)
 
     # Apply any relevant patches.
     patches.apply_patches_to_directory(OUTPATH)
