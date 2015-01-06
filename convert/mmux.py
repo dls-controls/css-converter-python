@@ -207,7 +207,8 @@ def build_filelist(basepath):
         Returns:
             iterator over relative filepaths
     """
-    proc = subprocess.Popen("find " + basepath + " | xargs grep -sl " + mmux.MENU_MUX_ID,
+    log.debug("Building menu mux list.")
+    proc = subprocess.Popen("find " + basepath + " -name \"*.opi\" | xargs grep -sl " + mmux.MENU_MUX_ID,
                             stdout=subprocess.PIPE,
                             shell=True)
 
