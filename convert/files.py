@@ -113,5 +113,4 @@ def convert_edl(filename, destination):
     log.debug('Converting %s to %s', filename, destination)
     command = CONVERT_CMD + [filename, destination]
     returncode = subprocess.call(command)
-    utils.make_read_only(destination)
     return returncode
