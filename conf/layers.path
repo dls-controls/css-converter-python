@@ -19,6 +19,9 @@ output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-46/linac/overview.opi
 output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-46/bts/overview.opi
 output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-46/shared/fan_overview.opi
 output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-46/sr/best.opi
+output/dls_sw/prod/R3.14.12.3/support/MPS/3-1/data/MPS-Overview.opi
+output/dls_sw/prod/R3.14.12.3/support/MPS/3-1/data/MPS-CIAtemps.opi
+output/dls_sw/prod/R3.14.12.3/support/MPS/3-1/data/MPS-TunnelTemps.opi
 output/dls_sw/prod/R3.14.11/ioc/IsaPBPM/1-1/opi/pbpm/overview.opi
 output/dls_sw/prod/R3.14.12.3/support/vacuum/3-49/data/diamondVacuumOverview.opi
 output/dls_sw/prod/R3.14.12.3/support/vacuum/3-47/data/diamondVacuumOverview.opi
