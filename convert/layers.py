@@ -84,6 +84,10 @@ def create_new_clicker(node, x, y):
     new_atag.attrib['hook'] = 'true'
     rect.append(new_atag)
 
+    pvtag = node.find('pv_name')
+    if pvtag is not None:
+        rect.append(pvtag)
+
     new_xtag = et.SubElement(rect, 'x')
     xtag = node.find('x')
     new_xtag.text = str(int(xtag.text) + x)
