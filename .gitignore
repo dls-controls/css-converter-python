@@ -4,7 +4,6 @@
 # vim ctags file
 tags
 # datafile directories
-project/opi*
 output/
 tmp/
 edl/
