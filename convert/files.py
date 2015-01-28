@@ -10,12 +10,12 @@ import logging as log
 
 NULL_FILE = open(os.devnull, 'w')
 TMP_DIR = './tmp'
+SYMBOLS_DIR = os.path.join(TMP_DIR, 'symbols')
 # Commands in lists for subprocess
 COLORS_VARIABLE = '-Dedm2xml.colorsFile=res/colors.list'
 SYMBOLS_VARIABLE = '-Dedm2xml.symbolsFile=res/symbols.conf'
 CONVERT_CMD = ['/usr/lib/jvm/jre-1.7.0-oracle.x86_64/bin/java', COLORS_VARIABLE, SYMBOLS_VARIABLE, '-jar', 'res/conv.jar']
 UPDATE_CMD = ['edm', '-convert']
-SYMBOLS_DIR = './tmp/symbols'
 SYMBOL_SCRIPT = os.path.join(os.getcwd(), 'res/auto-symb.sh')
 SYMBOL_TO_PNG_CMD = [SYMBOL_SCRIPT]
 
@@ -26,6 +26,9 @@ def convert_symbol(symbol_file, destinations):
     This uses an external shell script.
     """
     log.debug("Converting symbol %s", symbol_file)
+    if not os.path.exists(SYMBOLS_DIR):
+        os.makedirs(SYMBOLS_DIR)
+
     temp_file = os.path.join(SYMBOLS_DIR, os.path.basename(symbol_file))
     utils.make_writeable(temp_file)
     shutil.copyfile(symbol_file, temp_file)
@@ -82,6 +85,8 @@ def update_edl(filename, in_place=False):
     """
     try:
         if not in_place:
+            if not os.path.exists(TMP_DIR):
+                os.makedirs(TMP_DIR)
             temp_file = os.path.join(TMP_DIR, os.path.basename(filename))
             shutil.copyfile(filename, temp_file)
             filename = temp_file
