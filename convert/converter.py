@@ -138,12 +138,9 @@ class Converter(object):
 
     def _is_symbol(self, filename):
         """
-        Return True if:
-         - the opi file name ends with 'symbol.edl'
-         - the opi file name is included in self.symbol_files
+        Return True if the opi file name is included in self.symbol_files
         """
-        return filename.endswith('symbol.edl') or \
-            os.path.basename(filename) in self.symbol_files
+        return os.path.basename(filename) in self.symbol_files
 
     def _already_converted(self, outdir, file):
         """
