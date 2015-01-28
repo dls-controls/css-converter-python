@@ -118,27 +118,36 @@ def find_groups(filename):
 def compress(filename):
     log.info('Parsing %s', filename)
     groups = find_groups(filename)
+    if len(groups) == 0:
+        raise SymbolError('No groups found in symbols file')
 
     log.info('Found %s symbols.', len(groups))
     x, y, width, height = locate_group(groups[0])
+    log.debug("Width %s; height %s", width, height)
+
+
+    # Get maximum height and width
+    for group in groups:
+        x, y, w, h = locate_group(group)
+        log.debug("Width %s; height %s", w, h)
+        if w != width:
+            log.warn('Symbol widths not consistent')
+            width = max(w, width)
+        if h != height:
+            log.warn('Symbol heights not consistent')
+            height = max(h, height)
+
 
     # We'll later resize to the exact size
     total_height = height
     total_width = width * len(groups)
-
     # Move each group's top left to width*i, 0
     start_x = 0
     moved_groups = []
-
-    try:
-        for group in groups:
-            x, y, w, h = locate_group(group)
-            assert w == width
-            assert h == height
-            moved_groups.append(move_group(group, start_x - x, 0 - y))
-            start_x += width
-    except AssertionError:
-        raise SymbolError('Could not parse EDM symbol file.')
+    for group in groups:
+        x, y, w, h = locate_group(group)
+        moved_groups.append(move_group(group, start_x - x, 0 - y))
+        start_x += width
 
     # Create new file by passing through every line
     i = 0
@@ -189,6 +198,7 @@ if __name__ == '__main__':
         print "Usage: %s <symbol-file>" % sys.argv[0]
         sys.exit()
 
+    log.basicConfig(level=log.DEBUG)
     filename = sys.argv[1]
     try:
         compress(filename)
