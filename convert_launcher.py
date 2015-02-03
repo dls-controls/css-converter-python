@@ -40,7 +40,7 @@ GROUPS_CONF = 'conf/groups.path'
 ESCAPE_CHARS = ['.', ':']
 
 
-def generate_run_script(script_path, project, module_dict):
+def gen_run_script(script_path, project, module_dict):
     '''
     Generate a wrapper script which updates the appropriate
     links before opening a CSS window.
@@ -89,7 +89,20 @@ def get_module_dict(dirs):
     return module_dict
 
 
-def update_cmd(cmd, args, symbols, pp_dict, force):
+def gen_run_cmd(macros, launch_opi):
+    # Add OPI shell macro to those already there
+    macros['OPI_SHELL'] = 'true'
+    macros_strings = []
+    for key, value in macros.iteritems():
+        macros_strings.append('%s=%s' % (key, value))
+    macros_string = ','.join(macros_strings)
+    for c in ESCAPE_CHARS:
+        macros_string = macros_string.replace(c, '[\%d]' % ord(c))
+
+    run_cmd = '"%s %s"' % (launch_opi, macros_string)
+    return run_cmd
+
+def update_cmd(cmd, args):
     '''
     Given a command and arguments from the launcher, determine
     the appropriate command for running CSS.
@@ -98,7 +111,7 @@ def update_cmd(cmd, args, symbols, pp_dict, force):
     Returns:
         - script_path - path to the generated CSS wrapper script
         - launch command - command including any macros
-        - symbols_path - dict with cached symbols for conversion
+        - all_dirs - list of all directories that need conversion
     '''
     log.info("Updating command: %s, %s", cmd, args)
     try:
@@ -125,25 +138,10 @@ def update_cmd(cmd, args, symbols, pp_dict, force):
     module_dict = get_module_dict(all_dirs)
 
     script_path = os.path.join(OUTPATH, os.path.dirname(path_to_run.lstrip('/')), 'runcss.sh')
-    generate_run_script(script_path, project, module_dict)
+    gen_run_script(script_path, project, module_dict)
+    run_cmd = gen_run_cmd(macros, launch_opi)
 
-    symbol_paths = {}
-    try:
-        c = converter.Converter(all_dirs, symbols, OUTPATH, pp_dict)
-        c.convert(force)
-        symbol_paths = c.get_symbol_paths()
-    except OSError as e:
-        log.warn('Exception converting %s: %s', cmd, e)
-
-    # Add OPI shell macro to those already there
-    macros['OPI_SHELL'] = 'true'
-    macros_strings = []
-    for key, value in macros.iteritems():
-        macros_strings.append('%s=%s' % (key, value))
-    macros_string = ','.join(macros_strings)
-    for c in ESCAPE_CHARS:
-        macros_string = macros_string.replace(c, '[\%d]' % ord(c))
-    return script_path, ['"%s %s"' % (launch_opi, macros_string)], symbol_paths
+    return script_path, [run_cmd], all_dirs
 
 
 def get_apps(node):
@@ -239,7 +237,14 @@ def run_conversion(force, convert_symbols):
     symbol_paths = {}
     for name, cmd, args in apps:
         try:
-            new_cmd, new_args, new_symbol_paths = update_cmd(cmd, args.split(), symbols, pp_dict, force)
+            new_cmd, new_args, all_dirs = update_cmd(cmd, args.split())
+            try:
+                c = converter.Converter(all_dirs, symbols, OUTPATH, pp_dict)
+                c.convert(force)
+                new_symbol_paths = c.get_symbol_paths()
+            except OSError as e:
+                log.warn('Exception converting %s: %s', cmd, e)
+
             log.warn('%s gave new command %s %s', cmd, new_cmd, new_args)
             log.warn('%s gave these symbols: %s', cmd, new_symbol_paths)
             symbol_paths = merge_symbol_paths(symbol_paths, new_symbol_paths)
