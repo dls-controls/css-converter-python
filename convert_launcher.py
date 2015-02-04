@@ -16,6 +16,7 @@ LOG_LEVEL = log.DEBUG
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 from convert import converter
+from convert import launcher
 from convert import utils
 from convert import spoof
 from convert import files
@@ -26,8 +27,7 @@ from convert import mmux
 from convert import patches
 from convert import colourtweak
 
-LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
-APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
+APPS_XML = os.path.join(launcher.LAUNCHER_DIR, 'applications.xml')
 OUTDIR = 'output'
 OUTPATH = os.path.abspath(os.path.join(os.path.dirname(__file__), OUTDIR))
 NEW_APPS = os.path.join(OUTPATH, 'css_apps.xml')
@@ -40,7 +40,24 @@ GROUPS_CONF = 'conf/groups.path'
 ESCAPE_CHARS = ['.', ':']
 
 
-def gen_run_script(script_path, project, module_dict):
+def get_module_dict(launcher_cmd):
+    '''
+    Create a mapping from output path to module name.
+    '''
+    module_dict = {}
+    for directory in launcher_cmd.all_dirs:
+        try:
+            module_path, module_name, mversion, _ = utils.parse_module_name(directory)
+            if mversion is None:
+                mversion = ''
+            p = os.path.join(OUTPATH, module_path.lstrip('/'), module_name, mversion)
+            module_dict[p] = module_name
+        except ValueError:
+            continue
+    return module_dict
+
+
+def gen_run_script(launcher_cmd):
     '''
     Generate a wrapper script which updates the appropriate
     links before opening a CSS window.
@@ -48,15 +65,17 @@ def gen_run_script(script_path, project, module_dict):
     Arguments:
         - script_path - the location of the script to write
         - project - the Eclipse project any links are contained by
-        - module_dict - the mapping from module path to its name
+        - all_dirs - all directories that may be referenced from this script
     '''
+    script_path = os.path.join(OUTPATH, os.path.dirname(launcher_cmd.path_to_run.lstrip('/')), 'runcss.sh')
     try:
         os.makedirs(os.path.dirname(script_path))
     except OSError:
         pass
     links_strings = []
+    module_dict = get_module_dict(launcher_cmd)
     for path, m in module_dict.iteritems():
-        links_strings.append('%s=%s' % (path, os.path.join('/', project, m)))
+        links_strings.append('%s=%s' % (path, os.path.join('/', launcher_cmd.project, m)))
     links_string = ',\\\n'.join(links_strings)
     for c in ESCAPE_CHARS:
         links_string = links_string.replace(c, '[\%d]' % ord(c))
@@ -70,78 +89,21 @@ def gen_run_script(script_path, project, module_dict):
     st = os.stat(script_path)
     os.chmod(script_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP)
     log.info('Run script written to %s', script_path)
+    return script_path
 
 
-def get_module_dict(dirs):
-    '''
-    Create a mapping from output path to module name.
-    '''
-    module_dict = {}
-    for directory in dirs:
-        try:
-            module_path, module_name, mversion, _ = utils.parse_module_name(directory)
-            if mversion is None:
-                mversion = ''
-            p = os.path.join(OUTPATH, module_path.lstrip('/'), module_name, mversion)
-            module_dict[p] = module_name
-        except ValueError:
-            continue
-    return module_dict
-
-
-def gen_run_cmd(macros, launch_opi):
+def gen_run_cmd(launcher_cmd):
     # Add OPI shell macro to those already there
-    macros['OPI_SHELL'] = 'true'
+    launcher_cmd.macros['OPI_SHELL'] = 'true'
     macros_strings = []
-    for key, value in macros.iteritems():
+    for key, value in launcher_cmd.macros.iteritems():
         macros_strings.append('%s=%s' % (key, value))
     macros_string = ','.join(macros_strings)
     for c in ESCAPE_CHARS:
         macros_string = macros_string.replace(c, '[\%d]' % ord(c))
 
-    run_cmd = '"%s %s"' % (launch_opi, macros_string)
+    run_cmd = '"%s %s"' % (launcher_cmd.launch_opi, macros_string)
     return run_cmd
-
-def update_cmd(cmd, args):
-    '''
-    Given a command and arguments from the launcher, determine
-    the appropriate command for running CSS.
-    If the command was not an EDM script, raise SpoofError.
-
-    Returns:
-        - script_path - path to the generated CSS wrapper script
-        - launch command - command including any macros
-        - all_dirs - list of all directories that need conversion
-    '''
-    log.info("Updating command: %s, %s", cmd, args)
-    try:
-        all_dirs, module_name, version, file_to_run, macros = utils.interpret_command(cmd, args, LAUNCHER_DIR)
-    except spoof.SpoofError as e:
-        raise e
-
-    path_to_run = paths.full_path(all_dirs, file_to_run)
-    path_to_run = os.path.realpath(path_to_run)
-    if path_to_run.endswith('edl'):
-        path_to_run = path_to_run[:-3] + 'opi'
-    else:
-        path_to_run += '.opi'
-    module_path, module, version, rel_path = utils.parse_module_name(path_to_run)
-    if module != '':
-        # Project name example: LI_TI_5-2 - i.e. replace / with _
-        module_name = '_'.join(module.split('/'))
-        project = '%s_%s' % (module_name, version)
-        launch_opi = os.path.join('/', project, module, rel_path)
-    else:
-        project = os.path.basename(cmd)
-        launch_opi = os.path.join('/', project, os.path.basename(path_to_run))
-
-    module_dict = get_module_dict(all_dirs)
-
-    script_path = os.path.join(OUTPATH, os.path.dirname(path_to_run.lstrip('/')), 'runcss.sh')
-    gen_run_script(script_path, project, module_dict)
-    run_cmd = gen_run_cmd(macros, launch_opi)
-
-    return script_path, [run_cmd], all_dirs
 
 
 def get_apps(node):
@@ -237,18 +199,21 @@ def run_conversion(force, convert_symbols):
     symbol_paths = {}
     for name, cmd, args in apps:
         try:
-            new_cmd, new_args, all_dirs = update_cmd(cmd, args.split())
+            launcher_cmd = launcher.LauncherCommand(cmd, args.split())
+            launcher_cmd.interpret()
+            script_path = gen_run_script(launcher_cmd)
+            run_cmd = gen_run_cmd(launcher_cmd)
             try:
-                c = converter.Converter(all_dirs, symbols, OUTPATH, pp_dict)
+                c = converter.Converter(launcher_cmd.all_dirs, symbols, OUTPATH, pp_dict)
                 c.convert(force)
                 new_symbol_paths = c.get_symbol_paths()
             except OSError as e:
                 log.warn('Exception converting %s: %s', cmd, e)
 
-            log.warn('%s gave new command %s %s', cmd, new_cmd, new_args)
+            log.warn('%s gave new command %s %s', cmd, script_path, run_cmd)
             log.warn('%s gave these symbols: %s', cmd, new_symbol_paths)
             symbol_paths = merge_symbol_paths(symbol_paths, new_symbol_paths)
-            app_dict[(name, cmd, args)] = (new_cmd, new_args)
+            app_dict[(name, cmd, args)] = (script_path, [run_cmd])
         except spoof.SpoofError as e:
             log.warn('Could not understand launcher script %s', cmd)
             log.warn(e)
