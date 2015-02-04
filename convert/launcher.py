@@ -136,9 +136,7 @@ class LauncherCommand(object):
         '''
         log.info("Updating command: %s, %s", self.cmd, self.args)
         all_dirs, module_name, version, file_to_run, macros = utils.interpret_command(self.cmd, self.args, LAUNCHER_DIR)
-
         path_to_run = paths.full_path(all_dirs, file_to_run)
-        path_to_run = os.path.realpath(path_to_run)
         if path_to_run.endswith('edl'):
             path_to_run = path_to_run[:-3] + 'opi'
         else:
