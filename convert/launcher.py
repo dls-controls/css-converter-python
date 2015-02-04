@@ -4,6 +4,7 @@ import logging as log
 import string
 import stat
 
+import spoof
 import paths
 
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
@@ -115,6 +116,20 @@ def gen_run_cmd(launcher_cmd):
     return run_cmd
 
 
+def _get_macros(edm_args):
+    macro_dict = {}
+    try:
+        x_index = edm_args.index('-m')
+        macros_arg = edm_args[x_index + 1]
+        macros = macros_arg.split(',')
+        for macro in macros:
+            key, value = macro.split('=')
+            macro_dict[key] = value
+    except (ValueError, IndexError):
+        pass
+    return macro_dict
+
+
 class LauncherCommand(object):
 
     def __init__(self, cmd, args):
@@ -124,9 +139,10 @@ class LauncherCommand(object):
         self.launch_opi = None
         self.path_to_run = None
         self.project = None
+        self.edl_file = None
+        self.version = None
         self.macros = {}
         self.all_dirs = []
-
 
     def interpret(self):
         '''
@@ -135,8 +151,8 @@ class LauncherCommand(object):
         If the command was not an EDM script, raise SpoofError.
         '''
         log.info("Updating command: %s, %s", self.cmd, self.args)
-        all_dirs, module_name, version, file_to_run, macros = utils.interpret_command(self.cmd, self.args, LAUNCHER_DIR)
-        path_to_run = paths.full_path(all_dirs, file_to_run)
+        self._spoof_command(self.cmd, self.args, LAUNCHER_DIR)
+        path_to_run = paths.full_path(self.all_dirs, self.edl_file)
         if path_to_run.endswith('edl'):
             path_to_run = path_to_run[:-3] + 'opi'
         else:
@@ -152,8 +168,43 @@ class LauncherCommand(object):
             launch_opi = os.path.join('/', project, os.path.basename(path_to_run))
 
         self.launch_opi = launch_opi
-        self.macros = macros
         self.project = project
         self.path_to_run = path_to_run
+
+    def _spoof_command(self, cmd, args, directory):
+        log.info('Launcher command: %s', cmd)
+        if not os.path.isabs(cmd) and cmd in os.listdir(directory):
+            cmd = os.path.join(directory, cmd)
+        log.info('Command corrected to %s', cmd)
+        # Spoof EDM to find EDMDATAFILES and PATH
+        # Index these directories to find which modules
+        # relative paths may be in.
+        edmdatafiles, path_dirs, working_dir, args = spoof.spoof_edm(cmd, args)
+
+        macros = _get_macros(args)
+
+        edl_files = [a for a in args if a.endswith('edl')]
+        edl_file = edl_files[0] if len(edl_files) > 0 else args[-1]
+        try:
+            _, module_name, version, _ = utils.parse_module_name(working_dir)
+        except ValueError:
+            log.warn("Didn't understand script's working directory!")
+            module_name = os.path.basename(cmd)
+            version = None
+
+        module_name = module_name.replace('/', '_')
+
+        if version is None:
+            version = 'no-version'
+
+        all_dirs = edmdatafiles + path_dirs
+        all_dirs.append(working_dir)
+        all_dirs = [os.path.realpath(f) for f in all_dirs if f not in ('', '.')]
+        all_dirs = set(all_dirs)
+
         self.all_dirs = all_dirs
+        self.module_name = module_name
+        self.version = version
+        self.edl_file = edl_file
+        self.macros = macros
 
