@@ -6,9 +6,7 @@ and convert EDM files referenced by each script it finds.
 
 import xml.etree.ElementTree as et
 import os
-import stat
 import sys
-import string
 import collections
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
@@ -20,7 +18,6 @@ from convert import launcher
 from convert import utils
 from convert import spoof
 from convert import files
-from convert import paths
 from convert import layers
 from convert import groups
 from convert import mmux
@@ -31,116 +28,10 @@ APPS_XML = os.path.join(launcher.LAUNCHER_DIR, 'applications.xml')
 OUTDIR = 'output'
 OUTPATH = os.path.abspath(os.path.join(os.path.dirname(__file__), OUTDIR))
 NEW_APPS = os.path.join(OUTPATH, 'css_apps.xml')
-SCRIPT_TEMPLATE = 'res/runcss.template'
 
 SYMBOLS_CONF = 'res/symbols.conf'
 LAYERS_CONF = 'conf/layers.path'
 GROUPS_CONF = 'conf/groups.path'
-
-ESCAPE_CHARS = ['.', ':']
-
-
-def get_module_dict(launcher_cmd):
-    '''
-    Create a mapping from output path to module name.
-    '''
-    module_dict = {}
-    for directory in launcher_cmd.all_dirs:
-        try:
-            module_path, module_name, mversion, _ = utils.parse_module_name(directory)
-            if mversion is None:
-                mversion = ''
-            p = os.path.join(OUTPATH, module_path.lstrip('/'), module_name, mversion)
-            module_dict[p] = module_name
-        except ValueError:
-            continue
-    return module_dict
-
-
-def gen_run_script(launcher_cmd):
-    '''
-    Generate a wrapper script which updates the appropriate
-    links before opening a CSS window.
-
-    Arguments:
-        - script_path - the location of the script to write
-        - project - the Eclipse project any links are contained by
-        - all_dirs - all directories that may be referenced from this script
-    '''
-    script_path = os.path.join(OUTPATH, os.path.dirname(launcher_cmd.path_to_run.lstrip('/')), 'runcss.sh')
-    try:
-        os.makedirs(os.path.dirname(script_path))
-    except OSError:
-        pass
-    links_strings = []
-    module_dict = get_module_dict(launcher_cmd)
-    for path, m in module_dict.iteritems():
-        links_strings.append('%s=%s' % (path, os.path.join('/', launcher_cmd.project, m)))
-    links_string = ',\\\n'.join(links_strings)
-    for c in ESCAPE_CHARS:
-        links_string = links_string.replace(c, '[\%d]' % ord(c))
-    with open(script_path, 'w') as f:
-        with open(SCRIPT_TEMPLATE) as template:
-            content = template.read()
-            s = string.Template(content)
-            updated_content = s.substitute(links=links_string)
-            f.write(updated_content)
-    # Give owner and group execute permissions.
-    st = os.stat(script_path)
-    os.chmod(script_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP)
-    log.info('Run script written to %s', script_path)
-    return script_path
-
-
-def gen_run_cmd(launcher_cmd):
-    # Add OPI shell macro to those already there
-    launcher_cmd.macros['OPI_SHELL'] = 'true'
-    macros_strings = []
-    for key, value in launcher_cmd.macros.iteritems():
-        macros_strings.append('%s=%s' % (key, value))
-    macros_string = ','.join(macros_strings)
-    for c in ESCAPE_CHARS:
-        macros_string = macros_string.replace(c, '[\%d]' % ord(c))
-
-    run_cmd = '"%s %s"' % (launcher_cmd.launch_opi, macros_string)
-    return run_cmd
-
-
-def get_apps(node):
-    '''
-    Recursively retrieve all commands and arguments from the specified
-    node in the launcher XML file.
-
-    Return a list of tuples (name, cmd, args).
-    '''
-    apps = []
-    if node.tag == 'button':
-        name = node.get('text')
-        cmd = node.get('command')
-        args = node.get('args', default="")
-        apps.append((name, cmd, args))
-    else:
-        for child in node:
-            apps.extend(get_apps(child))
-    return apps
-
-
-def update_xml(node, apps_dict):
-    '''
-    Given updated commands in apps_dict, recursively update the
-    launcher XML file.
-    '''
-    if node.tag == 'button':
-        name = node.get('text')
-        cmd = node.get('command')
-        args = node.get('args', default="")
-        if (name, cmd, args) in apps_dict:
-            new_cmd, new_args = apps_dict[(name, cmd, args)]
-            node.set('command', new_cmd)
-            node.set('args', ' '.join(new_args))
-    else:
-        for child in node:
-            update_xml(child, apps_dict)
 
 
 def merge_symbol_paths(paths_dict1, paths_dict2):
@@ -181,28 +72,15 @@ def get_pp_paths():
     return pp_dict
 
 
-def run_conversion(force, convert_symbols):
-    '''
-    Iterate over the launcher XML file and fetch each command.
-    Convert files referenced by EDM scripts.
-    If the command is an EDM script, update XML with new command.
-    '''
-    tree = et.parse(APPS_XML)
-    root = tree.getroot()
-
-    apps = get_apps(root)
-    pp_dict = get_pp_paths()
+def convert_apps(apps, symbols, pp_dict):
     app_dict = {}
-
-    symbols = utils.read_symbols_file(SYMBOLS_CONF)
-    log.info('Symbols found: %s', symbols)
     symbol_paths = {}
     for name, cmd, args in apps:
         try:
             launcher_cmd = launcher.LauncherCommand(cmd, args.split())
             launcher_cmd.interpret()
-            script_path = gen_run_script(launcher_cmd)
-            run_cmd = gen_run_cmd(launcher_cmd)
+            script_path = launcher.gen_run_script(launcher_cmd, OUTPATH)
+            run_cmd = launcher.gen_run_cmd(launcher_cmd)
             try:
                 c = converter.Converter(launcher_cmd.all_dirs, symbols, OUTPATH, pp_dict)
                 c.convert(force)
@@ -210,9 +88,9 @@ def run_conversion(force, convert_symbols):
             except OSError as e:
                 log.warn('Exception converting %s: %s', cmd, e)
 
+            symbol_paths = merge_symbol_paths(symbol_paths, new_symbol_paths)
             log.warn('%s gave new command %s %s', cmd, script_path, run_cmd)
             log.warn('%s gave these symbols: %s', cmd, new_symbol_paths)
-            symbol_paths = merge_symbol_paths(symbol_paths, new_symbol_paths)
             app_dict[(name, cmd, args)] = (script_path, [run_cmd])
         except spoof.SpoofError as e:
             log.warn('Could not understand launcher script %s', cmd)
@@ -223,8 +101,28 @@ def run_conversion(force, convert_symbols):
             log.fatal('Unexpected exception: %s', type(e))
             continue
 
+    return app_dict, symbol_paths
+
+
+def run_conversion(force, convert_symbols):
+    '''
+    Iterate over the launcher XML file and fetch each command.
+    Convert files referenced by EDM scripts.
+    If the command is an EDM script, update XML with new command.
+    '''
+    tree = et.parse(APPS_XML)
+    root = tree.getroot()
+
+    apps = launcher.get_apps(root)
+    pp_dict = get_pp_paths()
+
+    symbols = utils.read_symbols_file(SYMBOLS_CONF)
+    log.info('Symbols found: %s', symbols)
+
+    # Convert each application from the launcher.
+    app_dict, symbol_paths = convert_apps(apps, symbols, pp_dict)
     # Update applications.xml and write out to a new file.
-    update_xml(root, app_dict)
+    launcher.update_xml(root, app_dict)
     tree.write(NEW_APPS, encoding='utf-8', xml_declaration=True)
 
     # Post-process menu-mux files
