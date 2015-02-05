@@ -47,3 +47,5 @@ output/dls_sw/prod/R3.14.12.3/support/pss/9-16/data/pss_main.opi
 output/dls_sw/prod/R3.14.12.3/support/pss/9-16/data/pss_minor.opi
 output/dls_sw/prod/R3.14.12.3/support/pss/9-17/data/pss_main.opi
 output/dls_sw/prod/R3.14.12.3/support/pss/9-17/data/pss_minor.opi
+output/home/ops/scripts/svn/ops/edl/FE-control/FE_Control.opi
+output/home/ops/scripts/svn/ops/edl/ID-control/ID_Control.opi
