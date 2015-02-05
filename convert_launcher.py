@@ -72,7 +72,7 @@ def get_pp_paths():
     return pp_dict
 
 
-def convert_apps(apps, symbols, pp_dict):
+def convert_apps(apps, symbols, pp_dict, force):
     app_dict = {}
     symbol_paths = {}
     for name, cmd, args in apps:
@@ -120,7 +120,7 @@ def run_conversion(force, convert_symbols):
     log.info('Symbols found: %s', symbols)
 
     # Convert each application from the launcher.
-    app_dict, symbol_paths = convert_apps(apps, symbols, pp_dict)
+    app_dict, symbol_paths = convert_apps(apps, symbols, pp_dict, force)
     # Update applications.xml and write out to a new file.
     launcher.update_xml(root, app_dict)
     tree.write(NEW_APPS, encoding='utf-8', xml_declaration=True)
