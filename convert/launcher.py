@@ -115,20 +115,6 @@ def gen_run_cmd(launcher_cmd):
     return run_cmd
 
 
-def _get_macros(edm_args):
-    macro_dict = {}
-    try:
-        x_index = edm_args.index('-m')
-        macros_arg = edm_args[x_index + 1]
-        macros = macros_arg.split(',')
-        for macro in macros:
-            key, value = macro.split('=')
-            macro_dict[key] = value
-    except (ValueError, IndexError):
-        pass
-    return macro_dict
-
-
 class LauncherCommand(object):
 
     def __init__(self, cmd, args):
@@ -180,7 +166,7 @@ class LauncherCommand(object):
         # relative paths may be in.
         edmdatafiles, path_dirs, working_dir, args = spoof.spoof_edm(cmd, args)
 
-        macros = _get_macros(args)
+        self._get_macros(args)
 
         edl_files = [a for a in args if a.endswith('edl')]
         edl_file = edl_files[0] if len(edl_files) > 0 else args[-1]
@@ -205,5 +191,18 @@ class LauncherCommand(object):
         self.module_name = module_name
         self.version = version
         self.edl_file = edl_file
-        self.macros = macros
+
+    def _get_macros(self, edm_args):
+        macro_dict = {}
+        try:
+            x_index = edm_args.index('-m')
+            macros_arg = edm_args[x_index + 1]
+            macros = macros_arg.split(',')
+            for macro in macros:
+                key, value = macro.split('=')
+                macro_dict[key] = value
+        except (ValueError, IndexError):
+            pass
+
+        self.macros = macro_dict
 
