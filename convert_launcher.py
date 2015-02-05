@@ -10,7 +10,7 @@ import sys
 import collections
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
-LOG_LEVEL = log.DEBUG
+LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 from convert import converter
@@ -46,8 +46,8 @@ def merge_symbol_paths(paths_dict1, paths_dict2):
 def process_symbol_files(symbol_paths, convert_symbols):
     input = "y" if convert_symbols else ""
     while input.lower() not in ('y', 'n'):
-        log.warn('About to process %s symbol files.', len(symbol_paths))
-        log.warn('Press y to continue, n to quit')
+        print('About to process %s symbol files.' % len(symbol_paths))
+        print('Press y to continue, n to quit')
         input = raw_input()
     if input.lower() == 'y':
         log.info('Post-processing %s symbol files', len(symbol_paths))
@@ -89,8 +89,8 @@ def convert_apps(apps, symbols, pp_dict, force):
                 log.warn('Exception converting %s: %s', cmd, e)
 
             symbol_paths = merge_symbol_paths(symbol_paths, new_symbol_paths)
-            log.warn('%s gave new command %s %s', cmd, script_path, run_cmd)
-            log.warn('%s gave these symbols: %s', cmd, new_symbol_paths)
+            log.info('%s gave new command %s %s', cmd, script_path, run_cmd)
+            log.debug('%s gave these symbols: %s', cmd, new_symbol_paths)
             app_dict[(name, cmd, args)] = (script_path, [run_cmd])
         except spoof.SpoofError as e:
             log.warn('Could not understand launcher script %s', cmd)

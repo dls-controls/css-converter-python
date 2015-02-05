@@ -73,15 +73,14 @@ def gen_run_script(launcher_cmd, root_dir):
     links before opening a CSS window.
 
     Arguments:
-        - script_path - the location of the script to write
-        - project - the Eclipse project any links are contained by
-        - all_dirs - all directories that may be referenced from this script
+        - launcher_cmd - the object containing info about the command
+        - root_dir - the root of the output directory
     '''
-    script_path = os.path.join(root_dir, os.path.dirname(launcher_cmd.path_to_run.lstrip('/')), 'runcss.sh')
-    try:
-        os.makedirs(os.path.dirname(script_path))
-    except OSError:
-        pass
+    rel_dir = os.path.dirname(launcher_cmd.path_to_run.lstrip('/'))
+    script_dir = os.path.join(root_dir, rel_dir)
+    if not os.path.exists(script_dir):
+        os.makedirs(script_dir)
+    script_path = os.path.join(script_dir, 'runcss.sh')
     links_strings = []
     module_dict = get_module_dict(launcher_cmd, root_dir)
     for path, m in module_dict.iteritems():
