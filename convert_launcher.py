@@ -24,6 +24,7 @@ from convert import layers
 from convert import groups
 from convert import mmux
 from convert import patches
+from convert import colourtweak
 
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 APPS_XML = os.path.join(LAUNCHER_DIR, 'applications.xml')
@@ -264,6 +265,12 @@ def run_conversion(force, convert_symbols):
 
     # Apply any relevant patches.
     patches.apply_patches_to_directory(OUTPATH)
+
+    # Now change all the colours
+    colourtweak_paths = [os.path.abspath(p) for p in colourtweak.build_filelist(OUTDIR)]
+    for path in sorted(colourtweak_paths):
+        log.debug('colourtweakpath: %s', path)
+        colourtweak.parse(path)    
 
     # Process symbol files at end.
     if symbol_paths:
