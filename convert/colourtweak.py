@@ -283,8 +283,10 @@ def build_filelist(basepath):
             iterator over relative filepaths
     """
     log.debug("Building colourtweak list.")
+    files = []
     for dirpath, dirnames, filenames in os.walk(basepath):
         for filename in filenames:
             if filename.endswith(".opi"):
-                return os.path.join(dirpath, filename)
+                files.append(os.path.join(dirpath, filename))
 
+    return files
