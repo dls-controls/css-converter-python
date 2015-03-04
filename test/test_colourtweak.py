@@ -57,6 +57,56 @@ DISPLAY_TWK = """<display typeId="org.csstudio.opibuilder.Display" version="1.0"
   <grid_space>5</grid_space>
 </display>"""
 
+DISPLAY_ANON_COLOUR = """<display typeId="org.csstudio.opibuilder.Display" version="1.0">
+  <x>97</x>
+  <y>277</y>
+  <width>1305</width>
+  <height>500</height>
+  <font>
+    <fontdata fontName="arial" height="12" style="0" />
+  </font>
+  <foreground_color>
+    <color blue="0" green="0" name="Black" red="0" />
+  </foreground_color>
+  <background_color>
+    <color blue="200" green="200" red="200" />
+    <color blue="1" green="200" name="LINAC Canvas" red="200" />
+    <color blue="2" green="200" name="FE Canvas" red="200" />
+    <color blue="3" green="200" name="RING Canvas" red="200" />
+    <color blue="4" green="200" name="TARGET Canvas" red="200" />
+    <color blue="5" green="200" name="CF Canvas" red="200" />
+    <color blue="6" green="200" name="UNMS Canvas" red="200" />
+  </background_color>
+  <name>Six Circle Diffractometer Control - $(device)</name>
+  <show_grid>true</show_grid>
+  <grid_space>5</grid_space>
+</display>"""
+
+DISPLAY_ANON_COLOUR_TWK = """<display typeId="org.csstudio.opibuilder.Display" version="1.0">
+  <x>97</x>
+  <y>277</y>
+  <width>1305</width>
+  <height>500</height>
+  <font>
+    <fontdata fontName="arial" height="12" style="0" />
+  </font>
+  <foreground_color>
+    <color blue="0" green="0" name="Black" red="0" />
+  </foreground_color>
+  <background_color>
+    <color blue="200" green="200" red="200" />
+    <color blue="200" green="200" name="Canvas" red="200" />
+    <color blue="200" green="200" name="Canvas" red="200" />
+    <color blue="200" green="200" name="Canvas" red="200" />
+    <color blue="200" green="200" name="Canvas" red="200" />
+    <color blue="200" green="200" name="Canvas" red="200" />
+    <color blue="200" green="200" name="Canvas" red="200" />
+  </background_color>
+  <name>Six Circle Diffractometer Control - $(device)</name>
+  <show_grid>true</show_grid>
+  <grid_space>5</grid_space>
+</display>"""
+
 LABEL = """<widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0">
     <border_alarm_sensitive>false</border_alarm_sensitive>
     <x>35</x>
@@ -703,6 +753,7 @@ MISC_COLOURS_TWK = """<widget typeId="org.csstudio.opibuilder.widgets.Unknown" v
     </foreground_color>
 </widget>"""
 
+
 class ColourChangeTest(unittest.TestCase):
     def assertStringsEqual(self, first, second, msg=None):
         """Assert that two multi-line strings are equal.
@@ -726,6 +777,9 @@ class ColourChangeTest(unittest.TestCase):
     def test_change_colours_label(self):
         self.assertStringsEqual(self.do_colourtweak(LABEL), LABEL_TWK)
 
+    def test_anon_colour(self):
+        self.assertStringsEqual(self.do_colourtweak(DISPLAY_ANON_COLOUR),
+                                DISPLAY_ANON_COLOUR_TWK)
     def test_change_colours_action_button(self):
         self.assertStringsEqual(self.do_colourtweak(ACTIONBUTTON), ACTIONBUTTON_TWK)
 

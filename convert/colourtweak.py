@@ -210,6 +210,8 @@ def change_colours(widget):
     for colour in widget.findall(".//color"):
         # Map colours
         name = colour.get("name")
+        if name is None:
+            continue
         prop = colour_prop[colour]
         # Role specific overrides
         if name.split()[-1].lower() == "canvas" and typeId in textStatic + [DISPLAY] and prop == "background_color":
@@ -258,19 +260,22 @@ def change_colours(widget):
             colour.attrib.pop("name")
 
 def parse(filepath):
-    if os.path.exists(filepath) or os.access(filepath, os.R_OK):
-        tree = ET.parse(filepath)
-        root = tree.getroot()
-        
-        for widget in root.findall(".//widget"):            
-            change_colours(widget)
+    try:
+        if os.path.exists(filepath) or os.access(filepath, os.R_OK):
+            tree = ET.parse(filepath)
+            root = tree.getroot()
 
-        # write the new tree out to the same file
-        make_writeable(filepath)
-        tree.write(filepath, encoding='utf-8', xml_declaration=True)
-        make_read_only(filepath)
-    else:
-        log.warn("Skipping %s, file not found", filepath)
+            for widget in root.findall(".//widget"):
+                change_colours(widget)
+
+            # write the new tree out to the same file
+            make_writeable(filepath)
+            tree.write(filepath, encoding='utf-8', xml_declaration=True)
+            make_read_only(filepath)
+        else:
+            log.warn("Skipping %s, file not found", filepath)
+    except ET.ParseError:
+        log.warn("Skipping %s, XML invalid", filepath)
 
 
 def build_filelist(basepath):
@@ -283,8 +288,10 @@ def build_filelist(basepath):
             iterator over relative filepaths
     """
     log.debug("Building colourtweak list.")
+    files = []
     for dirpath, dirnames, filenames in os.walk(basepath):
         for filename in filenames:
             if filename.endswith(".opi"):
-                return os.path.join(dirpath, filename)
+                files.append(os.path.join(dirpath, filename))
 
+    return files
