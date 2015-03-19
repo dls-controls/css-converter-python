@@ -84,7 +84,8 @@ def gen_run_script(launcher_cmd, root_dir):
     links_strings = []
     module_dict = get_module_dict(launcher_cmd, root_dir)
     for path, m in module_dict.iteritems():
-        links_strings.append('%s=%s' % (path, os.path.join('/', launcher_cmd.project, m)))
+        links_strings.append('%s=%s' %
+                             (path, os.path.join('/', launcher_cmd.project, m)))
     links_string = ',\\\n'.join(links_strings)
     for c in ESCAPE_CHARS:
         links_string = links_string.replace(c, '[\%d]' % ord(c))
@@ -113,6 +114,21 @@ def gen_run_cmd(launcher_cmd):
 
     run_cmd = '"%s %s"' % (launcher_cmd.launch_opi, macros_string)
     return run_cmd
+
+
+def _get_macros(edm_args):
+    macro_dict = {}
+    try:
+        x_index = edm_args.index('-m')
+        macros_arg = edm_args[x_index + 1]
+        macros = macros_arg.split(',')
+        for macro in macros:
+            key, value = macro.split('=')
+            macro_dict[key] = value
+    except (ValueError, IndexError):
+        pass
+
+    return macro_dict
 
 
 class LauncherCommand(object):
@@ -166,7 +182,7 @@ class LauncherCommand(object):
         # relative paths may be in.
         edmdatafiles, path_dirs, working_dir, args = spoof.spoof_edm(cmd, args)
 
-        self._get_macros(args)
+        self.macros = _get_macros(args)
 
         edl_files = [a for a in args if a.endswith('edl')]
         edl_file = edl_files[0] if len(edl_files) > 0 else args[-1]
@@ -191,18 +207,4 @@ class LauncherCommand(object):
         self.module_name = module_name
         self.version = version
         self.edl_file = edl_file
-
-    def _get_macros(self, edm_args):
-        macro_dict = {}
-        try:
-            x_index = edm_args.index('-m')
-            macros_arg = edm_args[x_index + 1]
-            macros = macros_arg.split(',')
-            for macro in macros:
-                key, value = macro.split('=')
-                macro_dict[key] = value
-        except (ValueError, IndexError):
-            pass
-
-        self.macros = macro_dict
 
