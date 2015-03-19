@@ -28,7 +28,7 @@ import files
 import os
 import glob
 import shutil
-import string
+import collections
 
 import logging as log
 
@@ -69,7 +69,7 @@ class Converter(object):
 
         self._post_process_functions = pp_functions
         self.symbol_files = symbol_files
-        self.symbol_dict = {}
+        self.symbol_dict = collections.defaultdict(set)
 
         self.root_outdir = os.path.realpath(root_outdir)
 
@@ -164,8 +164,8 @@ class Converter(object):
         file.
         """
         log.debug('Post processing %s', destination)
-        for pp_fn, paths in self._post_process_functions.iteritems():
-            if destination in paths:
+        for pp_fn, pp_paths in self._post_process_functions.iteritems():
+            if destination in pp_paths:
                 pp_fn(destination)
 
     def _convert_one_file(self, full_path, outdir, force, depth):
@@ -184,7 +184,7 @@ class Converter(object):
                 # symbols are not converted here; conversion is postponed
                 # until the end of the script to reduce focus-grabbing
                 # machine distruption
-                store_symbol(full_path, destination, self.symbol_dict)
+                self.symbol_dict[full_path].add(destination)
                 log.info('Successfully stored symbol file %s', destination)
             else:
                 returncode = files.convert_edl(full_path, destination)
@@ -246,24 +246,4 @@ class Converter(object):
         module = filepath.split('/')[1]
         log.debug('Module for path %s is %s', filepath, module)
         paths.update_opi_file(filepath, depth, self.file_index, module)
-
-
-# helper functions
-def store_symbol(source, destination, symbol_dictionary):
-    """ Build a global dictionary of {fullname:<destinations>}
-        for symbol files needing conversion.
-
-        If the passed source file is not in the dictionary it is added.
-        If the passed source file is already in the dictionary the destination
-        is added to the set, provided it is not already there.
-
-        Arguments:
-            source -> full path to file to be converted
-            destination -> full path to output file
-    """
-    log.debug("Adding %s: %s to symbol dictionary", source, destination)
-    if source in symbol_dictionary:
-        symbol_dictionary[source].add(destination)
-    else:
-        symbol_dictionary[source] = set([destination])
 

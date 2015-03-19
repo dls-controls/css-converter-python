@@ -33,15 +33,6 @@ LAYERS_CONF = 'conf/layers.path'
 GROUPS_CONF = 'conf/groups.path'
 
 
-def merge_symbol_paths(paths_dict1, paths_dict2):
-    for symbol in paths_dict1:
-        if symbol in paths_dict2:
-            paths_dict2[symbol].update(paths_dict1[symbol])
-        else:
-            paths_dict2[symbol] = paths_dict1[symbol]
-    return paths_dict2
-
-
 def process_symbol_files(symbol_paths, convert_symbols):
     input = "y" if convert_symbols else ""
     while input.lower() not in ('y', 'n'):
@@ -64,16 +55,18 @@ def process_symbol_files(symbol_paths, convert_symbols):
 
 
 def get_pp_paths():
-    layers_paths = [os.path.abspath(p) for p in utils.read_conf_file(LAYERS_CONF)]
-    group_paths = [os.path.abspath(p) for p in utils.read_conf_file(GROUPS_CONF)]
+    layers_paths = [os.path.abspath(p)
+                    for p in utils.read_conf_file(LAYERS_CONF)]
+    group_paths = [os.path.abspath(p)
+                   for p in utils.read_conf_file(GROUPS_CONF)]
     pp_dict = collections.OrderedDict({layers.parse: layers_paths,
-                groups.parse: group_paths})
+                                      groups.parse: group_paths})
     return pp_dict
 
 
 def convert_apps(cmds, symbols, pp_dict, force):
     cmd_dict = {}
-    symbol_paths = {}
+    symbol_paths = collections.defaultdict(set)
     for cmd in cmds:
         try:
             cmd.interpret()
@@ -87,7 +80,10 @@ def convert_apps(cmds, symbols, pp_dict, force):
             except OSError as e:
                 log.warn('Exception converting %s: %s', cmd, e)
 
-            symbol_paths = merge_symbol_paths(symbol_paths, new_symbol_paths)
+            # merge the two defaultdicts
+            for symbol in new_symbol_paths:
+                symbol_paths[symbol].update(new_symbol_paths[symbol])
+
             log.info('%s gave new command %s %s', cmd, script_path, run_cmd)
             log.debug('%s gave these symbols: %s', cmd, new_symbol_paths)
             cmd_dict[cmd] = (script_path, [run_cmd])

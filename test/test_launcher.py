@@ -1,4 +1,4 @@
-from convert.launcher import _get_macros
+from convert.launcher import _get_macros, LauncherCommand
 import unittest
 
 
@@ -24,6 +24,22 @@ class LauncherTest(unittest.TestCase):
         macros = _get_macros(args)
         self.assertEquals(macros, {})
 
+
+class LauncherCommandTest(unittest.TestCase):
+
+    def test_cmds_compare_equal(self):
+        cmd1 = LauncherCommand("a", "b", "c")
+        cmd2 = LauncherCommand("a", "b", "c")
+        self.assertEqual(cmd1, cmd2)
+
+    def test_cmds_hash_equal(self):
+        cmd1 = LauncherCommand("a", "b", "c")
+        cmd2 = LauncherCommand("a", "b", "c")
+        d = {}
+        d[cmd1] = "a"
+        d[cmd2] = "b"
+        self.assertEqual(d[cmd1], "b")
+        self.assertEqual(len(d), 1)
 
 if __name__ == '__main__':
     unittest.main()

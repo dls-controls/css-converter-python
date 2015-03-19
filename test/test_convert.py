@@ -1,35 +1,7 @@
 
-from convert.converter import store_symbol, Converter
+from convert.converter import Converter
 import unittest
 import mock
-
-
-class SymbolDictionaryTest(unittest.TestCase):
-
-    def test_stores_new_path_dest_in_empty_dictionary(self):
-        symbol_dict = {}
-        store_symbol("path", "dest", symbol_dict)
-        self.assertTrue(symbol_dict.has_key("path"))
-        self.assertEqual(symbol_dict["path"], set(["dest"]))
-
-    def test_adds_new_path_dest_in_non_empty_dictionary(self):
-        symbol_dict = {"oldkey": set(["oldval"])}
-        store_symbol("path", "dest", symbol_dict)
-
-        self.assertDictEqual({"oldkey": set(["oldval"]), "path": set(["dest"])},
-                             symbol_dict)
-
-    def test_does_not_store_duplicate_if_same_path_dest(self):
-        symbol_dict = {"path": set(["dest"])}
-        store_symbol("path", "dest", symbol_dict)
-
-        self.assertDictEqual({"path": set(["dest"])}, symbol_dict)
-
-    def test_does_append_new_dest_for_existing_key(self):
-        symbol_dict = {"path": set(["dest"])}
-        store_symbol("path", "new_dest", symbol_dict)
-
-        self.assertDictEqual({"path": set(["dest", "new_dest"])}, symbol_dict)
 
 
 class DepthTest(unittest.TestCase):

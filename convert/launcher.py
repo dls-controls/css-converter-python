@@ -76,7 +76,7 @@ class LauncherXml(object):
             name = node.get('text')
             command = node.get('command')
             args = node.get('args', default="")
-            cmd = LauncherCommand(name, command, args)
+            cmd = LauncherCommand(name, command, args.split())
             if cmd in cmd_dict:
                 new_cmd, new_args = cmd_dict[cmd]
                 node.set('command', new_cmd)
@@ -104,6 +104,9 @@ class LauncherCommand(object):
     def __eq__(self, other):
         return (self.name == other.name and self.cmd == other.cmd
                 and self.args == other.args)
+
+    def __hash__(self):
+        return 3*hash(self.name) * 5*hash(self.cmd) % 7*hash(tuple(self.args))
 
     def interpret(self):
         '''
