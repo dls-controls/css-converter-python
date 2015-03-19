@@ -8,7 +8,7 @@ NO_MMUX = r'<display typeId="org.csstudio.opibuilder.Display" version="1.0">' \
           r' </display>'
 
 ONE_MMUX_ONE_SET = r'<display typeId="org.csstudio.opibuilder.Display" version="1.0">' \
-                   r'<widget typeId="org.csstudio.opibuilder.widgets.edm.muxmenu" version="1.0">' \
+                   r'<widget typeId="org.csstudio.opibuilder.widgets.edm.menumux" version="1.0">' \
                    r'<border_alarm_sensitive>false</border_alarm_sensitive> ' \
                    r'<x>416</x> <y>648</y> <width>97</width> <height>25</height> ' \
                    r'<foreground_color> <color blue="0" green="0" name="Black" red="0" /> </foreground_color> ' \
@@ -23,7 +23,7 @@ ONE_MMUX_ONE_SET = r'<display typeId="org.csstudio.opibuilder.Display" version="
                    r' </display>'
 
 ONE_MMUX_TWO_SET = r'<display typeId="org.csstudio.opibuilder.Display" version="1.0"> ' \
-                   r'<widget typeId="org.csstudio.opibuilder.widgets.edm.muxmenu" version="1.0">' \
+                   r'<widget typeId="org.csstudio.opibuilder.widgets.edm.menumux" version="1.0">' \
                    r'<border_alarm_sensitive>false</border_alarm_sensitive> ' \
                    r'<x>416</x> <y>648</y> <width>97</width> <height>25</height> ' \
                    r'<foreground_color> <color blue="0" green="0" name="Black" red="0" /> </foreground_color> ' \
@@ -39,7 +39,7 @@ ONE_MMUX_TWO_SET = r'<display typeId="org.csstudio.opibuilder.Display" version="
                    r'</display>'
 
 TWO_MMUX_ONE_SET = r'<display typeId="org.csstudio.opibuilder.Display" version="1.0"> ' \
-                   r'<widget typeId="org.csstudio.opibuilder.widgets.edm.muxmenu" version="1.0">' \
+                   r'<widget typeId="org.csstudio.opibuilder.widgets.edm.menumux" version="1.0">' \
                    r'<border_alarm_sensitive>false</border_alarm_sensitive> ' \
                    r'<x>416</x> <y>648</y> <width>97</width> <height>25</height> ' \
                    r'<foreground_color> <color blue="0" green="0" name="Black" red="0" /> </foreground_color> ' \
@@ -51,7 +51,7 @@ TWO_MMUX_ONE_SET = r'<display typeId="org.csstudio.opibuilder.Display" version="
                    r'<values0> <s>val01</s> <s>val02</s> </values0> ' \
                    r'<num_sets>1</num_sets> ' \
                    r'</widget> ' \
-                   r'<widget typeId="org.csstudio.opibuilder.widgets.edm.muxmenu" version="1.0">' \
+                   r'<widget typeId="org.csstudio.opibuilder.widgets.edm.menumux" version="1.0">' \
                    r'<border_alarm_sensitive>false</border_alarm_sensitive> ' \
                    r'<x>416</x> <y>648</y> <width>97</width> <height>25</height> ' \
                    r'<foreground_color> <color blue="0" green="0" name="Black" red="0" /> </foreground_color> ' \
