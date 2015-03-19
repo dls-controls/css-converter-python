@@ -36,13 +36,6 @@ OPI_EXT = 'opi'
 EDL_EXT = 'edl'
 
 
-class ConfigurationError(Exception):
-    """ Customer exception to be raised in there is a config-file parse
-        error
-    """
-    pass
-
-
 class Converter(object):
     """
     Given a script used to start EDM, deduce the directories needed
