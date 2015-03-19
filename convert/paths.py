@@ -183,8 +183,16 @@ def update_opi_file(path, depth, file_index, module):
 
 
 def full_path(dirs, relative_path):
+    """
+    If the combination of one of the dirs and the relative path
+    corresponds to an existing file, return the combined path
+    of the first match.
+    Otherwise raise ValueError.
+    """
+    log.debug('Locating %s in directories %s', relative_path, dirs)
     for directory in dirs:
         full_path = os.path.join(directory, relative_path)
         if os.path.exists(full_path):
-            return full_path
-    return None
+            return os.path.realpath(full_path)
+
+    raise ValueError('Relative path %s not found in EDMDATAFILES' % relative_path)
