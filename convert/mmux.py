@@ -183,17 +183,18 @@ def parse(filepath):
         root = tree.getroot()
 
         mm_symbols = find_mm_symbols(root)
-        log.info('There are %s mm_symbols:', len(mm_symbols))
-        log.info('%s', mm_symbols)
+        if mm_symbols:
+            log.info('There are %s mm_symbols:', len(mm_symbols))
+            log.info('%s', mm_symbols)
 
-        warning = replace_symbols(root, mm_symbols)
-        if warning:
-            log.warn(">>> Manual post-processing required: '%s' contains Label with PV-value text <<<", filepath)
+            warning = replace_symbols(root, mm_symbols)
+            if warning:
+                log.warn(">>> Manual post-processing required: '%s' contains Label with PV-value text <<<", filepath)
 
-        # write the new tree out to the same file
-        make_writeable(filepath)
-        tree.write(filepath, encoding='utf-8', xml_declaration=True)
-        make_read_only(filepath)
+            # write the new tree out to the same file
+            make_writeable(filepath)
+            tree.write(filepath, encoding='utf-8', xml_declaration=True)
+            make_read_only(filepath)
     else:
         log.warn("Skipping %s, file not found", filepath)
 
