@@ -3,6 +3,7 @@ import utils
 import logging as log
 import string
 import stat
+import xml.etree.ElementTree as et
 
 import spoof
 import paths
@@ -13,114 +14,11 @@ SCRIPT_TEMPLATE = 'res/runcss.template'
 ESCAPE_CHARS = ['.', ':']
 
 
-def get_apps(node):
-    '''
-    Recursively retrieve all commands and arguments from the specified
-    node in the launcher XML file.
-
-    Return a list of tuples (name, cmd, args).
-    '''
-    apps = []
-    if node.tag == 'button':
-        name = node.get('text')
-        cmd = node.get('command')
-        args = node.get('args', default="")
-        apps.append((name, cmd, args))
-    else:
-        for child in node:
-            apps.extend(get_apps(child))
-    return apps
-
-
-def update_xml(node, apps_dict):
-    '''
-    Given updated commands in apps_dict, recursively update the
-    launcher XML file.
-    '''
-    if node.tag == 'button':
-        name = node.get('text')
-        cmd = node.get('command')
-        args = node.get('args', default="")
-        if (name, cmd, args) in apps_dict:
-            new_cmd, new_args = apps_dict[(name, cmd, args)]
-            node.set('command', new_cmd)
-            node.set('args', ' '.join(new_args))
-    else:
-        for child in node:
-            update_xml(child, apps_dict)
-
-
-def get_module_dict(launcher_cmd, root_dir):
-    '''
-    Create a mapping from output path to module name.
-    '''
-    module_dict = {}
-    for directory in launcher_cmd.all_dirs:
-        try:
-            module_path, module_name, mversion, _ = utils.parse_module_name(directory)
-            if mversion is None:
-                mversion = ''
-            p = os.path.join(root_dir, module_path.lstrip('/'), module_name, mversion)
-            module_dict[p] = module_name
-        except ValueError:
-            continue
-    return module_dict
-
-
-def gen_run_script(launcher_cmd, root_dir):
-    '''
-    Generate a wrapper script which updates the appropriate
-    links before opening a CSS window.
-
-    Arguments:
-        - launcher_cmd - the object containing info about the command
-        - root_dir - the root of the output directory
-    '''
-    rel_dir = os.path.dirname(launcher_cmd.path_to_run.lstrip('/'))
-    script_dir = os.path.join(root_dir, rel_dir)
-    if not os.path.exists(script_dir):
-        os.makedirs(script_dir)
-    script_path = os.path.join(script_dir, 'runcss.sh')
-    links_strings = []
-    module_dict = get_module_dict(launcher_cmd, root_dir)
-    for path, m in module_dict.iteritems():
-        links_strings.append('%s=%s' %
-                             (path, os.path.join('/', launcher_cmd.project, m)))
-    links_string = ',\\\n'.join(links_strings)
-    for c in ESCAPE_CHARS:
-        links_string = links_string.replace(c, '[\%d]' % ord(c))
-    with open(script_path, 'w') as f:
-        with open(SCRIPT_TEMPLATE) as template:
-            content = template.read()
-            s = string.Template(content)
-            updated_content = s.substitute(links=links_string)
-            f.write(updated_content)
-    # Give owner and group execute permissions.
-    st = os.stat(script_path)
-    os.chmod(script_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP)
-    log.info('Run script written to %s', script_path)
-    return script_path
-
-
-def gen_run_cmd(launcher_cmd):
-    # Add OPI shell macro to those already there
-    launcher_cmd.macros['OPI_SHELL'] = 'true'
-    macros_strings = []
-    for key, value in launcher_cmd.macros.iteritems():
-        macros_strings.append('%s=%s' % (key, value))
-    macros_string = ','.join(macros_strings)
-    for c in ESCAPE_CHARS:
-        macros_string = macros_string.replace(c, '[\%d]' % ord(c))
-
-    run_cmd = '"%s %s"' % (launcher_cmd.launch_opi, macros_string)
-    return run_cmd
-
-
 def _get_macros(edm_args):
     macro_dict = {}
     try:
-        x_index = edm_args.index('-m')
-        macros_arg = edm_args[x_index + 1]
+        flag_index = edm_args.index('-m')
+        macros_arg = edm_args[flag_index + 1]
         macros = macros_arg.split(',')
         for macro in macros:
             key, value = macro.split('=')
@@ -131,9 +29,67 @@ def _get_macros(edm_args):
     return macro_dict
 
 
+class LauncherXml(object):
+
+    def __init__(self, old_apps_xml, new_apps_xml):
+        self.old_apps_xml = old_apps_xml
+        self.new_apps_xml = new_apps_xml
+        self._xml_tree = et.parse(old_apps_xml)
+        self._xml_root = self._xml_tree.getroot()
+
+    def get_cmds(self):
+        cmds = []
+        apps = self._apps_from_node(self._xml_root)
+        for name, cmd, args in apps:
+            cmd = LauncherCommand(name, cmd, args.split())
+            cmds.append(cmd)
+        return cmds
+
+    def write_new(self, cmd_dict):
+        '''
+        Given updated commands in apps_dict, write a new launcher XML file.
+        '''
+        self._update_node(self._xml_root, cmd_dict)
+        self._xml_tree.write(self.new_apps_xml, encoding='utf-8',
+                             xml_declaration=True)
+
+    def _apps_from_node(self, node):
+        '''
+        Recursively retrieve all commands and arguments from the specified
+        node in the launcher XML file.
+
+        Return a list of tuples (name, cmd, args).
+        '''
+        apps = []
+        if node.tag == 'button':
+            name = node.get('text')
+            cmd = node.get('command')
+            args = node.get('args', default="")
+            apps.append((name, cmd, args))
+        else:
+            for child in node:
+                apps.extend(self._apps_from_node(child))
+        return apps
+
+    def _update_node(self, node, cmd_dict):
+        if node.tag == 'button':
+            name = node.get('text')
+            command = node.get('command')
+            args = node.get('args', default="")
+            cmd = LauncherCommand(name, command, args)
+            if cmd in cmd_dict:
+                new_cmd, new_args = cmd_dict[cmd]
+                node.set('command', new_cmd)
+                node.set('args', ' '.join(new_args))
+        else:
+            for child in node:
+                self._update_node(child, cmd_dict)
+
+
 class LauncherCommand(object):
 
-    def __init__(self, cmd, args):
+    def __init__(self, name, cmd, args):
+        self.name = name
         self.cmd = cmd
         self.args = args
 
@@ -144,6 +100,10 @@ class LauncherCommand(object):
         self.version = None
         self.macros = {}
         self.all_dirs = []
+
+    def __eq__(self, other):
+        return (self.name == other.name and self.cmd == other.cmd
+                and self.args == other.args)
 
     def interpret(self):
         '''
@@ -158,15 +118,16 @@ class LauncherCommand(object):
             path_to_run = path_to_run[:-3] + 'opi'
         else:
             path_to_run += '.opi'
-        module_path, module, version, rel_path = utils.parse_module_name(path_to_run)
-        if module != '':
+        mpath, mname, mversion, rel_path = utils.parse_module_name(path_to_run)
+        if mname != '':
             # Project name example: LI_TI_5-2 - i.e. replace / with _
-            module_name = '_'.join(module.split('/'))
-            project = '%s_%s' % (module_name, version)
-            launch_opi = os.path.join('/', project, module, rel_path)
+            mname = '_'.join(mname.split('/'))
+            project = '%s_%s' % (mname, mversion)
+            launch_opi = os.path.join('/', project, mname, rel_path)
         else:
             project = os.path.basename(self.cmd)
-            launch_opi = os.path.join('/', project, os.path.basename(path_to_run))
+            launch_opi = os.path.join('/', project,
+                                      os.path.basename(path_to_run))
 
         self.launch_opi = launch_opi
         self.project = project
@@ -208,3 +169,65 @@ class LauncherCommand(object):
         self.version = version
         self.edl_file = edl_file
 
+    def get_run_cmd(self):
+        # Add OPI shell macro to those already there
+        self.macros['OPI_SHELL'] = 'true'
+        macros_strings = []
+        for key, value in self.macros.iteritems():
+            macros_strings.append('%s=%s' % (key, value))
+        macros_string = ','.join(macros_strings)
+        for c in ESCAPE_CHARS:
+            macros_string = macros_string.replace(c, '[\%d]' % ord(c))
+
+        run_cmd = '"%s %s"' % (self.launch_opi, macros_string)
+        return run_cmd
+
+    def gen_run_script(self, root_dir):
+        '''
+        Generate a wrapper script which updates the appropriate
+        links before opening a CSS window.
+
+        Arguments:
+            - root_dir - the root of the output directory
+        '''
+        rel_dir = os.path.dirname(self.path_to_run.lstrip('/'))
+        script_dir = os.path.join(root_dir, rel_dir)
+        if not os.path.exists(script_dir):
+            os.makedirs(script_dir)
+        script_path = os.path.join(script_dir, 'runcss.sh')
+        links_strings = []
+        module_dict = self._get_module_dict(root_dir)
+        for path, m in module_dict.iteritems():
+            links_strings.append('%s=%s' %
+                                (path, os.path.join('/', self.project, m)))
+        links_string = ',\\\n'.join(links_strings)
+        for c in ESCAPE_CHARS:
+            links_string = links_string.replace(c, '[\%d]' % ord(c))
+        with open(script_path, 'w') as f:
+            with open(SCRIPT_TEMPLATE) as template:
+                content = template.read()
+                s = string.Template(content)
+                updated_content = s.substitute(links=links_string)
+                f.write(updated_content)
+        # Give owner and group execute permissions.
+        st = os.stat(script_path)
+        os.chmod(script_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP)
+        log.info('Run script written to %s', script_path)
+        return script_path
+
+    def _get_module_dict(self, root_dir):
+        '''
+        Create a mapping from output path to module name.
+        '''
+        module_dict = {}
+        for directory in self.all_dirs:
+            try:
+                mpath, mname, mversion, _ = utils.parse_module_name(directory)
+                if mversion is None:
+                    mversion = ''
+                p = os.path.join(root_dir, mpath.lstrip('/'),
+                                 mname, mversion)
+                module_dict[p] = mname
+            except ValueError:
+                continue
+        return module_dict
