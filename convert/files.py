@@ -1,4 +1,3 @@
-
 import utils
 import symbols
 import glob
@@ -8,13 +7,16 @@ import shutil
 import os
 import logging as log
 
+
+# Configuration
 NULL_FILE = open(os.devnull, 'w')
 TMP_DIR = './tmp'
 SYMBOLS_DIR = os.path.join(TMP_DIR, 'symbols')
 # Commands in lists for subprocess
+JAVA = '/usr/lib/jvm/java-1.8.0-oracle-1.8.0.31.x86_64/jre/bin/java'
 COLORS_VARIABLE = '-Dedm2xml.colorsFile=res/colors.list'
 SYMBOLS_VARIABLE = '-Dedm2xml.symbolsFile=res/symbols.conf'
-CONVERT_CMD = ['/usr/lib/jvm/jre-1.7.0-oracle.x86_64/bin/java', COLORS_VARIABLE, SYMBOLS_VARIABLE, '-jar', 'res/conv.jar']
+CONVERT_CMD = [JAVA, COLORS_VARIABLE, SYMBOLS_VARIABLE, '-jar', 'res/conv.jar']
 UPDATE_CMD = ['edm', '-convert']
 SYMBOL_SCRIPT = os.path.join(os.getcwd(), 'res/auto-symb.sh')
 SYMBOL_TO_PNG_CMD = [SYMBOL_SCRIPT]
