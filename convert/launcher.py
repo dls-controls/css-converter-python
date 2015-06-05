@@ -124,8 +124,9 @@ class LauncherCommand(object):
         mpath, mname, mversion, rel_path = utils.parse_module_name(path_to_run)
         if mname != '':
             # Project name example: LI_TI_5-2 - i.e. replace / with _
-            mname = '_'.join(mname.split('/'))
-            project = '%s_%s' % (mname, mversion)
+            flat_mname = '_'.join(mname.split('/'))
+            project = '%s_%s' % (flat_mname, mversion)
+            # Actual path retains any / in module name
             launch_opi = os.path.join('/', project, mname, rel_path)
         else:
             project = os.path.basename(self.cmd)
