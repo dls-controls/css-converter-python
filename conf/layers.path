@@ -1,6 +1,7 @@
 # Files to update layers on.
 output/dls_sw/prod/R3.14.12.3/ioc/FE23B/CS/4-1/data/overview.opi
 output/dls_sw/prod/R3.14.12.3/ioc/Libera/2.05.15/opi/libera/overview.opi
+output/dls_sw/prod/R3.14.12.3/ioc/Libera/2.05.16/opi/libera/overview.opi
 output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-45/beamloss/sr_pin_overview.opi
 output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-45/beamloss/pmt_linac.opi
 output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-45/sr/overview.opi
@@ -19,10 +20,23 @@ output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-46/linac/overview.opi
 output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-46/bts/overview.opi
 output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-46/shared/fan_overview.opi
 output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-46/sr/best.opi
+output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-47/beamloss/sr_pin_overview.opi
+output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-47/beamloss/pmt_linac.opi
+output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-47/sr/overview.opi
+output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-47/booster/overview.opi
+output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-47/shared/overview.opi
+output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-47/linac/overview.opi
+output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-47/bts/overview.opi
+output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-47/shared/fan_overview.opi
+output/dls_sw/prod/R3.14.12.3/support/diagOpi/2-47/sr/best.opi
 output/dls_sw/prod/R3.14.12.3/support/MPS/3-1/data/MPS-Overview.opi
 output/dls_sw/prod/R3.14.12.3/support/MPS/3-1/data/MPS-CIAtemps.opi
 output/dls_sw/prod/R3.14.12.3/support/MPS/3-1/data/MPS-TunnelTemps.opi
+output/dls_sw/prod/R3.14.12.3/support/MPS/3-2/data/MPS-Overview.opi
+output/dls_sw/prod/R3.14.12.3/support/MPS/3-2/data/MPS-CIAtemps.opi
+output/dls_sw/prod/R3.14.12.3/support/MPS/3-2/data/MPS-TunnelTemps.opi
 output/dls_sw/prod/R3.14.11/ioc/IsaPBPM/1-1/opi/pbpm/overview.opi
+output/dls_sw/prod/R3.14.12.3/support/vacuum/3-57/data/diamondVacuumOverview.opi
 output/dls_sw/prod/R3.14.12.3/support/vacuum/3-49/data/diamondVacuumOverview.opi
 output/dls_sw/prod/R3.14.12.3/support/vacuum/3-47/data/diamondVacuumOverview.opi
 output/dls_sw/prod/R3.14.12.3/support/vacuum/3-41/data/diamondVacuumOverview.opi
@@ -32,6 +46,8 @@ output/dls_sw/prod/R3.14.11/support/vacuum/3-20/data/diamondVacuumOverview.opi
 output/dls_sw/prod/R3.14.11/support/vacuum/3-35/data/diamondVacuumOverview.opi
 output/dls_sw/prod/R3.14.11/support/vacuum/3-48/data/diamondVacuumOverview.opi
 output/dls_sw/prod/R3.14.11/support/vacuum/3-49/data/diamondVacuumOverview.opi
+output/dls_sw/prod/R3.14.11/support/vacuum/3-57/data/diamondVacuumOverview.opi
+output/dls_sw/prod/R3.14.12.3/support/vacuum/3-57/data/diamondVacIlks.opi
 output/dls_sw/prod/R3.14.12.3/support/vacuum/3-49/data/diamondVacIlks.opi
 output/dls_sw/prod/R3.14.12.3/support/vacuum/3-47/data/diamondVacIlks.opi
 output/dls_sw/prod/R3.14.12.3/support/vacuum/3-41/data/diamondVacIlks.opi
@@ -43,9 +59,13 @@ output/dls_sw/prod/R3.14.11/support/vacuum/3-48/data/diamondVacIlks.opi
 output/dls_sw/prod/R3.14.11/support/vacuum/3-49/data/diamondVacIlks.opi
 output/dls_sw/prod/R3.14.12.3/support/psc/4-3-15/data/pscL2.opi
 output/dls_sw/prod/R3.14.12.3/support/psc/4-3-15/data/pscAllOn.opi
+output/dls_sw/prod/R3.14.12.3/support/psc/4-3-18/data/pscL2.opi
+output/dls_sw/prod/R3.14.12.3/support/psc/4-3-18/data/pscAllOn.opi
 output/dls_sw/prod/R3.14.12.3/support/pss/9-16/data/pss_main.opi
 output/dls_sw/prod/R3.14.12.3/support/pss/9-16/data/pss_minor.opi
 output/dls_sw/prod/R3.14.12.3/support/pss/9-17/data/pss_main.opi
 output/dls_sw/prod/R3.14.12.3/support/pss/9-17/data/pss_minor.opi
+output/dls_sw/prod/R3.14.12.3/support/pss/9-20/data/pss_main.opi
+output/dls_sw/prod/R3.14.12.3/support/pss/9-20/data/pss_minor.opi
 output/home/ops/scripts/svn/ops/edl/FE-control/FE_Control.opi
 output/home/ops/scripts/svn/ops/edl/ID-control/ID_Control.opi
