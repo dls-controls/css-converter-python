@@ -130,8 +130,8 @@ def run_conversion(force, convert_symbols):
     # Now change all the colours
     colourtweak_paths = [os.path.abspath(p) for p in colourtweak.build_filelist(OUTDIR)]
     for path in sorted(colourtweak_paths):
-        log.debug('colourtweakpath: %s', path)
-        colourtweak.parse(path)    
+        log.info('colourtweakpath: %s', path)
+        colourtweak.parse(path)
 
     # Process symbol files at end.
     if symbol_paths:
