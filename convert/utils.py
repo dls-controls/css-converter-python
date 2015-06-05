@@ -1,5 +1,3 @@
-
-
 import os
 import stat
 import subprocess
@@ -61,7 +59,7 @@ def make_read_only(filename, executable=False):
         st = os.stat(filename)
         os.chmod(filename, st.st_mode & ~stat.S_IWUSR & ~stat.S_IWGRP & ~stat.S_IWOTH)
     except OSError:
-        pass
+        log.debug("Failed to make file %s read-only.", filename)
 
 
 def make_writeable(filename):
@@ -72,7 +70,7 @@ def make_writeable(filename):
         st = os.stat(filename)
         os.chmod(filename, st.st_mode | stat.S_IWUSR)
     except OSError:
-        pass
+        log.debug("Failed to make file %s writeable.", filename)
 
 
 def read_conf_file(filename):

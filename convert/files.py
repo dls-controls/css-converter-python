@@ -13,10 +13,12 @@ NULL_FILE = open(os.devnull, 'w')
 TMP_DIR = './tmp'
 SYMBOLS_DIR = os.path.join(TMP_DIR, 'symbols')
 # Commands in lists for subprocess
-JAVA = '/usr/lib/jvm/java-1.8.0-oracle-1.8.0.31.x86_64/jre/bin/java'
+JAVA = '/usr/lib/jvm/java-1.8.0-oracle-1.8.0.45.x86_64/jre/bin/java'
+CLASSPATH = 'res/conv.jar'
+MAIN_CLASS = 'org.csstudio.opibuilder.converter.EdmConverter'
 COLORS_VARIABLE = '-Dedm2xml.colorsFile=res/colors.list'
 SYMBOLS_VARIABLE = '-Dedm2xml.symbolsFile=res/symbols.conf'
-CONVERT_CMD = [JAVA, COLORS_VARIABLE, SYMBOLS_VARIABLE, '-jar', 'res/conv.jar']
+CONVERT_CMD = [JAVA, COLORS_VARIABLE, SYMBOLS_VARIABLE, '-cp', CLASSPATH, MAIN_CLASS]
 UPDATE_CMD = ['edm', '-convert']
 SYMBOL_SCRIPT = os.path.join(os.getcwd(), 'res/auto-symb.sh')
 SYMBOL_TO_PNG_CMD = [SYMBOL_SCRIPT]
@@ -119,5 +121,6 @@ def convert_edl(filename, destination):
     utils.make_writeable(destination)
     log.debug('Converting %s to %s', filename, destination)
     command = CONVERT_CMD + [filename, destination]
+    log.debug('Conversion command {}'.format(' '.join(command)))
     returncode = subprocess.call(command)
     return returncode

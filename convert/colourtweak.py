@@ -216,7 +216,7 @@ def build_filelist(basepath):
         Returns:
             iterator over relative filepaths
     """
-    log.debug("Building colourtweak list.")
+    log.info("Building colourtweak list.")
     files = []
     for dirpath, dirnames, filenames in os.walk(basepath):
         for filename in filenames:

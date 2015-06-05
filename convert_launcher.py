@@ -4,7 +4,6 @@ Simple script to walk through the Launcher's applications.xml file
 and convert EDM files referenced by each script it finds.
 '''
 
-import xml.etree.ElementTree as et
 import os
 import sys
 import collections
@@ -27,20 +26,11 @@ from convert import colourtweak
 APPS_XML = os.path.join(launcher.LAUNCHER_DIR, 'applications.xml')
 OUTDIR = 'output'
 OUTPATH = os.path.abspath(os.path.join(os.path.dirname(__file__), OUTDIR))
-NEW_APPS = os.path.join(OUTPATH, 'css_apps.xml')
+NEW_APPS_XML = os.path.join(OUTPATH, 'css_apps.xml')
 
 SYMBOLS_CONF = 'res/symbols.conf'
 LAYERS_CONF = 'conf/layers.path'
 GROUPS_CONF = 'conf/groups.path'
-
-
-def merge_symbol_paths(paths_dict1, paths_dict2):
-    for symbol in paths_dict1:
-        if symbol in paths_dict2:
-            paths_dict2[symbol].update(paths_dict1[symbol])
-        else:
-            paths_dict2[symbol] = paths_dict1[symbol]
-    return paths_dict2
 
 
 def process_symbol_files(symbol_paths, convert_symbols):
@@ -65,33 +55,38 @@ def process_symbol_files(symbol_paths, convert_symbols):
 
 
 def get_pp_paths():
-    layers_paths = [os.path.abspath(p) for p in utils.read_conf_file(LAYERS_CONF)]
-    group_paths = [os.path.abspath(p) for p in utils.read_conf_file(GROUPS_CONF)]
+    layers_paths = [os.path.abspath(p)
+                    for p in utils.read_conf_file(LAYERS_CONF)]
+    group_paths = [os.path.abspath(p)
+                   for p in utils.read_conf_file(GROUPS_CONF)]
     pp_dict = collections.OrderedDict({layers.parse: layers_paths,
-                groups.parse: group_paths})
+                                      groups.parse: group_paths})
     return pp_dict
 
 
-def convert_apps(apps, symbols, pp_dict, force):
-    app_dict = {}
-    symbol_paths = {}
-    for name, cmd, args in apps:
+def convert_apps(cmds, symbols, pp_dict, force):
+    cmd_dict = {}
+    symbol_paths = collections.defaultdict(set)
+    for cmd in cmds:
         try:
-            launcher_cmd = launcher.LauncherCommand(cmd, args.split())
-            launcher_cmd.interpret()
-            script_path = launcher.gen_run_script(launcher_cmd, OUTPATH)
-            run_cmd = launcher.gen_run_cmd(launcher_cmd)
+            cmd.interpret()
+            script_path = cmd.gen_run_script(OUTPATH)
+            run_cmd = cmd.get_run_cmd()
             try:
-                c = converter.Converter(launcher_cmd.all_dirs, symbols, OUTPATH, pp_dict)
+                c = converter.Converter(cmd.all_dirs, symbols,
+                                        OUTPATH, pp_dict)
                 c.convert(force)
                 new_symbol_paths = c.get_symbol_paths()
             except OSError as e:
                 log.warn('Exception converting %s: %s', cmd, e)
 
-            symbol_paths = merge_symbol_paths(symbol_paths, new_symbol_paths)
+            # merge the two defaultdicts
+            for symbol in new_symbol_paths:
+                symbol_paths[symbol].update(new_symbol_paths[symbol])
+
             log.info('%s gave new command %s %s', cmd, script_path, run_cmd)
             log.debug('%s gave these symbols: %s', cmd, new_symbol_paths)
-            app_dict[(name, cmd, args)] = (script_path, [run_cmd])
+            cmd_dict[cmd] = (script_path, [run_cmd])
         except spoof.SpoofError as e:
             log.warn('Could not understand launcher script %s', cmd)
             log.warn(e)
@@ -101,7 +96,7 @@ def convert_apps(apps, symbols, pp_dict, force):
             log.fatal('Unexpected exception: %s', type(e))
             continue
 
-    return app_dict, symbol_paths
+    return cmd_dict, symbol_paths
 
 
 def run_conversion(force, convert_symbols):
@@ -110,20 +105,18 @@ def run_conversion(force, convert_symbols):
     Convert files referenced by EDM scripts.
     If the command is an EDM script, update XML with new command.
     '''
-    tree = et.parse(APPS_XML)
-    root = tree.getroot()
+    lxml = launcher.LauncherXml(APPS_XML, NEW_APPS_XML)
+    cmds = lxml.get_cmds()
 
-    apps = launcher.get_apps(root)
     pp_dict = get_pp_paths()
 
     symbols = utils.read_symbols_file(SYMBOLS_CONF)
     log.info('Symbols found: %s', symbols)
 
     # Convert each application from the launcher.
-    app_dict, symbol_paths = convert_apps(apps, symbols, pp_dict, force)
+    cmd_dict, symbol_paths = convert_apps(cmds, symbols, pp_dict, force)
     # Update applications.xml and write out to a new file.
-    launcher.update_xml(root, app_dict)
-    tree.write(NEW_APPS, encoding='utf-8', xml_declaration=True)
+    lxml.write_new(cmd_dict)
 
     # Post-process menu-mux files
     mmux_paths = [os.path.abspath(p) for p in mmux.build_filelist(OUTDIR)]
@@ -137,8 +130,8 @@ def run_conversion(force, convert_symbols):
     # Now change all the colours
     colourtweak_paths = [os.path.abspath(p) for p in colourtweak.build_filelist(OUTDIR)]
     for path in sorted(colourtweak_paths):
-        log.debug('colourtweakpath: %s', path)
-        colourtweak.parse(path)    
+        log.info('colourtweakpath: %s', path)
+        colourtweak.parse(path)
 
     # Process symbol files at end.
     if symbol_paths:
