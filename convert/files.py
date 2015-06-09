@@ -66,7 +66,6 @@ def convert_symbol(symbol_file, destinations):
 
             utils.make_writeable(absfilename)
             shutil.copyfile(source, absfilename)
-            utils.make_read_only(absfilename)
         except Exception as e:
             log.error("Failed copying file: %s", str(e))
 

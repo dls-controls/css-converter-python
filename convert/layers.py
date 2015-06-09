@@ -17,7 +17,7 @@ import xml.etree.ElementTree as et
 import copy
 import logging as log
 
-from utils import make_writeable, make_read_only
+import utils
 
 # BOY type IDs
 LINK = 'org.csstudio.opibuilder.widgets.linkingContainer'
@@ -120,7 +120,6 @@ def parse(path):
     root.extend(newcs)
 
     # write the new tree out to the same file
-    make_writeable(path)
+    utils.make_writeable(path)
     tree.write(path, encoding='utf-8', xml_declaration=True)
-    make_read_only(path)
 

@@ -179,7 +179,6 @@ def update_opi_file(path, depth, file_index, module):
     # write the new tree out to the same file
     utils.make_writeable(path)
     tree.write(path, encoding='utf-8', xml_declaration=True)
-    utils.make_read_only(path)
 
 
 def full_path(dirs, relative_path):

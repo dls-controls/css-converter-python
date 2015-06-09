@@ -10,7 +10,7 @@ dimensions so that they match the contents.
 '''
 
 import xml.etree.ElementTree as et
-from utils import make_writeable, make_read_only
+import utils
 
 GROUPING_CONTAINER = 'org.csstudio.opibuilder.widgets.groupingContainer'
 
@@ -92,7 +92,6 @@ def parse(filepath):
                 set_grouping_container_size(child)
 
     # Overwrite the old file with the new tree
-    make_writeable(filepath)
+    utils.make_writeable(filepath)
     tree.write(filepath, encoding='utf-8', xml_declaration=True)
-    make_read_only(filepath)
 

@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import os
 import logging as log
 
-from utils import make_writeable, make_read_only
+import utils
 
 COLOR_DEF = 'res/colourtweak.def'
 
@@ -198,9 +198,8 @@ def parse(filepath):
                 change_colours(widget)
 
             # write the new tree out to the same file
-            make_writeable(filepath)
+            utils.make_writeable(filepath)
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
-            make_read_only(filepath)
         else:
             log.warn("Skipping %s, file not found", filepath)
     except ET.ParseError:

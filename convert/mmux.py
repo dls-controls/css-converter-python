@@ -16,11 +16,11 @@ Process:
 '''
 import os
 import subprocess
-import mmux
 import xml.etree.ElementTree as ET
 import logging as log
 
-from utils import make_writeable, make_read_only
+import mmux
+import utils
 
 MENU_MUX_ID = 'org.csstudio.opibuilder.widgets.edm.menumux'
 MISSING = 'missing'
@@ -192,9 +192,8 @@ def parse(filepath):
                 log.warn(">>> Manual post-processing required: '%s' contains Label with PV-value text <<<", filepath)
 
             # write the new tree out to the same file
-            make_writeable(filepath)
+            utils.make_writeable(filepath)
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
-            make_read_only(filepath)
     else:
         log.warn("Skipping %s, file not found", filepath)
 
