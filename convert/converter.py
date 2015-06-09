@@ -54,8 +54,9 @@ class Converter(object):
         """
         self.dirs = []
         for d in dirs:
-            if d not in Converter.converted_dirs:
-                self.dirs.append(os.path.realpath(d))
+            d = os.path.realpath(d)
+            if d not in Converter.converted_dirs and os.path.isdir(d):
+                self.dirs.append(d)
         Converter.converted_dirs.update(self.dirs)
         # Index directories including those already converted.
         self.file_index = paths.index_paths(dirs, True)
@@ -119,7 +120,7 @@ class Converter(object):
         """
         for datadir in self.dirs:
             # Currently can't handle relative directories.
-            if datadir.startswith('.'):
+            if datadir.startswith('.') or datadir.startswith('..'):
                 continue
             log.debug('EDM data file %s', datadir)
             entries = os.listdir(datadir)
