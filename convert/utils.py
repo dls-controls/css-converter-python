@@ -1,4 +1,5 @@
 import os
+import re
 import stat
 import subprocess
 import logging as log
@@ -49,6 +50,16 @@ def parse_module_name(filepath):
         raise ValueError('No module found in %s' % filepath)
 
     return module_path, module, version, relative_path
+
+
+def increment_version(version_string):
+    # Group parentheses required to include numbers in result.
+    parts = re.split('([!0-9])', version_string)
+    parts = [p for p in parts if p != '']
+    last_number = parts.pop()
+    new_version = str(int(last_number) + 1)
+    parts.append(new_version)
+    return ''.join(parts)
 
 
 def make_read_only(filename, executable=False):

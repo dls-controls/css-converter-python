@@ -1,5 +1,5 @@
 
-from convert.utils import parse_module_name
+from convert.utils import parse_module_name, increment_version
 
 import unittest
 
@@ -114,3 +114,26 @@ class UtilsTest(unittest.TestCase):
         self.assertEquals(version, None)
         self.assertEquals(rel_path, 'data')
 
+
+class TestIncrementVersion(unittest.TestCase):
+
+    def test_handles_basic_cases(self):
+        old_versions = ['0-1', '0-2', '1-2', '11-12']
+        new_versions = ['0-2', '0-3', '1-3', '11-13']
+        for old, new in zip(old_versions, new_versions):
+            self.assertEqual(new, increment_version(old))
+
+    def test_handles_periods(self):
+        old_versions = ['0.1', '11.12']
+        new_versions = ['0.2', '11.13']
+        for old, new in zip(old_versions, new_versions):
+            self.assertEqual(new, increment_version(old))
+
+    def test_handles_dls_versions(self):
+        old = '3-4-2dls3'
+        new = '3-4-2dls4'
+        self.assertEqual(new, increment_version(old))
+
+
+if __name__ == '__main__':
+    unittest.main()
