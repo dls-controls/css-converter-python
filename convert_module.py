@@ -1,7 +1,12 @@
+import pkg_resources
+pkg_resources.require('dls_epicsparser')
 import os
 import sys
 import argparse
 import ConfigParser
+
+
+from convert import module
 
 
 IOC_CONFIG = 'ioc.ini'
@@ -11,7 +16,7 @@ GENERAL_CONFIG = 'converter.ini'
 
 def parse_arguments():
     ap = argparse.ArgumentParser()
-    ap.add_argument('module', metavar='<module>', nargs=1,
+    ap.add_argument('module', metavar='<module>',
                     help='IOC or support module')
     ap.add_argument('-i', help='module is an ioc', action='store_true')
     ap.add_argument('-s', help='module is support module', action='store_true')
@@ -44,7 +49,14 @@ if __name__ == '__main__':
     args = parse_arguments()
     gen_cfg = parse_configuration(args.general_config)
     if args.i:
-        ioc_cfg = parse_configuration(args.ioc_config)
+        cfg = parse_configuration(args.ioc_config)
     else:
-        support_cfg = parse_configuration(args.support_config)
+        cfg = parse_configuration(args.support_config)
     print(gen_cfg.get('general', 'java'))
+
+    module_cfg = cfg.items(args.module)
+
+    m = module.Module(args.module, cfg.get(args.module, 'version'),
+                      gen_cfg.get('general', 'root'),
+                      gen_cfg.get('general', 'mirror_root'), args.i)
+    print(m.get_dependencies())
