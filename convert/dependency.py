@@ -19,14 +19,14 @@ class DependencyParser(object):
 
     def find_dependencies(self):
         """ Generate a dictionary of dependencies for this module
-            {dependency name => path to version++1}
+
+        :return Dictionary of {dependency name => (path to module, version)
         """
         dependencies = {}
 
         cr_path = os.path.join(self._module_path, CONFIGURE_RELEASE)
         r = dls_epicsparser.releaseparser.Release(cr_path)
 
-        print r
         for dependency in r.flatten():
             if self.is_valid(dependency):
                 dependencies[dependency.name] = (os.path.split(dependency.path))
