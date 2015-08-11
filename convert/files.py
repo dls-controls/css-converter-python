@@ -13,7 +13,7 @@ NULL_FILE = open(os.devnull, 'w')
 TMP_DIR = './tmp'
 SYMBOLS_DIR = os.path.join(TMP_DIR, 'symbols')
 # Commands in lists for subprocess
-JAVA = '/usr/lib/jvm/java-1.8.0-oracle-1.8.0.45.x86_64/jre/bin/java'
+JAVA = '/usr/bin/java'
 CLASSPATH = 'res/conv.jar'
 MAIN_CLASS = 'org.csstudio.opibuilder.converter.EdmConverter'
 COLORS_VARIABLE = '-Dedm2xml.colorsFile=res/colors.list'
