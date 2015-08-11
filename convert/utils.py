@@ -57,7 +57,12 @@ def increment_version(version_string):
     parts = re.split('([!0-9])', version_string)
     parts = [p for p in parts if p != '']
     last_number = parts.pop()
-    new_version = str(int(last_number) + 1)
+    try:
+        new_version = str(int(last_number) + 1)
+    except ValueError:
+        # if last value is not a number will raise an error, so abort
+        new_version = last_number
+
     parts.append(new_version)
     return ''.join(parts)
 

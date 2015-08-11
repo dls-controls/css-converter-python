@@ -134,6 +134,11 @@ class TestIncrementVersion(unittest.TestCase):
         new = '3-4-2dls4'
         self.assertEqual(new, increment_version(old))
 
+    def test_returns_unchanged_version_if_does_not_end_with_number(self):
+        version = '1-4dls-alpha'
+
+        self.assertEqual(version, increment_version(version))
+
 
 if __name__ == '__main__':
     unittest.main()
