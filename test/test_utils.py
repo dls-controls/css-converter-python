@@ -1,6 +1,10 @@
+from pkg_resources import require
+require("mock")
+
+from mock import patch
 
 from convert.utils import parse_module_name, increment_version, get_all_dirs, \
-    find_modules
+    find_modules, get_latest_version, parse_version
 
 import unittest
 
@@ -162,6 +166,61 @@ class TestGetModules(unittest.TestCase):
 
         self.assertSetEqual(set(expected_modules), set(modules))
 
+    def test_parse_version_handles_pair_case(self):
+        self.assertListEqual([4,2], parse_version("4-2"))
+
+    def test_parse_version_handles_triple_case(self):
+        self.assertListEqual([4,2,1], parse_version("4-2-1"))
+
+    def test_parse_version_handles_pair_case_with_unnumbered_suffix(self):
+        self.assertListEqual([4,2], parse_version("4-2dls"))
+
+    def test_parse_version_handles_pair_case_with_numbered_suffix(self):
+        self.assertListEqual([4,2,7], parse_version("4-2dls7"))
+
+    def test_parse_version_handles_prefixed_case(self):
+        self.assertListEqual([2,3], parse_version("dls2-3"))
+
+    def test_parse_version_handles_pair_case_with_doubly_numbered_suffix(self):
+        self.assertListEqual([4,2,1,1], parse_version("4-2dls1-1"))
+
+    @patch('os.walk')
+    def test_get_latest_version_returns_max_for_simple_pair_versions(self, mock_walk):
+        mock_walk.return_value = [
+            ('/path_to_module', ('3-8', '4-2','4-1'), ('6-2.tar.gz',)),
+            ('/path_to_module/3-8', ('88-88'), ('spam', 'eggs')) ]
+
+        latest = get_latest_version('/path_to_module')
+        self.assertEqual('4-2', latest)
+
+    @patch('os.walk')
+    def test_get_latest_version_returns_max_for_complex_postfix_versions(self, mock_walk):
+        mock_walk.return_value = [
+            ('/path_to_module', ('6-7-1dls10', '6-7-1dls14', '6-8-1dls3', '6-8-1dls4-1', '6-9dls1',), ('6-8-1dls1.tar.gz',)),
+            ('/path_to_module/3-8', ('88-88'), ('spam', 'eggs')) ]
+
+        latest = get_latest_version('/path_to_module')
+        self.assertEqual('6-9dls1', latest)
+
+
+    @patch('os.walk')
+    def test_get_latest_version_returns_max_for_simple_mix_variable_length_max_last_versions(self, mock_walk):
+        mock_walk.return_value = [
+            ('/path_to_module', ('6-7-1', '6-7', '6-8-4-0', '6-8-4-1',), ()),
+            ('/path_to_module/3-8', ('88-88'), ('spam', 'eggs')) ]
+
+        latest = get_latest_version('/path_to_module')
+        self.assertEqual('6-8-4-1', latest)
+
+
+    @patch('os.walk')
+    def test_get_latest_version_returns_max_for_mix_variable_length_max_first_versions(self, mock_walk):
+        mock_walk.return_value = [
+            ('/path_to_module', ('6-9-1', '6-7', '6-8-4-0', '6-8-4-1',), ()),
+            ('/path_to_module/3-8', ('88-88'), ('spam', 'eggs')) ]
+
+        latest = get_latest_version('/path_to_module')
+        self.assertEqual('6-9-1', latest)
 
 if __name__ == '__main__':
     unittest.main()

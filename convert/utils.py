@@ -27,11 +27,57 @@ def find_modules(filepath):
     modules = set()
 
     for path in all_paths:
-        _, modulename, _, relpath = parse_module_name(path)
+        _, module_name, _, relpath = parse_module_name(path)
         if relpath in ['configure', 'bin', 'data', 'db', 'bin', 'etc']:
-            modules.add(modulename)
+            modules.add(module_name)
+
+    print modules
 
     return list(modules)
+
+
+def get_latest_version(filepath):
+    """ Find the 'latest' version from a release directory containing version
+        numbered folders.
+
+        It simply finds the 'largest' tuple of numbered components so
+            4-2 > 4-1
+            5-4-2 > 5-4-1
+            5-4-2 > 5-2-8
+            5-4dls2 > 5-4dls1
+
+    :param filepath: Module path to search
+    :return: Largest version number
+    """
+    all_parts = []
+    for root, dirs, _ in os.walk(filepath):
+        for version in dirs:
+            all_parts.append( (parse_version(version), version) )
+        # only process the first level of the tree; this should contain the
+        # release version folders
+        break
+
+    if all_parts:
+        version_string = max(all_parts)[1]
+    else:
+        raise ValueError("No version found in %s", filepath)
+
+    return version_string
+
+
+def parse_version(version_string):
+    """ Convert version number string, containing test and numbers into a
+        list of the integer parts
+
+        Note: this is different to the parsing done in increment version as that
+        keeps the non-numeric parts and is only interested in final number
+
+    :param version_string: Version string to parse (e.g. dls1-2, 1-2, 1-4-2dls4)
+    :return: numeric elements as list of values ordered as in the string (e.g. [1,4,2,4])
+    """
+
+    matches = re.findall("\d+\d*", version_string)
+    return [int(m) for m in matches] #([int(m) for m in matches], version_string)
 
 def get_all_dirs(filepath):
     """
