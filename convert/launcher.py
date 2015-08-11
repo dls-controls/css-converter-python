@@ -175,7 +175,7 @@ class LauncherCommand(object):
 
     def get_run_cmd(self):
         # Add OPI shell macro to those already there
-        self.macros['OPI_SHELL'] = 'true'
+        self.macros['Position'] = 'NEW_SHELL'
         macros_strings = []
         for key, value in self.macros.iteritems():
             macros_strings.append('%s=%s' % (key, value))

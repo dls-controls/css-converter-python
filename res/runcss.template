@@ -2,7 +2,7 @@
 
 # Generated run script for cs-studio.
 
-CSSTUDIO=/dls_sw/work/common/CSS/CSS_4.0_dls-alpha4/cs-studio
+CSSTUDIO=/dls_sw/work/common/CSS/CSS_dls-4.2.x_nightly/cs-studio
 LAUNCH_OPI=$$1
 
 if [ -z $$LAUNCH_OPI ]; then
@@ -12,5 +12,4 @@ fi
 
 LINKS="${links}"
 
-echo $$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI}¬$$LINKS"
-$$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI}¬$$LINKS"
+$$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI} -share_link $$LINKS"
