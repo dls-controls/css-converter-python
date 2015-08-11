@@ -9,6 +9,47 @@ import string
 PROJECT_TEMPLATE = 'res/project.template'
 PROJECT_FILENAME = '.project'
 
+
+def find_modules(filepath):
+    """ Find all modules in the given filepath.
+
+        If path if not IOC or support module raises ValueError
+
+        "module" is determined as the path section between ioc/support and a
+        version number, e.g.
+            /dls_sw/prod/R3.14.12.3/support/zebra/2-0-1 => zebra
+            /dls_sw/prod/R3.14.12.3/ioc/LI/TI/5-3 => LI/TI
+
+    :param filepath:
+    :return: list of module_names
+    """
+    all_paths = get_all_dirs(filepath)
+    modules = set()
+
+    for path in all_paths:
+        _, modulename, _, relpath = parse_module_name(path)
+        if relpath in ['configure', 'bin', 'data', 'db', 'bin', 'etc']:
+            modules.add(modulename)
+
+    return list(modules)
+
+def get_all_dirs(filepath):
+    """
+    :param filepath: Path to search
+    :return: list of all child folders
+    """
+    all_paths = []
+    for root, dirs, _ in os.walk(filepath):
+        all_paths.extend([os.path.join(root, d) for d in dirs])
+
+        # do not parse .svn, bin, etc directories
+        for d in ['.svn', 'configure', 'src', 'iocBoot', 'Db']:
+            if d in dirs:
+                dirs.remove(d)
+
+    return all_paths
+
+
 def parse_module_name(filepath):
     """
     Return (module_path, module_name, version, relative_path)

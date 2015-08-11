@@ -1,5 +1,6 @@
 
-from convert.utils import parse_module_name, increment_version
+from convert.utils import parse_module_name, increment_version, get_all_dirs, \
+    find_modules
 
 import unittest
 
@@ -143,6 +144,23 @@ class TestIncrementVersion(unittest.TestCase):
         version = '1-4dls-alpha'
 
         self.assertEqual(version, increment_version(version))
+
+
+class TestGetModules(unittest.TestCase):
+
+    def test_find_modules_returns_module_names_in_ioc_LI(self):
+        modules = find_modules("/dls_sw/prod/R3.14.12.3/ioc/LI")
+        expected_modules = [
+            'LI/LI-DI-IOC-01', 'LI/LI-DI-IOC-02', 'LI/LI-PC-IOC-01',
+            'LI/LI-PC-IOC-02', 'LI/PS', 'LI/RF', 'LI/TI', 'LI/VA']
+
+        self.assertSetEqual(set(expected_modules), set(modules))
+
+    def test_find_modules_returns_module_names_in_support_vacuum(self):
+        modules = find_modules("/dls_sw/prod/R3.14.12.3/support/vacuum")
+        expected_modules = ['vacuum']
+
+        self.assertSetEqual(set(expected_modules), set(modules))
 
 
 if __name__ == '__main__':
