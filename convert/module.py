@@ -24,11 +24,12 @@ class Module(object):
 
     def get_dependencies(self):
         print(self.name, self.old_version)
-        dp = dependency.DependencyParser(self.name, self.old_version)
+        dp = dependency.DependencyParser(self.prod_root, self.area,
+                                         self.name, self.old_version)
         deps = dp.find_dependencies()
         for d in deps:
-            version = deps[d].split('/')[-1]
-            self.deps.append(Module(d, version, self.prod_root, self.mirror_root))
+            version = deps[d][1]
+            self.deps.append(Module(d, version, self.prod_root, self.mirror_root, False))
 
     def get_dependency_file_dict(self):
         all_files = {}
