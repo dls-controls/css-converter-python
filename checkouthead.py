@@ -31,7 +31,14 @@ def checkout_module(name, path):
     except OSError:
         print 'module already present; skipping'
         return
-    subprocess.call(['svn', 'checkout', svn_location, mirror_location])
+    ret_val = subprocess.call(['svn', 'checkout', svn_location, mirror_location])
+    if ret_val == 0:
+        current_dir = os.curdir
+        try:
+            os.chdir(mirror_location)
+            subprocess.call(['make'])
+        except OSError:
+            os.chdir(current_dir)
 
 
 if __name__ == '__main__':

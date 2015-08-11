@@ -9,8 +9,8 @@ def convert(origin, destination):
 
 class Module(object):
 
-    def __init__(self, name, version, prod_root, mirror_root, is_ioc=True):
-        self.area = 'ioc' if is_ioc else 'support'
+    def __init__(self, name, cfg, prod_root, mirror_root):
+        self.area = cfg['area']
         self.prod_root = prod_root
         self.module_dir = os.path.join(self.prod_root, self.area, name)
         if not os.path.exists(self.module_dir):
@@ -18,17 +18,18 @@ class Module(object):
 
         self.mirror_root = mirror_root
         self.name = name
-        self.old_version = version
+        self.old_version = cfg['version']
         self.new_version = utils.increment_version(self.old_version)
         self.deps = []
 
     def get_dependencies(self):
         print(self.name, self.old_version)
-        dp = dependency.DependencyParser(self.name, self.old_version)
+        dp = dependency.DependencyParser(self.prod_root, self.area,
+                                         self.name, self.old_version)
         deps = dp.find_dependencies()
         for d in deps:
-            version = deps[d].split('/')[-1]
-            self.deps.append(Module(d, version, self.prod_root, self.mirror_root))
+            version = deps[d][1]
+            self.deps.append(Module(d, version, self.prod_root, self.mirror_root, False))
 
     def get_dependency_file_dict(self):
         all_files = {}
