@@ -81,11 +81,19 @@ def parse_configuration(filepath):
 
 
 def get_config_section(cfg, name):
-    cfg_section = {}
+    cfg_section = {'datapath': 'data',
+                   'layers': [],
+                   'groups': [],
+                   'symbols': [],
+                   'version': None}
     try:
         items = cfg.items(name)
-        for i in items:
-            cfg_section[i[0]] = i[1]
+        for key, value in items:
+            if key in ('layers', 'groups', 'symbols'):
+                cfg_section[key] = [val.strip() for val in value.split(';')
+                                    if val != '']
+            else:
+                cfg_section[key] = value
     except ConfigParser.NoSectionError:
         pass
     return cfg_section
@@ -98,11 +106,10 @@ if __name__ == '__main__':
     print(gen_cfg.get('general', 'java'))
 
     module_cfg = get_config_section(cfg, args.module)
+    module_cfg['area'] = 'ioc' if args.ioc else 'support'
+    print(module_cfg)
 
-    m = module.Module(args.module,
-                      module_cfg.get('version', None),
-                      gen_cfg.get('general', 'root'),
-                      gen_cfg.get('general', 'mirror_root'),
-                      args.ioc)
-
+    m = module.Module(args.module, module_cfg,
+                      gen_cfg.get('general', 'prod_root'),
+                      gen_cfg.get('general', 'mirror_root'))
     print(m.get_dependencies())
