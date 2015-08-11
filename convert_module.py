@@ -28,9 +28,9 @@ def parse_arguments():
         print('Please choose either IOC [-i] or support module [-s].')
         sys.exit()
     if args.s:
-        args.support_config = os.path.join(args.c, SUPPORT_CONFIG)
+        args.module_config = os.path.join(args.c, SUPPORT_CONFIG)
     else:
-        args.ioc_config = os.path.join(args.c, IOC_CONFIG)
+        args.module_config = os.path.join(args.c, IOC_CONFIG)
     args.general_config = os.path.join(args.c, GENERAL_CONFIG)
     if not os.path.exists(args.general_config):
         print('Could not locate configuration file {}'.format(args.general_config))
@@ -45,18 +45,26 @@ def parse_configuration(filepath):
     return config
 
 
+def get_config_section(cfg, name):
+    cfg_section = {}
+    try:
+        items = cfg.items(name)
+        for i in items:
+            cfg_section[i[0]] = i[1]
+    except ConfigParser.NoSectionError:
+        pass
+    return cfg_section
+
+
 if __name__ == '__main__':
     args = parse_arguments()
     gen_cfg = parse_configuration(args.general_config)
-    if args.i:
-        cfg = parse_configuration(args.ioc_config)
-    else:
-        cfg = parse_configuration(args.support_config)
+    cfg = parse_configuration(args.module_config)
     print(gen_cfg.get('general', 'java'))
 
-    module_cfg = cfg.items(args.module)
+    module_cfg = get_config_section(cfg, args.module)
 
-    m = module.Module(args.module, cfg.get(args.module, 'version'),
+    m = module.Module(args.module, module_cfg.get('version', None),
                       gen_cfg.get('general', 'root'),
                       gen_cfg.get('general', 'mirror_root'), args.i)
     print(m.get_dependencies())
