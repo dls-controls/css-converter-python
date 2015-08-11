@@ -53,8 +53,15 @@ def parse_module_name(filepath):
 
 
 def increment_version(version_string):
+    """ Increment a version number, adding 1 to the final digit
+
+        e.g. 1-4dls4 -> 1-4dls5, 4-2 -> 4-3
+
+    :param version_string: current module version
+    :return: incremented version
+    """
     # Group parentheses required to include numbers in result.
-    parts = re.split('([!0-9])', version_string)
+    parts = re.split('([!0-9]*)', version_string)
     parts = [p for p in parts if p != '']
     last_number = parts.pop()
     try:

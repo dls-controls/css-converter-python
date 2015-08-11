@@ -123,6 +123,11 @@ class TestIncrementVersion(unittest.TestCase):
         for old, new in zip(old_versions, new_versions):
             self.assertEqual(new, increment_version(old))
 
+    def test_correctly_increments_nineteen(self):
+        old = '3-19'
+        new = '3-20'
+        self.assertEqual(new, increment_version(old))
+
     def test_handles_periods(self):
         old_versions = ['0.1', '11.12']
         new_versions = ['0.2', '11.13']
