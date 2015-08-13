@@ -6,18 +6,20 @@ import pkg_resources
 pkg_resources.require('dls_epicsparser')
 
 from convert import utils
-import dls_epicsparser.releaseparser
+from convert import coordinates
+from convert import dependency
 import os
 import subprocess
 
 
 SVN_ROOT = 'svn+ssh://serv0002.cs.diamond.ac.uk/home/subversion/repos/controls'
 TRUNK = 'diamond/trunk'
-IOC_DIR = '/dls_sw/prod/R3.14.12.3/ioc/'
-CONFIGURE_RELEASE = 'configure/RELEASE'
-MIRROR_ROOT = '/dls_sw/work/common/CSS/converter/output/mirror_root'
-IOC_NAME = 'LI/TI'
-IOC_VERSION = '5-3'
+MIRROR_ROOT = '/scratch/will/css/converter/output/mirror_root'
+
+PROD_ROOT = '/dls_sw/prod/R3.14.12.3/'
+AREA = 'support'
+MODULE = 'diagOpi'
+VERSION = '2-48'
 
 
 def checkout_module(name, path):
@@ -41,22 +43,25 @@ def checkout_module(name, path):
             os.chdir(current_dir)
 
 
-if __name__ == '__main__':
-    cr_path = os.path.join(IOC_DIR, IOC_NAME, IOC_VERSION, CONFIGURE_RELEASE)
-    r = dls_epicsparser.releaseparser.Release(cr_path)
-    r.parse(cr_path)
+def checkout_deps(coords):
+    print(coordinates.as_path(coords))
+    dp = dependency.DependencyParser(coords)
+    deps = dp.find_dependencies()
+    print(deps)
 
-    for p in r.flatten():
-        print p.name, p.path
+    deps[MODULE] = coords
+    for module, coords in deps.items():
         try:
-            _, module_name, _, _ = utils.parse_module_name(p.path)
-        except ValueError:
-            module_name = p.name
-        try:
-            version = p.path.split('/')[-1]
-            new_version = utils.increment_version(version)
+            new_version = utils.increment_version(coords.version)
             print('new version {}'.format(new_version))
-            new_path = '/'.join(p.path.split('/')[:-1] + [new_version])
-            checkout_module(module_name, new_path)
+            new_coords = coordinates.create(coords.root, coords.area,
+                                                  coords.module, new_version)
+            new_path = coordinates.as_path(new_coords)
+            checkout_module(new_coords.module, new_path)
         except ValueError:
-            print("Can't handle path {}".format(p.path))
+            print("Can't handle coordinates {}".format(coords))
+
+
+if __name__ == '__main__':
+    coords = coordinates.create(PROD_ROOT, AREA, MODULE, VERSION)
+    checkout_deps(coords)
