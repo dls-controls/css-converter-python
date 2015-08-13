@@ -43,25 +43,28 @@ def checkout_module(name, path):
             os.chdir(current_dir)
 
 
-def checkout_deps(coords):
+def checkout_coords(coords, include_deps=True):
     print(coordinates.as_path(coords))
-    dp = dependency.DependencyParser(coords)
-    deps = dp.find_dependencies()
-    print(deps)
+    if include_deps:
+        dp = dependency.DependencyParser(coords)
+        to_checkout = dp.find_dependencies()
+    else:
+        to_checkout = {}
 
-    deps[MODULE] = coords
-    for module, coords in deps.items():
+    to_checkout[MODULE] = coords
+
+    for module, mcoords in to_checkout.items():
         try:
-            new_version = utils.increment_version(coords.version)
+            new_version = utils.increment_version(mcoords.version)
             print('new version {}'.format(new_version))
-            new_coords = coordinates.create(coords.root, coords.area,
-                                                  coords.module, new_version)
+            new_coords = coordinates.create(mcoords.root, mcoords.area,
+                                                  mcoords.module, new_version)
             new_path = coordinates.as_path(new_coords)
             checkout_module(new_coords.module, new_path)
         except ValueError:
-            print("Can't handle coordinates {}".format(coords))
+            print("Can't handle coordinates {}".format(mcoords))
 
 
 if __name__ == '__main__':
     coords = coordinates.create(PROD_ROOT, AREA, MODULE, VERSION)
-    checkout_deps(coords)
+    checkout_coords(coords, True)
