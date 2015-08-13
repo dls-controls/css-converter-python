@@ -1,12 +1,81 @@
+import os
 from pkg_resources import require
 require("mock")
 
 from mock import patch
 
 from convert.utils import parse_module_name, increment_version, get_all_dirs, \
-    find_modules, get_latest_version, parse_version
+    find_modules, get_latest_version, parse_version, find_module_from_path
 
 import unittest
+
+
+class FileMungingTests(unittest.TestCase):
+
+    # def test_get_all_dirs_returns_list_of_folders_ioc(self):
+    #     moduledirs = get_all_dirs("/dls_sw/prod/R3.14.12.3/ioc")
+    #     print len(moduledirs)
+    #
+    # def test_get_all_dirs_returns_list_of_folders_support(self):
+    #     moduledirs = get_all_dirs("/dls_sw/prod/R3.14.12.3/support")
+    #     print len(moduledirs)
+
+    def test_get_all_dirs_returns_list_of_folders_support_module(self):
+        moduledirs = get_all_dirs("/dls_sw/prod/R3.14.12.3/support/mirror")
+        for d in sorted(moduledirs):
+            print d
+
+    def test_find_module_from_path_returns_path_at_module_version_from_edlfile(self):
+        path = "/dls_sw/prod/R3.14.12.3/support/mirror/4-7-3/data/mirrorKBM-I22-HFM.edl"
+        expected = "/dls_sw/prod/R3.14.12.3/support/mirror/4-7-3"
+
+        actual = find_module_from_path(path)
+
+        self.assertEqual(expected, actual)
+
+    def test_find_module_from_path_returns_path_at_module_version_from_deep_edlfile(self):
+        path = "/dls_sw/prod/R3.14.12.3/support/mirror/4-7-3/myIocApp/ioc/mirrorKBM-I22-HFM.edl"
+        expected = "/dls_sw/prod/R3.14.12.3/support/mirror/4-7-3"
+
+        actual = find_module_from_path(path)
+
+        self.assertEqual(expected, actual)
+
+    def test_find_module_from_path_returns_path_at_module_from_edlfile_no_version(self):
+        path = "/dls_sw/prod/R3.14.12.3/support/mirror/data/mirrorKBM-I22-HFM.edl"
+        expected = "/dls_sw/prod/R3.14.12.3/support/mirror"
+
+        actual = find_module_from_path(path)
+
+        self.assertEqual(expected, actual)
+
+    def test_find_module_from_path_returns_path_at_module_from_midpoint_in_tree(self):
+        path = "/dls_sw/prod/R3.14.12.3/ioc/LI"
+        expected = "/dls_sw/prod/R3.14.12.3/support/mirror"
+
+        actual = find_module_from_path(path)
+
+        self.assertEqual(expected, actual)
+
+
+    def test_find_module_from_path_does_something_with_versioned_support_module(self):
+        path = "/dls_sw/prod/R3.14.12.3/support/mirror/4-7-3"
+        actual = find_module_from_path(path)
+
+        self.assertEqual(path, actual)
+
+
+    def test_find_module_from_path_does_something_with_support_module(self):
+        path = "/dls_sw/prod/R3.14.12.3/support/mirror"
+        actual = find_module_from_path(path)
+
+        self.assertEqual(path, actual)
+
+    def test_find_module_from_path_does_nothing_with_support(self):
+        path = "/dls_sw/prod/R3.14.12.3/support"
+        actual = find_module_from_path(path)
+
+        self.assertEqual(path, actual)
 
 
 class UtilsTest(unittest.TestCase):
@@ -221,6 +290,7 @@ class TestGetModules(unittest.TestCase):
 
         latest = get_latest_version('/path_to_module')
         self.assertEqual('6-9-1', latest)
+
 
 if __name__ == '__main__':
     unittest.main()

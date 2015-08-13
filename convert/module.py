@@ -9,8 +9,8 @@ def convert(origin, destination):
 
 class Module(object):
 
-    def __init__(self, name, cfg, prod_root, mirror_root):
-        self.area = cfg['area']
+    def __init__(self, name, cfg, area, prod_root, mirror_root):
+        self.area = area
         self.prod_root = prod_root
         self.module_dir = os.path.join(self.prod_root, self.area, name)
         if not os.path.exists(self.module_dir):

@@ -1,13 +1,15 @@
 import os
 import re
 import stat
-import subprocess
 import logging as log
 import string
 
 
 PROJECT_TEMPLATE = 'res/project.template'
 PROJECT_FILENAME = '.project'
+
+IGNORE_DIR_IN_SEARCH = ('.svn', 'Db', 'bin', 'configure', 'data', 'db', 'dbd', 'etc', 'iocBoot', 'opi', 'src')
+EXPECTED_DIR_IN_MODULE = ('bin', 'configure', 'data', 'db', 'etc')
 
 
 def find_modules(filepath):
@@ -23,13 +25,17 @@ def find_modules(filepath):
     :param filepath:
     :return: list of module_names
     """
+    print "Finding modules in: %s" % filepath
     all_paths = get_all_dirs(filepath)
     modules = set()
 
     for path in all_paths:
-        _, module_name, _, relpath = parse_module_name(path)
-        if relpath in ['configure', 'bin', 'data', 'db', 'bin', 'etc']:
-            modules.add(module_name)
+        try:
+            _, module_name, _, relpath = parse_module_name(path)
+            if relpath in EXPECTED_DIR_IN_MODULE:
+                modules.add(module_name)
+        except ValueError as ex:
+            print ex.message
 
     print modules
 
@@ -77,24 +83,52 @@ def parse_version(version_string):
     """
 
     matches = re.findall("\d+\d*", version_string)
-    return [int(m) for m in matches] #([int(m) for m in matches], version_string)
+    return [int(m) for m in matches]
+
 
 def get_all_dirs(filepath):
-    """
+    """ Walk the file system from specified start point terminating at the iocBoot level
+
     :param filepath: Path to search
     :return: list of all child folders
     """
     all_paths = []
     for root, dirs, _ in os.walk(filepath):
         all_paths.extend([os.path.join(root, d) for d in dirs])
-
         # do not parse .svn, bin, etc directories
-        for d in ['.svn', 'configure', 'src', 'iocBoot', 'Db']:
-            if d in dirs:
+        for d in IGNORE_DIR_IN_SEARCH:
+            try:
                 dirs.remove(d)
+            except ValueError:
+                # raised if d not in dirs
+                pass
 
     return all_paths
 
+
+def find_module_from_path(filepath, top_dir="/dls_sw/prod/R3.14.12.3"):
+    """ Crawl UP the file system to find the <module>/<version> folder containing
+        the specified path.
+
+        This is the same level as produced by get_all_dirs()
+            e.g. /dls_sw/prod/R3.14.12.3/ioc/LI/TI/5-3
+
+        If initial path is *above* this level no version will be included.
+
+    :param filepath: path to search
+    :param top_dir: top directory level: abort search here
+    :return: filepath of module/version
+    """
+
+    test_path = filepath
+    print "trying %s" % test_path
+
+    while not get_all_dirs(test_path) and \
+            os.path.abspath(test_path) != os.path.abspath(top_dir):
+        test_path, _ = os.path.split(test_path)
+        print "trying %s" % test_path
+
+    return test_path
 
 def parse_module_name(filepath):
     """

@@ -1,4 +1,6 @@
 import pkg_resources
+from convert.utils import find_modules
+
 pkg_resources.require('dls_epicsparser')
 import os
 import sys
@@ -99,17 +101,47 @@ def get_config_section(cfg, name):
     return cfg_section
 
 
+def get_modules(args, gen_cfg, area):
+    """
+    :param args: conversion arguments (uses .all and .module)
+    :param module_cfg: configuration containing area
+    :param gen_cfg: configuration containing general/prod_root and general/mirror_root
+    :return: list of Modules
+    """
+    modules = []
+
+    root = gen_cfg.get('general', 'prod_root')
+    mirror = gen_cfg.get('general', 'mirror_root')
+
+    if args.all:
+        #TODO: update to return list of modcoord instead of (name,area,version,root)
+        all_mods = find_modules(os.path.join(root, area))
+
+        for m in all_mods:
+            print m
+
+            module_cfg = get_config_section(cfg, m)
+            modules.append(
+                module.Module(m, module_cfg, area, root, mirror))
+    else:
+        print args.module
+
+        #TODO: update to use modcoord instead of (name,area,version,root)
+        module_cfg = get_config_section(cfg, args.module)
+        modules.append(
+            module.Module(args.module, module_cfg, area, root, mirror))
+
+    return modules
+
 if __name__ == '__main__':
     args = parse_arguments()
     gen_cfg = parse_configuration(args.general_config)
-    cfg = parse_configuration(args.module_config)
+    cfg = parse_configuration(args.module_config)  #ioc.conf or support.conf
+    area = 'ioc' if args.ioc else 'support'
+
     print(gen_cfg.get('general', 'java'))
 
-    module_cfg = get_config_section(cfg, args.module)
-    module_cfg['area'] = 'ioc' if args.ioc else 'support'
-    print(module_cfg)
+    modules = get_modules(args, gen_cfg, area)
 
-    m = module.Module(args.module, module_cfg,
-                      gen_cfg.get('general', 'prod_root'),
-                      gen_cfg.get('general', 'mirror_root'))
-    print(m.get_dependencies())
+    for mod in modules:
+        print(mod.get_dependencies())

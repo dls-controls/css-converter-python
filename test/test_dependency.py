@@ -21,6 +21,7 @@ class TestIncrementVersion(unittest.TestCase):
         d = DependencyParser('/dls_sw/prod/R3.14.12.3', 'ioc', 'LI/TI', '5-3')
         depends = d.find_dependencies()
 
+        print "Searching: %s" % d._module_path
         for k, v in depends.iteritems():
             print k, v
 
@@ -29,5 +30,6 @@ class TestIncrementVersion(unittest.TestCase):
         d = DependencyParser('/dls_sw/prod/R3.14.12.3', 'support', 'dlsPLC', '1-30')
         depends = d.find_dependencies()
 
+        print "Searching: %s" % d._module_path
         for k, v in depends.iteritems():
             print k, v
