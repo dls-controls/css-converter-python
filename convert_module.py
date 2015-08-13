@@ -58,8 +58,6 @@ def parse_arguments():
     ap = build_parser()
     arguments = ap.parse_args()
 
-    print arguments
-
     arguments.general_config = os.path.join(arguments.config, GENERAL_CONFIG)
 
     if arguments.support:
@@ -87,6 +85,7 @@ def parse_configuration(filepath):
 
 def get_config_section(cfg, name):
     cfg_section = {'datapath': 'data',
+                   'opipath': name + 'App/opi/opi',
                    'layers': [],
                    'groups': [],
                    'symbols': [],
@@ -119,30 +118,21 @@ def get_modules(args, gen_cfg, area):
     if args.all:
         #TODO: update to return list of modcoord instead of (name,area,version,root)
         all_mods = utils.find_modules(os.path.join(root, area))
-
-        for m in all_mods:
-            print m
-
-            module_cfg = get_config_section(cfg, m)
-            version = utils.get_latest_version(os.path.join(root, area, args.module))
-            coords = coordinates.create(root, area, m, version)
-            modules.append(
-                module.Module(coords, mirror))
     else:
-        print args.module
+        all_mods = [args.module]
 
-        #TODO: update to use modcoord instead of (name,area,version,root)
-        module_cfg = get_config_section(cfg, args.module)
-        print('{} {} {}'.format(root, area, args.module))
-        print(os.path.join(root, area, args.module))
-        version = utils.get_latest_version(os.path.join(root, area, args.module))
-        print('The latest version for {} is {}'.format(args.module, version))
-        coords = coordinates.create(root, area, args.module, version)
-        modules.append(module.Module(coords, mirror))
+    for m in all_mods:
+        print('The module is {}'.format(m))
+        module_cfg = get_config_section(cfg, m)
+        version = utils.get_latest_version(os.path.join(root, area, m))
+        coords = coordinates.create(root, area, m, version)
+        modules.append(module.Module(coords, module_cfg['datapath'],
+                                     module_cfg['opipath'], mirror))
 
     return modules
 
 if __name__ == '__main__':
+    force = False
     args = parse_arguments()
     gen_cfg = parse_configuration(args.general_config)
     cfg = parse_configuration(args.module_config)  #ioc.conf or support.conf
@@ -153,4 +143,14 @@ if __name__ == '__main__':
     modules = get_modules(args, gen_cfg, area)
 
     for mod in modules:
-        print(mod.get_dependencies())
+        dependencies = mod.get_dependencies()
+        print('The dependencies are {}'.format(dependencies))
+        dirs = [mod.get_datadir()]
+        for dep, dep_coords in dependencies.items():
+            mod_cfg = get_config_section(cfg, mod.coords.module)
+            print('The dep is {}'.format(dep))
+            dep_mod = module.Module(dep_coords, mod_cfg['datapath'], mod_cfg['opipath'],
+                                    gen_cfg.get('general', 'mirror_root'))
+            dirs.append(dep_mod.get_datadir())
+        file_index = paths.index_paths(dirs, True)
+        mod.convert(file_index, force)
