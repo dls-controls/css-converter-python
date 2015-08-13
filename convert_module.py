@@ -6,7 +6,7 @@ import sys
 import argparse
 import ConfigParser
 
-from convert import module, utils, coordinates
+from convert import module, utils, coordinates, paths
 
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
