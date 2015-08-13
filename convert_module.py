@@ -45,6 +45,7 @@ def build_parser():
     ap.add_argument('-c', "--config",
         help='configuration file directory', metavar='<config-file>', default='conf/')
 
+    ap.add_argument('-f', "--force", help='Replace all files', action='store_true')
     return ap
 
 
@@ -132,7 +133,6 @@ def get_modules(args, gen_cfg, area):
     return modules
 
 if __name__ == '__main__':
-    force = False
     args = parse_arguments()
     gen_cfg = parse_configuration(args.general_config)
     cfg = parse_configuration(args.module_config)  #ioc.conf or support.conf
@@ -153,4 +153,4 @@ if __name__ == '__main__':
                                     gen_cfg.get('general', 'mirror_root'))
             dirs.append(dep_mod.get_datadir())
         file_index = paths.index_paths(dirs, True)
-        mod.convert(file_index, force)
+        mod.convert(file_index, args.force)
