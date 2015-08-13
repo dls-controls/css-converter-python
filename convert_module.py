@@ -8,6 +8,11 @@ import ConfigParser
 
 from convert import module, utils, coordinates
 
+import logging as log
+LOG_FORMAT = '%(levelname)s:  %(message)s'
+LOG_LEVEL = log.DEBUG
+log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
+
 
 IOC_CONFIG = 'ioc.ini'
 SUPPORT_CONFIG = 'support.ini'
