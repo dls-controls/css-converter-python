@@ -10,6 +10,7 @@ def convert(origin, destination):
 class Module(object):
 
     def __init__(self, coords, mirror_root):
+        self.coords = coords
         self.name = coords.module
         self.area = coords.area
         self.old_version = coords.version
@@ -24,9 +25,7 @@ class Module(object):
         self.deps = []
 
     def get_dependencies(self):
-        print(self.name, self.old_version)
-        dp = dependency.DependencyParser(self.prod_root, self.area,
-                                         self.name, self.old_version)
+        dp = dependency.DependencyParser(self.coords)
         self.deps = dp.find_dependencies()
 
     def get_dependency_file_dict(self):
