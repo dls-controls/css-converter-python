@@ -1,5 +1,6 @@
 from collections import namedtuple
 import os
+
 from convert.utils import find_module_from_path
 
 __author__ = 'xzl80115'
@@ -7,8 +8,8 @@ __author__ = 'xzl80115'
 ModCoord = namedtuple('ModCoord', 'root, area, module, version')
 
 
-def generate_coord(filepath):
-    """ Separate a filepath into:
+def from_path(filepath):
+    """ Separate a file path into:
             root = File location (e.g. /dls_sw/prod/R3.14.12.3)
             area = [ioc / support]
             module = path between <area> and <version>
@@ -26,10 +27,10 @@ def generate_coord(filepath):
     base, module = os.path.split(base)
     root, area = os.path.split(base)
 
-    return create_coordinate(root, area, module, version)
+    return create(root, area, module, version)
 
 
-def create_coordinate(root, area, module, version=None):
+def create(root, area, module, version=None):
     """ Generate a coordinate tuple for a module or file
     :param root: File location (e.g. /dls_sw/prod/R3.14.12.3)
     :param area: "ioc" or "support"

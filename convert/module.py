@@ -3,7 +3,7 @@ import files
 import os
 import shutil
 import dependency
-import coords
+import coordinates
 import paths
 
 
@@ -13,12 +13,12 @@ def convert(origin, destination):
 
 class Module(object):
 
-    def __init__(self, coordinates, mirror_root):
-        self.coordinates = coordinates
-        self.old_version = coordinates.version
-        self.module_dir = coords.as_path(coordinates, False)
+    def __init__(self, coords, mirror_root):
+        self.coordinates = coords
+        self.old_version = coords.version
+        self.module_dir = coordinates.as_path(coords, False)
         if not os.path.exists(self.module_dir):
-            raise ValueError('Cannot locate module {} at {}'.format(coordinates.name,
+            raise ValueError('Cannot locate module {} at {}'.format(coords.name,
                                                                     self.module_dir))
 
         self.mirror_root = mirror_root

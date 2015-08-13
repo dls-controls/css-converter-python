@@ -1,8 +1,4 @@
 import pkg_resources
-from convert import utils
-from convert import coords
-
-
 pkg_resources.require('dls_epicsparser')
 
 import os
@@ -10,7 +6,7 @@ import sys
 import argparse
 import ConfigParser
 
-from convert import module, utils
+from convert import module, utils, coordinates
 
 
 IOC_CONFIG = 'ioc.ini'
@@ -124,9 +120,9 @@ def get_modules(args, gen_cfg, area):
 
             module_cfg = get_config_section(cfg, m)
             version = utils.get_latest_version(os.path.join(root, area, args.module))
-            coordinates = coords.create_coordinate(root, area, m, version)
+            coords = coordinates.create(root, area, m, version)
             modules.append(
-                module.Module(coordinates, mirror))
+                module.Module(coords, mirror))
     else:
         print args.module
 
@@ -136,8 +132,8 @@ def get_modules(args, gen_cfg, area):
         print(os.path.join(root, area, args.module))
         version = utils.get_latest_version(os.path.join(root, area, args.module))
         print('The latest version for {} is {}'.format(args.module, version))
-        coordinates = coords.create_coordinate(root, area, args.module, version)
-        modules.append(module.Module(coordinates, mirror))
+        coords = coordinates.create(root, area, args.module, version)
+        modules.append(module.Module(coords, mirror))
 
     return modules
 

@@ -1,4 +1,4 @@
-from convert import coords
+from convert import coordinates
 import dls_epicsparser.releaseparser
 import os
 
@@ -16,7 +16,7 @@ class DependencyParser(object):
         assert module_coord.version is not None, \
             "Cannot find dependencies of module (%s) with no version" % module_coord.module
 
-        self._module_path = coords.as_path(module_coord)
+        self._module_path = coordinates.as_path(module_coord)
 
     def find_dependencies(self):
         """ Generate a dictionary of dependencies for this module
@@ -30,7 +30,7 @@ class DependencyParser(object):
 
         for dependency in r.flatten():
             if self.is_valid(dependency):
-                dependencies[dependency.name] = coords.generate_coord(dependency.path)
+                dependencies[dependency.name] = coordinates.from_path(dependency.path)
 
         return dependencies
 
