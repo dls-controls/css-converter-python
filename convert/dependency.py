@@ -1,3 +1,4 @@
+from convert import descriptor
 import dls_epicsparser.releaseparser
 import os
 
@@ -7,7 +8,7 @@ EPICS_BASE = '/dls_sw/epics/R3.14.12.3/base'
 
 class DependencyParser(object):
 
-    def __init__(self, root, area, module_name, version):
+    def __init__(self, module_coord):
         """ Parse dependencies for IOC
 
         :param root: Base path to search ('/dls_sw/prod/R3.14.12.3')
@@ -15,7 +16,7 @@ class DependencyParser(object):
         :param module_name: IOC/support module name (e.g. "LI/TI")
         :param version: Version number to inspect (e.g. "5-4")
         """
-        self._module_path = os.path.join(root, area, module_name, version)
+        self._module_path = descriptor.as_path(module_coord)
 
     def find_dependencies(self):
         """ Generate a dictionary of dependencies for this module
@@ -29,7 +30,7 @@ class DependencyParser(object):
 
         for dependency in r.flatten():
             if self.is_valid(dependency):
-                dependencies[dependency.name] = (os.path.split(dependency.path))
+                dependencies[dependency.name] = descriptor.generate_coord(dependency.path)
 
         return dependencies
 

@@ -36,3 +36,16 @@ def create_coordinate(root, area, module, version=None):
     :return:
     """
     return ModCoord(root, area, module, version)
+
+def as_path(coord):
+    """ Convert a module coordinate object to a file path
+
+    :param coord: Coordinate to interpret
+    :return: Full path to module
+    """
+    if coord.version is None:
+        path = os.path.join(coord.root, coord.area, coord.module)
+    else:
+        path = os.path.join(coord.root, coord.area, coord.module, coord.version)
+
+    return path

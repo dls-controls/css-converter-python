@@ -1,4 +1,5 @@
 import unittest
+from convert import descriptor
 from convert.descriptor import create_coordinate, generate_coord
 
 
@@ -37,9 +38,19 @@ class TestDescriptors(unittest.TestCase):
         self.assertEqual("mirror", x.module)
         self.assertEqual("4-7-3", x.version)
 
+class TestCoordinatePaths(unittest.TestCase):
 
+    def test_as_path_returns_full_path_if_version_specified(self):
+        x = create_coordinate("/my_root", "my_area", "my_module", "my_version")
+        path = descriptor.as_path(x)
 
+        self.assertEqual("/my_root/my_area/my_module/my_version", path)
 
+    def test_as_path_returns_full_path_if_version_not_specified(self):
+        x = create_coordinate("/my_root", "my_area", "my_module")
+        path = descriptor.as_path(x)
+
+        self.assertEqual("/my_root/my_area/my_module", path)
 
 class TestCoordinates(unittest.TestCase):
 
