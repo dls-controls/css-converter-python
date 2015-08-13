@@ -36,3 +36,7 @@ class TestIncrementVersion(unittest.TestCase):
         print "Searching: %s" % d._module_path
         for k, v in depends.iteritems():
             print k, v
+
+    def test_depends_parser_asserts_if_coordinate_does_not_contain_version(self):
+        coord = coords.create_coordinate('/dls_sw/prod/R3.14.12.3', 'ioc', 'LI/TI', None)
+        self.assertRaises(AssertionError, DependencyParser, coord)
