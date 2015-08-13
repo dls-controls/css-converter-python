@@ -11,11 +11,11 @@ class DependencyParser(object):
     def __init__(self, module_coord):
         """ Parse dependencies for IOC
 
-        :param root: Base path to search ('/dls_sw/prod/R3.14.12.3')
-        :param area: Module area: 'support' or 'ioc'
-        :param module_name: IOC/support module name (e.g. "LI/TI")
-        :param version: Version number to inspect (e.g. "5-4")
+        :param module_coord: tuple containing path to searchm area, mod name and version
         """
+        assert module_coord.version is not None, \
+            "Cannot find dependencies of module (%s) with no version" % module_coord.module
+
         self._module_path = coords.as_path(module_coord)
 
     def find_dependencies(self):
