@@ -1,4 +1,4 @@
-from convert import descriptor
+from convert import coords
 import dls_epicsparser.releaseparser
 import os
 
@@ -16,7 +16,7 @@ class DependencyParser(object):
         :param module_name: IOC/support module name (e.g. "LI/TI")
         :param version: Version number to inspect (e.g. "5-4")
         """
-        self._module_path = descriptor.as_path(module_coord)
+        self._module_path = coords.as_path(module_coord)
 
     def find_dependencies(self):
         """ Generate a dictionary of dependencies for this module
@@ -30,7 +30,7 @@ class DependencyParser(object):
 
         for dependency in r.flatten():
             if self.is_valid(dependency):
-                dependencies[dependency.name] = descriptor.generate_coord(dependency.path)
+                dependencies[dependency.name] = coords.generate_coord(dependency.path)
 
         return dependencies
 

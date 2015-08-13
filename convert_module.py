@@ -1,14 +1,12 @@
 import pkg_resources
-from convert.utils import find_modules
-
 pkg_resources.require('dls_epicsparser')
+
 import os
 import sys
 import argparse
 import ConfigParser
 
-
-from convert import module
+from convert import module, utils
 
 
 IOC_CONFIG = 'ioc.ini'
@@ -115,7 +113,7 @@ def get_modules(args, gen_cfg, area):
 
     if args.all:
         #TODO: update to return list of modcoord instead of (name,area,version,root)
-        all_mods = find_modules(os.path.join(root, area))
+        all_mods = utils.find_modules(os.path.join(root, area))
 
         for m in all_mods:
             print m
