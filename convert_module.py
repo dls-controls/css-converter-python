@@ -31,21 +31,21 @@ def build_parser():
     ap = argparse.ArgumentParser()
 
     target_group = ap.add_mutually_exclusive_group(required=True)
-    target_group.add_argument('-a', "--all",
+    target_group.add_argument('-a', '--all',
         help='all support or IOC modules', action='store_true')
-    target_group.add_argument('-m', "--module",
+    target_group.add_argument('-m', '--module',
         help='IOC or support module', metavar='<module>')
 
     module_type_group = ap.add_mutually_exclusive_group(required=True)
-    module_type_group.add_argument('-i', "--ioc",
+    module_type_group.add_argument('-i', '--ioc',
         help='module is an ioc', action='store_true')
-    module_type_group.add_argument('-s', "--support",
+    module_type_group.add_argument('-s', '--support',
         help='module is support module', action='store_true')
 
-    ap.add_argument('-c', "--config",
+    ap.add_argument('-c', '--config',
         help='configuration file directory', metavar='<config-file>', default='conf/')
 
-    ap.add_argument('-f', "--force", help='Replace all files', action='store_true')
+    ap.add_argument('-f', '--force', help='Replace all files', action='store_true')
     return ap
 
 
@@ -68,11 +68,11 @@ def parse_arguments():
 
 
     if not os.path.exists(arguments.general_config):
-        print('Could not locate configuration file {}'.format(arguments.general_config))
+        log.warn('Could not locate configuration file %s', arguments.general_config)
         sys.exit()
 
     if not os.path.exists(arguments.module_config):
-        print('Could not locate configuration file {}'.format(arguments.module_config))
+        log.warn('Could not locate configuration file %s', arguments.module_config)
         sys.exit()
 
     return arguments
@@ -117,13 +117,12 @@ def get_modules(args, gen_cfg, area):
     mirror = gen_cfg.get('general', 'mirror_root')
 
     if args.all:
-        #TODO: update to return list of modcoord instead of (name,area,version,root)
+        # TODO: update to return list of modcoord instead of (name,area,version,root)
         all_mods = utils.find_modules(os.path.join(root, area))
     else:
         all_mods = [args.module]
 
     for m in all_mods:
-        print('The module is {}'.format(m))
         module_cfg = get_config_section(cfg, m)
         version = utils.get_latest_version(os.path.join(root, area, m))
         coords = coordinates.create(root, area, m, version)
@@ -138,17 +137,13 @@ if __name__ == '__main__':
     cfg = parse_configuration(args.module_config)  #ioc.conf or support.conf
     area = 'ioc' if args.ioc else 'support'
 
-    print(gen_cfg.get('general', 'java'))
-
     modules = get_modules(args, gen_cfg, area)
 
     for mod in modules:
         dependencies = mod.get_dependencies()
-        print('The dependencies are {}'.format(dependencies))
         dirs = [mod.get_datadir()]
         for dep, dep_coords in dependencies.items():
             mod_cfg = get_config_section(cfg, mod.coords.module)
-            print('The dep is {}'.format(dep))
             dep_mod = module.Module(dep_coords, mod_cfg['datapath'], mod_cfg['opipath'],
                                     gen_cfg.get('general', 'mirror_root'))
             dirs.append(dep_mod.get_datadir())

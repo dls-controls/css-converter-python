@@ -25,7 +25,7 @@ def find_modules(filepath):
     :param filepath:
     :return: list of module_names
     """
-    print "Finding modules in: %s" % filepath
+    log.debug('Finding modules in: %s', filepath)
     all_paths = get_all_dirs(filepath)
     modules = set()
 
@@ -35,9 +35,9 @@ def find_modules(filepath):
             if relpath in EXPECTED_DIR_IN_MODULE:
                 modules.add(module_name)
         except ValueError as ex:
-            print ex.message
+            log.warn(ex.message)
 
-    print modules
+    log.debug('Found modules %s', modules)
 
     return list(modules)
 
@@ -58,7 +58,7 @@ def get_latest_version(filepath):
     all_parts = []
     for root, dirs, _ in os.walk(filepath):
         for version in dirs:
-            all_parts.append( (parse_version(version), version) )
+            all_parts.append((parse_version(version), version))
         # only process the first level of the tree; this should contain the
         # release version folders
         break
@@ -66,7 +66,7 @@ def get_latest_version(filepath):
     if all_parts:
         version_string = max(all_parts)[1]
     else:
-        raise ValueError("No version found in %s", filepath)
+        raise ValueError('No version found in %s', filepath)
 
     return version_string
 
@@ -82,7 +82,7 @@ def parse_version(version_string):
     :return: numeric elements as list of values ordered as in the string (e.g. [1,4,2,4])
     """
 
-    matches = re.findall("\d+\d*", version_string)
+    matches = re.findall('\d+\d*', version_string)
     return [int(m) for m in matches]
 
 
@@ -106,7 +106,7 @@ def get_all_dirs(filepath):
     return all_paths
 
 
-def find_module_from_path(filepath, top_dir="/dls_sw/prod/R3.14.12.3"):
+def find_module_from_path(filepath, top_dir='/dls_sw/prod/R3.14.12.3'):
     """ Crawl UP the file system to find the <module>/<version> folder containing
         the specified path.
 
@@ -121,14 +121,15 @@ def find_module_from_path(filepath, top_dir="/dls_sw/prod/R3.14.12.3"):
     """
 
     test_path = filepath
-    print "trying %s" % test_path
+    log.debug('Trying %s', test_path)
 
     while not get_all_dirs(test_path) and \
             os.path.abspath(test_path) != os.path.abspath(top_dir):
         test_path, _ = os.path.split(test_path)
-        print "trying %s" % test_path
+        log.debug('Trying %s', test_path)
 
     return test_path
+
 
 def parse_module_name(filepath):
     """
@@ -138,7 +139,7 @@ def parse_module_name(filepath):
 
     version may be None
     """
-    log.debug("Parsing %s.", filepath)
+    log.debug('Parsing %s.', filepath)
     filepath = os.path.realpath(filepath)
     filepath = os.path.normpath(filepath)
     parts = filepath.split('/')
@@ -154,7 +155,7 @@ def parse_module_name(filepath):
 
     v = None
     for i, p in enumerate(parts):
-        if p == "":
+        if p == '':
             continue
         if p[0].isdigit() or p == 'Rx-y':
             version = p
@@ -203,7 +204,7 @@ def make_read_only(filename, executable=False):
         st = os.stat(filename)
         os.chmod(filename, st.st_mode & ~stat.S_IWUSR & ~stat.S_IWGRP & ~stat.S_IWOTH)
     except OSError:
-        log.debug("Failed to make file %s read-only.", filename)
+        log.debug('Failed to make file %s read-only.', filename)
 
 
 def make_writeable(filename):
@@ -214,7 +215,7 @@ def make_writeable(filename):
         st = os.stat(filename)
         os.chmod(filename, st.st_mode | stat.S_IWUSR)
     except OSError:
-        log.debug("Failed to make file %s writeable.", filename)
+        log.debug('Failed to make file %s writeable.', filename)
 
 
 def read_conf_file(filename):
@@ -255,5 +256,3 @@ def generate_project_file(outdir, module_name, version):
             updated_content = s.substitute(module_name=module_name,
                                            version=version)
             f.write(updated_content)
-
-

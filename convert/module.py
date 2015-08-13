@@ -18,7 +18,7 @@ def handle_one_file(origin, destination, module, depth, file_index, force):
     if edl_file:
         destination = destination[:-len(EDL_EXTENSION)] + OPI_EXTENSION
     if not force and os.path.exists(destination):
-        print('Skipping existing file {}'.format(destination))
+        log.info('Skipping existing file {}'.format(destination))
     else:
         if edl_file:
             files.convert_edl(origin, destination)
@@ -27,7 +27,7 @@ def handle_one_file(origin, destination, module, depth, file_index, force):
             try:
                 shutil.copy2(origin, destination)
             except IOError as e:
-                print('Error trying to copy {}: {}'.format(origin, e))
+                log.warn('Error trying to copy {}: {}'.format(origin, e))
 
 
 def convert_all(origin, destination, module, file_index, force):
@@ -110,7 +110,6 @@ class Module(object):
         return file_dict
 
     def convert(self, file_index, force):
-        print('Converting {}'.format(self.module_dir))
         new_root = os.path.join(self.mirror_root, self.module_dir[1:], self.new_version)
         origin = new_root if self.datadir == '.' else os.path.join(new_root, self.datadir)
         destination = os.path.join(new_root, self.opidir)
