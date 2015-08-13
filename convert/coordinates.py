@@ -1,7 +1,7 @@
 from collections import namedtuple
 import os
 
-from convert.utils import find_module_from_path
+from convert import utils
 
 __author__ = 'xzl80115'
 
@@ -21,13 +21,19 @@ def from_path(filepath):
     # try to get module path
     ## WIP: attempt to stip the 'it's a file' case
     if not os.path.isdir(filepath):
-        filepath = find_module_from_path(filepath)
+        filepath = utils.find_module_from_path(filepath)
 
     base, version = os.path.split(filepath)
     base, module = os.path.split(base)
     root, area = os.path.split(base)
 
     return create(root, area, module, version)
+
+
+def from_path2(filepath):
+    mp, m, v, rp = utils.parse_module_name(filepath)
+    root, area = os.path.split(mp)
+    return create(root, area, m, v)
 
 
 def create(root, area, module, version=None):

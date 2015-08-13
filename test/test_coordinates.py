@@ -2,8 +2,7 @@ import unittest
 from convert import coordinates
 
 
-class TestDescriptors(unittest.TestCase):
-
+class TestGenerateCoord(unittest.TestCase):
 
     def test_generate_coord_returns_tuple_with_correct_root_area_and_module_for_modlevel_support_path(self):
         x = coordinates.from_path("/dls_sw/prod/R3.14.12.3/support/mirror")
@@ -29,6 +28,14 @@ class TestDescriptors(unittest.TestCase):
         self.assertEqual("othermod", x.module)
         self.assertEqual("3-2-1", x.version)
 
+    def test_generate_coord_returns_tuple_with_correct_root_area_module_and_version_for_double_modlevel_ioc_path_with_simple_version(self):
+        x = coordinates.from_path2("/dls_sw/prod/R3.14.12.3/ioc/a/b/3-2-1")
+
+        self.assertEqual("/dls_sw/prod/R3.14.12.3", x.root)
+        self.assertEqual("ioc", x.area)
+        self.assertEqual("a/b", x.module)
+        self.assertEqual("3-2-1", x.version)
+
     def test_generate_coord_returns_tuple_with_correct_data_for_modlevel_ioc_path_with_simple_version_and_edl_file(self):
         x = coordinates.from_path("/dls_sw/prod/R3.14.12.3/support/mirror/4-7-3/data/mirrorKBM-I22-HFM.edl")
 
@@ -36,6 +43,7 @@ class TestDescriptors(unittest.TestCase):
         self.assertEqual("support", x.area)
         self.assertEqual("mirror", x.module)
         self.assertEqual("4-7-3", x.version)
+
 
 class TestCoordinatePaths(unittest.TestCase):
 
@@ -50,6 +58,7 @@ class TestCoordinatePaths(unittest.TestCase):
         path = coordinates.as_path(x)
 
         self.assertEqual("/my_root/my_area/my_module", path)
+
 
 class TestCoordinates(unittest.TestCase):
 
@@ -80,3 +89,5 @@ class TestCoordinates(unittest.TestCase):
         self.assertIsNone(x.version)
 
 
+if __name__ == '__main__':
+    unittest.main()
