@@ -1,5 +1,7 @@
 import pkg_resources
-from convert.utils import find_modules
+from convert import utils
+from convert import descriptor
+
 
 pkg_resources.require('dls_epicsparser')
 import os
@@ -115,21 +117,27 @@ def get_modules(args, gen_cfg, area):
 
     if args.all:
         #TODO: update to return list of modcoord instead of (name,area,version,root)
-        all_mods = find_modules(os.path.join(root, area))
+        all_mods = utils.find_modules(os.path.join(root, area))
 
         for m in all_mods:
             print m
 
             module_cfg = get_config_section(cfg, m)
+            version = utils.get_latest_version(os.path.join(root, area, args.module))
+            coords = descriptor.create_coordinate(root, area, m, version)
             modules.append(
-                module.Module(m, module_cfg, area, root, mirror))
+                module.Module(coords, mirror))
     else:
         print args.module
 
         #TODO: update to use modcoord instead of (name,area,version,root)
         module_cfg = get_config_section(cfg, args.module)
-        modules.append(
-            module.Module(args.module, module_cfg, area, root, mirror))
+        print('{} {} {}'.format(root, area, args.module))
+        print(os.path.join(root, area, args.module))
+        version = utils.get_latest_version(os.path.join(root, area, args.module))
+        print('The latest version for {} is {}'.format(args.module, version))
+        coords = descriptor.create_coordinate(root, area, args.module, version)
+        modules.append(module.Module(coords, mirror))
 
     return modules
 

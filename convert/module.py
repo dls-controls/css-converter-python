@@ -9,16 +9,17 @@ def convert(origin, destination):
 
 class Module(object):
 
-    def __init__(self, name, cfg, area, prod_root, mirror_root):
-        self.area = area
-        self.prod_root = prod_root
-        self.module_dir = os.path.join(self.prod_root, self.area, name)
+    def __init__(self, coords, mirror_root):
+        self.name = coords.module
+        self.area = coords.area
+        self.old_version = coords.version
+        self.prod_root = coords.root
+        self.module_dir = os.path.join(self.prod_root, self.area, self.name)
         if not os.path.exists(self.module_dir):
-            raise ValueError('Cannot locate module {} at {}'.format(name, self.module_dir))
+            raise ValueError('Cannot locate module {} at {}'.format(self.name,
+                                                                    self.module_dir))
 
         self.mirror_root = mirror_root
-        self.name = name
-        self.old_version = cfg['version']
         self.new_version = utils.increment_version(self.old_version)
         self.deps = []
 
@@ -26,10 +27,7 @@ class Module(object):
         print(self.name, self.old_version)
         dp = dependency.DependencyParser(self.prod_root, self.area,
                                          self.name, self.old_version)
-        deps = dp.find_dependencies()
-        for d in deps:
-            version = deps[d][1]
-            self.deps.append(Module(d, version, self.prod_root, self.mirror_root, False))
+        self.deps = dp.find_dependencies()
 
     def get_dependency_file_dict(self):
         all_files = {}
