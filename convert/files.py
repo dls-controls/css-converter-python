@@ -24,6 +24,10 @@ SYMBOL_SCRIPT = os.path.join(os.getcwd(), 'res/auto-symb.sh')
 SYMBOL_TO_PNG_CMD = [SYMBOL_SCRIPT]
 
 
+class OldEdlError(Exception):
+    pass
+
+
 def convert_symbol(symbol_file, destinations):
     """
     Convert an EDM symbol file into the png used by the CSS symbol widget.
@@ -116,7 +120,7 @@ def convert_edl(filename, destination):
     Return the conversion return code.
     """
     if is_old_edl(filename):
-        filename = update_edl(filename)
+        raise OldEdlError('EDL file in old format')
     utils.make_writeable(destination)
     log.debug('Converting %s to %s', filename, destination)
     command = CONVERT_CMD + [filename, destination]
