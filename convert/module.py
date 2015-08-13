@@ -1,6 +1,10 @@
-import os
 import utils
+import files
+import os
+import shutil
 import dependency
+import coords
+import paths
 
 
 def convert(origin, destination):
@@ -9,15 +13,12 @@ def convert(origin, destination):
 
 class Module(object):
 
-    def __init__(self, coords, mirror_root):
-        self.coords = coords
-        self.name = coords.module
-        self.area = coords.area
-        self.old_version = coords.version
-        self.prod_root = coords.root
-        self.module_dir = os.path.join(self.prod_root, self.area, self.name)
+    def __init__(self, coordinates, mirror_root):
+        self.coordinates = coordinates
+        self.old_version = coordinates.version
+        self.module_dir = coords.as_path(coordinates, False)
         if not os.path.exists(self.module_dir):
-            raise ValueError('Cannot locate module {} at {}'.format(self.name,
+            raise ValueError('Cannot locate module {} at {}'.format(coordinates.name,
                                                                     self.module_dir))
 
         self.mirror_root = mirror_root
@@ -25,7 +26,7 @@ class Module(object):
         self.deps = []
 
     def get_dependencies(self):
-        dp = dependency.DependencyParser(self.coords)
+        dp = dependency.DependencyParser(self.coordinates)
         self.deps = dp.find_dependencies()
 
     def get_dependency_file_dict(self):

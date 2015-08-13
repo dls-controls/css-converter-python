@@ -6,6 +6,7 @@ __author__ = 'xzl80115'
 
 ModCoord = namedtuple('ModCoord', 'root, area, module, version')
 
+
 def generate_coord(filepath):
     """ Separate a filepath into:
             root = File location (e.g. /dls_sw/prod/R3.14.12.3)
@@ -27,6 +28,7 @@ def generate_coord(filepath):
 
     return create_coordinate(root, area, module, version)
 
+
 def create_coordinate(root, area, module, version=None):
     """ Generate a coordinate tuple for a module or file
     :param root: File location (e.g. /dls_sw/prod/R3.14.12.3)
@@ -37,13 +39,14 @@ def create_coordinate(root, area, module, version=None):
     """
     return ModCoord(root, area, module, version)
 
-def as_path(coord):
+
+def as_path(coord, include_version=True):
     """ Convert a module coordinate object to a file path
 
     :param coord: Coordinate to interpret
     :return: Full path to module
     """
-    if coord.version is None:
+    if coord.version is None or not include_version:
         path = os.path.join(coord.root, coord.area, coord.module)
     else:
         path = os.path.join(coord.root, coord.area, coord.module, coord.version)
