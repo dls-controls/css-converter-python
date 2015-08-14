@@ -105,7 +105,7 @@ class Module(object):
         """
         :return: Full path to edl file directory
         """
-        return os.path.join(self.new_module_dir, self.edl_dir)
+        return os.path.join(self.mirror_root, self.new_module_dir[1:], self.edl_dir)
 
     def convert(self, file_dict, force):
         """
