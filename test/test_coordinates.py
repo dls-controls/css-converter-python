@@ -29,12 +29,20 @@ class TestGenerateCoord(unittest.TestCase):
         self.assertEqual("3-2-1", x.version)
 
     def test_generate_coord_returns_tuple_with_correct_root_area_module_and_version_for_double_modlevel_ioc_path_with_simple_version(self):
-        x = coordinates.from_path2("/dls_sw/prod/R3.14.12.3/ioc/a/b/3-2-1")
+        x = coordinates.from_path("/dls_sw/prod/R3.14.12.3/ioc/a/b/3-2-1")
 
         self.assertEqual("/dls_sw/prod/R3.14.12.3", x.root)
         self.assertEqual("ioc", x.area)
         self.assertEqual("a/b", x.module)
         self.assertEqual("3-2-1", x.version)
+
+    def test_generate_coord_returns_tuple_with_correct_root_area_module_and_version_for_double_modlevel_ioc_path_with_no_version(self):
+        x = coordinates.from_path("/dls_sw/prod/R3.14.12.3/ioc/a/b")
+
+        self.assertEqual("/dls_sw/prod/R3.14.12.3", x.root)
+        self.assertEqual("ioc", x.area)
+        self.assertEqual("a/b", x.module)
+        self.assertIsNone(x.version)
 
     def test_generate_coord_returns_tuple_with_correct_data_for_modlevel_ioc_path_with_simple_version_and_edl_file(self):
         x = coordinates.from_path("/dls_sw/prod/R3.14.12.3/support/mirror/4-7-3/data/mirrorKBM-I22-HFM.edl")

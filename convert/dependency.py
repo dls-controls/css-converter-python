@@ -8,15 +8,17 @@ EPICS_BASE = '/dls_sw/epics/R3.14.12.3/base'
 
 class DependencyParser(object):
 
-    def __init__(self, module_coord):
+    def __init__(self, module_coord, additional_depends=None):
         """ Parse dependencies for IOC
 
-        :param module_coord: tuple containing path to searchm area, mod name and version
+        :param module_coord: tuple containing path to search area, mod name and version
+        :param additional_depends: list of (name, version) tuples for dependencies not in RELEASE
         """
         assert module_coord.version is not None, \
             "Cannot find dependencies of module (%s) with no version" % module_coord.module
-
+        self._additional = additional_depends
         self._module_path = coordinates.as_path(module_coord)
+        self._root = module_coord.root
 
     def find_dependencies(self):
         """ Generate a dictionary of dependencies for this module
@@ -31,6 +33,10 @@ class DependencyParser(object):
         for dependency in r.flatten():
             if self.is_valid(dependency):
                 dependencies[dependency.name] = coordinates.from_path(dependency.path)
+
+        if self._additional is not None:
+            for (name, version) in self._additional:
+                dependencies[name] = coordinates.create(self._root, 'support', name, version)
 
         return dependencies
 
