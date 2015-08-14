@@ -76,7 +76,7 @@ def convert_all(origin, destination, module, file_index, force):
 
 class Module(object):
 
-    def __init__(self, coords, edl_dir, opi_dir, mirror_root, additional_depends):
+    def __init__(self, coords, edl_dir, opi_dir, mirror_root, extra_deps):
         """
 
         :param coords: source module co-ord
@@ -88,7 +88,7 @@ class Module(object):
         self.edl_dir = edl_dir
         self.opi_dir = opi_dir
         self.mirror_root = mirror_root
-        self.additonal_depends = additional_depends
+        self.extra_deps = extra_deps
 
         self.new_version = utils.increment_version(coords.version)
         self.new_module_dir = os.path.join(coordinates.as_path(coords, False),
@@ -98,7 +98,7 @@ class Module(object):
         """
         :return: List of coords of all module dependencies
         """
-        dp = dependency.DependencyParser(self.coords, self.additonal_depends)
+        dp = dependency.DependencyParser(self.coords, self.extra_deps)
         return dp.find_dependencies()
 
     def get_edl_path(self):
