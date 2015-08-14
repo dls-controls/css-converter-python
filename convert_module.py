@@ -150,13 +150,11 @@ if __name__ == '__main__':
         dependencies = mod.get_dependencies()
         edl_dirs = [mod.get_edl_path()]
         for dep, dep_coords in dependencies.items():
-            mod_cfg = get_config_section(cfg, mod.coords.module)
-
             new_version = utils.increment_version(dep_coords.version)
             dep_edl_path = os.path.join(mirror,
                                       coordinates.as_path(dep_coords, False)[1:],
                                       new_version,
-                                      mod_cfg['datapath'])
+                                      mod.edl_dir)
             edl_dirs.append(dep_edl_path)
 
         file_dict = paths.index_paths(edl_dirs, True)
