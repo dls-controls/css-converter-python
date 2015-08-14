@@ -117,15 +117,18 @@ def get_modules(args, gen_cfg, area):
     mirror = gen_cfg.get('general', 'mirror_root')
 
     if args.all:
-        # TODO: update to return list of modcoord instead of (name,area,version,root)
         all_mods = utils.find_modules(os.path.join(root, area))
     else:
         all_mods = [args.module]
 
-    for m in all_mods:
-        module_cfg = get_config_section(cfg, m)
-        version = utils.get_latest_version(os.path.join(root, area, m))
-        coords = coordinates.create(root, area, m, version)
+    for module_name in all_mods:
+        module_cfg = get_config_section(cfg, module_name)
+        if module_cfg.get('version') is not None:
+            version = module_cfg.version
+        else:
+            version = utils.get_latest_version(os.path.join(root, area, module_name))
+
+        coords = coordinates.create(root, area, module_name, version)
         modules.append(module.Module(coords, module_cfg['datapath'],
                                      module_cfg['opipath'], mirror))
 
