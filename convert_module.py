@@ -144,17 +144,20 @@ if __name__ == '__main__':
     area = 'ioc' if args.ioc else 'support'
 
     modules = get_modules(args, gen_cfg, area)
+    mirror = gen_cfg.get('general', 'mirror_root')
 
     for mod in modules:
         dependencies = mod.get_dependencies()
-        dirs = [mod.get_edl_path()]
+        edl_dirs = [mod.get_edl_path()]
         for dep, dep_coords in dependencies.items():
             mod_cfg = get_config_section(cfg, mod.coords.module)
 
             new_version = utils.increment_version(dep_coords.version)
-            depend_dir = os.path.join(coordinates.as_path(dep_coords, False),
-                                      new_version, mod_cfg['datapath'])
-            dirs.append(depend_dir)
+            dep_edl_path = os.path.join(mirror,
+                                      coordinates.as_path(dep_coords, False)[1:],
+                                      new_version,
+                                      mod_cfg['datapath'])
+            edl_dirs.append(dep_edl_path)
 
-        file_dict = paths.index_paths(dirs, True)
+        file_dict = paths.index_paths(edl_dirs, True)
         mod.convert(file_dict, args.force)
