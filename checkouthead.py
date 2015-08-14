@@ -36,7 +36,6 @@ def checkout_module(name, path, mirror_root):
             subprocess.call(['make'])
         except OSError:
             os.chdir(current_dir)
-    print('Finished checking out all modules.')
 
 
 def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None):
@@ -60,6 +59,7 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None):
             checkout_module(new_coords.module, new_path, mirror_root)
         except ValueError:
             print("Can't handle coordinates {}".format(mcoords))
+    print('Finished checking out all modules.')
 
 
 if __name__ == '__main__':

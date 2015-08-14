@@ -90,6 +90,7 @@ def get_config_section(cfg, name):
                    'layers': [],
                    'groups': [],
                    'symbols': [],
+                   'dependencies': [],
                    'version': None}
     try:
         items = cfg.items(name)
@@ -133,7 +134,8 @@ def get_modules(args, gen_cfg, area):
 
         coords = coordinates.create(root, area, module_name, version)
         modules.append(module.Module(coords, module_cfg['datapath'],
-                                     module_cfg['opipath'], mirror))
+                                     module_cfg['opipath'], mirror,
+                                     module_cfg['dependencies']))
 
     return modules
 
