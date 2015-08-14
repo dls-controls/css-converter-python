@@ -76,34 +76,61 @@ def convert_all(origin, destination, module, file_index, force):
 
 class Module(object):
 
-    def __init__(self, coords, datadir, opidir, mirror_root):
-        self.coords = coords
-        self.datadir = datadir
-        self.opidir = opidir
-        self.old_version = coords.version
-        self.module_dir = coordinates.as_path(coords, False)
-        if not os.path.exists(self.module_dir):
-            raise ValueError('Cannot locate module {} at {}'.format(coords.name,
-                                                                    self.module_dir))
+    def __init__(self, coords, edl_dir, opi_dir, mirror_root):
+        """
 
+        :param coords: source module co-ord
+        :param edl_dir: directory in module to convert edl files from
+        :param opidir: directory in module to store converted opi files
+        :param mirror_root: root of target filesystem
+        """
+        self.coords = coords
+        self.edl_dir = edl_dir
+        self.opi_dir = opi_dir
         self.mirror_root = mirror_root
-        self.new_version = utils.increment_version(self.old_version)
+
+        self.new_version = utils.increment_version(coords.version)
+        self.new_module_dir = os.path.join(coordinates.as_path(coords, False),
+                                           self.new_version)
+
+        if not os.path.exists(self.new_module_dir):
+            raise ValueError('Cannot locate module {} at {}'.format(coords.name,
+                                                                    self.new_module_dir))
 
     def get_dependencies(self):
+        """
+        :return: List of coords of all module dependencies
+        """
         dp = dependency.DependencyParser(self.coords)
         return dp.find_dependencies()
 
-    def get_datadir(self):
-        return os.path.join(self.module_dir, self.old_version, self.datadir)
+    def get_edl_path(self):
+        """
+        :return: Full path to edl file directory
+        """
+        return os.path.join(self.new_module_dir, self.edl_dir)
 
-    def convert(self, file_index, force):
-        new_root = os.path.join(self.mirror_root, self.module_dir[1:], self.new_version)
-        origin = new_root if self.datadir == '.' else os.path.join(new_root, self.datadir)
-        destination = os.path.join(new_root, self.opidir)
+    def convert(self, file_dict, force):
+        """
+
+        :param file_dict: filename -> (module,path-in-module)
+        :param force: Reconvert if destination exists
+        :return:
+        """
+        # self.new_module_dir[1:] strips leading / to allow creation of shadow
+        # file system INSIDE a containing dir /../dls_sw/prod/R3...
+        new_root = os.path.join(self.mirror_root, self.new_module_dir[1:])
+
+        if self.edl_dir == '.':
+            origin = new_root
+        else:
+            origin = os.path.join(new_root, self.edl_dir)
+
+        destination = os.path.join(new_root, self.opi_dir)
         try:
             os.makedirs(destination)
         except OSError:
             # directory already exists
             pass
-        convert_all(origin, destination, self.coords.module, file_index, force)
+        convert_all(origin, destination, self.coords.module, file_dict, force)
 

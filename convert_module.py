@@ -144,11 +144,14 @@ if __name__ == '__main__':
 
     for mod in modules:
         dependencies = mod.get_dependencies()
-        dirs = [mod.get_datadir()]
+        dirs = [mod.get_edl_path()]
         for dep, dep_coords in dependencies.items():
             mod_cfg = get_config_section(cfg, mod.coords.module)
-            dep_mod = module.Module(dep_coords, mod_cfg['datapath'], mod_cfg['opipath'],
-                                    gen_cfg.get('general', 'mirror_root'))
-            dirs.append(dep_mod.get_datadir())
-        file_index = paths.index_paths(dirs, True)
-        mod.convert(file_index, args.force)
+
+            new_version = utils.increment_version(dep_coords.version)
+            depend_dir = os.path.join(coordinates.as_path(dep_coords, False),
+                                      new_version, mod_cfg['datapath'])
+            dirs.append(depend_dir)
+
+        file_dict = paths.index_paths(dirs, True)
+        mod.convert(file_dict, args.force)
