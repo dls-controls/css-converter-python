@@ -93,10 +93,6 @@ class Module(object):
         self.new_module_dir = os.path.join(coordinates.as_path(coords, False),
                                            self.new_version)
 
-        if not os.path.exists(self.new_module_dir):
-            raise ValueError('Cannot locate module {} at {}'.format(coords.name,
-                                                                    self.new_module_dir))
-
     def get_dependencies(self):
         """
         :return: List of coords of all module dependencies
@@ -133,4 +129,3 @@ class Module(object):
             # directory already exists
             pass
         convert_all(origin, destination, self.coords.module, file_dict, force)
-
