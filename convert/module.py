@@ -12,7 +12,7 @@ EDL_EXTENSION = 'edl'
 OPI_EXTENSION = 'opi'
 
 
-def handle_one_file(origin, destination, module, depth, file_index, force):
+def handle_one_file(origin, destination, module, file_index, force):
     log.debug('Handling file: %s to %s', origin, destination)
     edl_file = origin.endswith(EDL_EXTENSION)
     if edl_file:
@@ -22,7 +22,11 @@ def handle_one_file(origin, destination, module, depth, file_index, force):
     else:
         if edl_file:
             files.convert_edl(origin, destination)
-            paths.update_opi_file(destination, depth, file_index, module)
+            # The 'depth' is now always 2.
+            # /proj/module1/opi1.opi
+            #      /module2/opi2.opi
+            # opi1.opi requires a relative path ../../module2/opi2.opi
+            paths.update_opi_file(destination, 2, file_index, module)
         else:
             try:
                 shutil.copy2(origin, destination)
@@ -64,9 +68,8 @@ def convert_all(origin, destination, module, file_index, force):
         destpaths = [os.path.join(destination, rp) for rp in relpaths]
         log.debug('The destination paths are %s', destpaths)
         for o, d, r in zip(originpaths, destpaths, relpaths):
-            depth = len(r.split(os.sep))
             try:
-                handle_one_file(o, d, module, depth, file_index, force)
+                handle_one_file(o, d, module, file_index, force)
             except files.OldEdlError:
                 log.warn('Skipping old edl file %s', o)
                 old_edl_files.append(o)
