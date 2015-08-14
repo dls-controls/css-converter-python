@@ -96,19 +96,6 @@ class Module(object):
     def get_datadir(self):
         return os.path.join(self.module_dir, self.old_version, self.datadir)
 
-    def get_file_dict(self, datadir):
-        # For all files return a dictionary
-        # {filename: (module, path-within-module)}
-        # This allows us to find any edl file by name
-        datapath = os.path.join(self.module_dir, self.old_version, datadir)
-        file_dict = {}
-        for dirname, dirs, filenames in os.walk(datapath):
-            for f in filenames:
-                relpath = os.path.relpath(os.path.join(dirname, f), datapath)
-                file_dict[f] = self.coords.module, relpath
-
-        return file_dict
-
     def convert(self, file_index, force):
         new_root = os.path.join(self.mirror_root, self.module_dir[1:], self.new_version)
         origin = new_root if self.datadir == '.' else os.path.join(new_root, self.datadir)
