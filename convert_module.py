@@ -123,9 +123,9 @@ def get_modules(args, gen_cfg, area):
 
     for module_name in all_mods:
         module_cfg = get_config_section(cfg, module_name)
-        if module_cfg.get('version') is not None:
-            version = module_cfg['version']
-        else:
+        # use latest version unless set explicitly in config file
+        version = module_cfg.get('version')
+        if version is not None:
             version = utils.get_latest_version(os.path.join(root, area, module_name))
 
         coords = coordinates.create(root, area, module_name, version)
