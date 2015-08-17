@@ -85,8 +85,12 @@ def parse_configuration(filepath):
 
 
 def get_config_section(cfg, name):
+    # In some cases, the new opi dir will be at moduleNameApp/opi/opi.
+    # In some of those cases, the IOC name may be prefix/moduleName
+    # e.g. CS/CS-RF-IOC-01 but the leading CS needs removing
+    opi_dir = name.split(os.sep)[-1] + 'App/opi/opi'
     cfg_section = {'edl_dir': 'data',
-                   'opi_dir': name + 'App/opi/opi',
+                   'opi_dir': opi_dir,
                    'layers': [],
                    'groups': [],
                    'symbols': [],
