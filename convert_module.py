@@ -85,20 +85,20 @@ def parse_configuration(filepath):
 
 
 def get_config_section(cfg, name):
-    cfg_section = {'datapath': 'data',
-                   'opipath': name + 'App/opi/opi',
+    cfg_section = {'edl_dir': 'data',
+                   'opi_dir': name + 'App/opi/opi',
                    'layers': [],
                    'groups': [],
                    'symbols': [],
-                   'dependencies': [],
+                   'extra_deps': [],
                    'version': None}
     try:
         items = cfg.items(name)
         for key, value in items:
-            if key in ('layers', 'groups', 'symbols', 'dependencies'):
+            if key in ('layers', 'groups', 'symbols', 'extra_deps'):
                 cfg_section[key] = [val.strip() for val in value.split(';')
                                     if val != '']
-                if key == 'dependencies':
+                if key == 'extra_deps':
                     cfg_section[key] = [os.path.split(val) for val in
                                         cfg_section[key]]
             else:
@@ -133,11 +133,10 @@ def get_modules(args, gen_cfg, area):
             version = utils.get_latest_version(os.path.join(root, area, module_name))
 
         coords = coordinates.create(root, area, module_name, version)
-        modules.append(module.Module(coords, module_cfg['datapath'],
-                                     module_cfg['opipath'], mirror,
-                                     module_cfg['dependencies']))
+        modules.append(module.Module(coords, module_cfg, mirror))
 
     return modules
+
 
 if __name__ == '__main__':
     args = parse_arguments()

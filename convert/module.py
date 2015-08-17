@@ -81,7 +81,7 @@ def convert_all(origin, destination, module, file_index, force):
 
 class Module(object):
 
-    def __init__(self, coords, edl_dir, opi_dir, mirror_root, extra_deps):
+    def __init__(self, coords, cfg_dict, mirror_root):
         """
 
         :param coords: source module co-ord
@@ -90,10 +90,10 @@ class Module(object):
         :param mirror_root: root of target filesystem
         """
         self.coords = coords
-        self.edl_dir = edl_dir
-        self.opi_dir = opi_dir
+        self.edl_dir = cfg_dict['edl_dir']
+        self.opi_dir = cfg_dict['opi_dir']
+        self.extra_deps = cfg_dict['extra_deps']
         self.mirror_root = mirror_root
-        self.extra_deps = extra_deps
 
         self.new_version = utils.increment_version(coords.version)
         self.new_module_dir = os.path.join(coordinates.as_path(coords, False),
