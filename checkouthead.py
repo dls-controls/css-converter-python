@@ -74,4 +74,4 @@ if __name__ == '__main__':
     version = utils.get_latest_version(coordinates.as_path(coords))
     full_coords = coordinates.create(prod_root, area, args.module, version)
     checkout_coords(full_coords, mirror_root, True,
-                    module_cfg.get('dependencies', []))
+                    module_cfg.get('extra_deps', []))
