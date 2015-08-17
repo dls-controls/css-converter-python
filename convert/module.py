@@ -96,8 +96,14 @@ class Module(object):
         self.mirror_root = mirror_root
 
         self.new_version = utils.increment_version(coords.version)
-        self.new_module_dir = os.path.join(coordinates.as_path(coords, False),
-                                           self.new_version)
+        prod_path = coordinates.as_path(coords, False)
+        # prod_path[1:] strips leading / to allow creation of shadow
+        # file system INSIDE a containing dir /.../dls_sw/prod/R3...
+        self.conversion_root = os.path.join(mirror_root, prod_path[:1],
+                                            self.new_version)
+        if not os.path.exists(self.conversion_root):
+            err_msg = 'Module to be converted does not exist: {}'
+            raise ValueError(err_msg.format(self.conversion_root))
 
     def get_dependencies(self):
         """
@@ -110,8 +116,7 @@ class Module(object):
         """
         :return: Full path to edl file directory
         """
-        edl_path =  os.path.join(self.mirror_root, self.new_module_dir[1:],
-                                 self.edl_dir)
+        edl_path =  os.path.join(self.conversion_root, self.edl_dir)
         return os.path.normpath(edl_path)
 
     def convert(self, file_dict, force):
@@ -121,12 +126,10 @@ class Module(object):
         :param force: Reconvert if destination exists
         :return:
         """
-        # self.new_module_dir[1:] strips leading / to allow creation of shadow
-        # file system INSIDE a containing dir /../dls_sw/prod/R3...
-        new_root = os.path.join(self.mirror_root, self.new_module_dir[1:])
-
-        origin = os.path.normpath(os.path.join(new_root, self.edl_dir))
-        destination = os.path.normpath(os.path.join(new_root, self.opi_dir))
+        origin = os.path.normpath(os.path.join(self.conversion_root,
+                                               self.edl_dir))
+        destination = os.path.normpath(os.path.join(self.conversion_root,
+                                                    self.opi_dir))
         try:
             os.makedirs(destination)
         except OSError:
