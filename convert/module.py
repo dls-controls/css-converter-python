@@ -110,7 +110,9 @@ class Module(object):
         """
         :return: Full path to edl file directory
         """
-        return os.path.join(self.mirror_root, self.new_module_dir[1:], self.edl_dir)
+        edl_path =  os.path.join(self.mirror_root, self.new_module_dir[1:],
+                                 self.edl_dir)
+        return os.path.normpath(edl_path)
 
     def convert(self, file_dict, force):
         """
@@ -123,12 +125,8 @@ class Module(object):
         # file system INSIDE a containing dir /../dls_sw/prod/R3...
         new_root = os.path.join(self.mirror_root, self.new_module_dir[1:])
 
-        if self.edl_dir == '.':
-            origin = new_root
-        else:
-            origin = os.path.join(new_root, self.edl_dir)
-
-        destination = os.path.join(new_root, self.opi_dir)
+        origin = os.path.normpath(os.path.join(new_root, self.edl_dir))
+        destination = os.path.normpath(os.path.join(new_root, self.opi_dir))
         try:
             os.makedirs(destination)
         except OSError:
