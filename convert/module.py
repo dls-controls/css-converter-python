@@ -99,7 +99,7 @@ class Module(object):
         prod_path = coordinates.as_path(coords, False)
         # prod_path[1:] strips leading / to allow creation of shadow
         # file system INSIDE a containing dir /.../dls_sw/prod/R3...
-        self.conversion_root = os.path.join(mirror_root, prod_path[:1],
+        self.conversion_root = os.path.join(mirror_root, prod_path[1:],
                                             self.new_version)
         if not os.path.exists(self.conversion_root):
             err_msg = 'Module to be converted does not exist: {}'
