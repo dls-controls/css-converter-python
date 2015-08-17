@@ -147,9 +147,13 @@ if __name__ == '__main__':
     gen_cfg = parse_configuration(args.general_config)
     cfg = parse_configuration(args.module_config)  #ioc.conf or support.conf
     area = 'ioc' if args.ioc else 'support'
-
-    modules = get_modules(args, gen_cfg, area)
     mirror = gen_cfg.get('general', 'mirror_root')
+
+    try:
+        modules = get_modules(args, gen_cfg, area)
+    except ValueError as e:
+        log.fatal('Failed to load modules: %s', e)
+        sys.exit()
 
     for mod in modules:
         log.info('Preparing conversion of module %s', mod)
