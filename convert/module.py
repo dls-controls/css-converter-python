@@ -38,9 +38,11 @@ def convert_all(origin, destination, module, file_index, force):
         * ignore .svn directories
     """
     old_edl_files = []
-    log.debug('Converting %s to %s', origin, destination)
+    log.info('Converting %s to %s', origin, destination)
     if not os.path.exists(destination):
         raise ValueError('Destination directory {} does not exist'.format(destination))
+    if not os.path.exists(origin):
+        raise ValueError('Origin directory {} does not exist'.format(origin))
     # Flatten list, otherwise creating directories while iterating
     # causes an infinite loop.
     walklist = list(os.walk(origin))
@@ -133,3 +135,6 @@ class Module(object):
             # directory already exists
             pass
         convert_all(origin, destination, self.coords.module, file_dict, force)
+
+    def __str__(self):
+        return 'Module at coordinates {}'.format(self.coords)
