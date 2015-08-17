@@ -101,7 +101,7 @@ class Module(object):
 
     def get_dependencies(self):
         """
-        :return: List of coords of all module dependencies
+        :return: dict {name: coords} for all module dependencies
         """
         dp = dependency.DependencyParser(self.coords, self.extra_deps)
         return dp.find_dependencies()
