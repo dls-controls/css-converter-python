@@ -66,13 +66,12 @@ def parse_arguments():
     else:  # arguments.ioc
         arguments.module_config = os.path.join(arguments.config, IOC_CONFIG)
 
-
     if not os.path.exists(arguments.general_config):
-        log.warn('Could not locate configuration file %s', arguments.general_config)
+        log.warn('Could not locate general configuration file %s', arguments.general_config)
         sys.exit()
 
     if not os.path.exists(arguments.module_config):
-        log.warn('Could not locate configuration file %s', arguments.module_config)
+        log.warn('Could not locate module configuration file %s', arguments.module_config)
         sys.exit()
 
     return arguments

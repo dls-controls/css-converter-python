@@ -88,7 +88,7 @@ class Module(object):
         self.edl_dir = edl_dir
         self.opi_dir = opi_dir
         self.mirror_root = mirror_root
-        self.additonal_depends = additional_depends
+        self.additional_depends = additional_depends
 
         self.new_version = utils.increment_version(coords.version)
         self.new_module_dir = os.path.join(coordinates.as_path(coords, False),
@@ -98,7 +98,7 @@ class Module(object):
         """
         :return: List of coords of all module dependencies
         """
-        dp = dependency.DependencyParser(self.coords, self.additonal_depends)
+        dp = dependency.DependencyParser(self.coords, self.additional_depends)
         return dp.find_dependencies()
 
     def get_edl_path(self):
