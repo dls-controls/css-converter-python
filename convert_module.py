@@ -10,7 +10,7 @@ from convert import module, utils, coordinates, paths
 
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
-LOG_LEVEL = log.DEBUG
+LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
@@ -149,6 +149,7 @@ if __name__ == '__main__':
     mirror = gen_cfg.get('general', 'mirror_root')
 
     for mod in modules:
+        log.info('Preparing conversion of module %s', mod)
         dependencies = mod.get_dependencies()
         edl_dirs = [mod.get_edl_path()]
         for dep, dep_coords in dependencies.items():
@@ -160,4 +161,8 @@ if __name__ == '__main__':
             edl_dirs.append(dep_edl_path)
 
         file_dict = paths.index_paths(edl_dirs, True)
-        mod.convert(file_dict, args.force)
+        try:
+            mod.convert(file_dict, args.force)
+        except ValueError as e:
+            log.warn('Conversion of %s failed:', mod)
+            log.warn('%s', e)
