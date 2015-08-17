@@ -12,7 +12,7 @@ EDL_EXTENSION = 'edl'
 OPI_EXTENSION = 'opi'
 
 
-def handle_one_file(origin, destination, module, depth, file_index, force):
+def handle_one_file(origin, destination, depth, module, file_index, force):
     log.debug('Handling file: %s to %s', origin, destination)
     edl_file = origin.endswith(EDL_EXTENSION)
     if edl_file:
@@ -22,7 +22,8 @@ def handle_one_file(origin, destination, module, depth, file_index, force):
     else:
         if edl_file:
             files.convert_edl(origin, destination)
-            paths.update_opi_file(destination, depth, file_index, module)
+            paths.update_opi_file(destination, depth, file_index,
+                                  module, use_rel=False)
         else:
             try:
                 shutil.copy2(origin, destination)
@@ -37,9 +38,11 @@ def convert_all(origin, destination, module, file_index, force):
         * ignore .svn directories
     """
     old_edl_files = []
-    log.debug('Converting %s to %s', origin, destination)
+    log.info('Converting %s to %s', origin, destination)
     if not os.path.exists(destination):
         raise ValueError('Destination directory {} does not exist'.format(destination))
+    if not os.path.exists(origin):
+        raise ValueError('Origin directory {} does not exist'.format(origin))
     # Flatten list, otherwise creating directories while iterating
     # causes an infinite loop.
     walklist = list(os.walk(origin))
@@ -64,9 +67,11 @@ def convert_all(origin, destination, module, file_index, force):
         destpaths = [os.path.join(destination, rp) for rp in relpaths]
         log.debug('The destination paths are %s', destpaths)
         for o, d, r in zip(originpaths, destpaths, relpaths):
-            depth = len(r.split(os.sep))
+            eclipse_path = os.path.join(module, r)
+            depth = len(eclipse_path.split(os.sep)) - 1
+            log.debug('The depth for %s in %s is %s', r, module, depth)
             try:
-                handle_one_file(o, d, module, depth, file_index, force)
+                handle_one_file(o, d, depth, module, file_index, force)
             except files.OldEdlError:
                 log.warn('Skipping old edl file %s', o)
                 old_edl_files.append(o)
@@ -76,7 +81,7 @@ def convert_all(origin, destination, module, file_index, force):
 
 class Module(object):
 
-    def __init__(self, coords, edl_dir, opi_dir, mirror_root, additional_depends):
+    def __init__(self, coords, cfg_dict, mirror_root):
         """
 
         :param coords: source module co-ord
@@ -85,27 +90,34 @@ class Module(object):
         :param mirror_root: root of target filesystem
         """
         self.coords = coords
-        self.edl_dir = edl_dir
-        self.opi_dir = opi_dir
+        self.edl_dir = cfg_dict['edl_dir']
+        self.opi_dir = cfg_dict['opi_dir']
+        self.extra_deps = cfg_dict['extra_deps']
         self.mirror_root = mirror_root
-        self.additional_depends = additional_depends
 
         self.new_version = utils.increment_version(coords.version)
-        self.new_module_dir = os.path.join(coordinates.as_path(coords, False),
-                                           self.new_version)
+        prod_path = coordinates.as_path(coords, False)
+        # prod_path[1:] strips leading / to allow creation of shadow
+        # file system INSIDE a containing dir /.../dls_sw/prod/R3...
+        self.conversion_root = os.path.join(mirror_root, prod_path[1:],
+                                            self.new_version)
+        if not os.path.exists(self.conversion_root):
+            err_msg = 'Module to be converted does not exist: {}'
+            raise ValueError(err_msg.format(self.conversion_root))
 
     def get_dependencies(self):
         """
-        :return: List of coords of all module dependencies
+        :return: dict {name: coords} for all module dependencies
         """
-        dp = dependency.DependencyParser(self.coords, self.additional_depends)
+        dp = dependency.DependencyParser(self.coords, self.extra_deps)
         return dp.find_dependencies()
 
     def get_edl_path(self):
         """
         :return: Full path to edl file directory
         """
-        return os.path.join(self.new_module_dir, self.edl_dir)
+        edl_path =  os.path.join(self.conversion_root, self.edl_dir)
+        return os.path.normpath(edl_path)
 
     def convert(self, file_dict, force):
         """
@@ -114,19 +126,16 @@ class Module(object):
         :param force: Reconvert if destination exists
         :return:
         """
-        # self.new_module_dir[1:] strips leading / to allow creation of shadow
-        # file system INSIDE a containing dir /../dls_sw/prod/R3...
-        new_root = os.path.join(self.mirror_root, self.new_module_dir[1:])
-
-        if self.edl_dir == '.':
-            origin = new_root
-        else:
-            origin = os.path.join(new_root, self.edl_dir)
-
-        destination = os.path.join(new_root, self.opi_dir)
+        origin = os.path.normpath(os.path.join(self.conversion_root,
+                                               self.edl_dir))
+        destination = os.path.normpath(os.path.join(self.conversion_root,
+                                                    self.opi_dir))
         try:
             os.makedirs(destination)
         except OSError:
             # directory already exists
             pass
         convert_all(origin, destination, self.coords.module, file_dict, force)
+
+    def __str__(self):
+        return 'Module at coordinates {}'.format(self.coords)

@@ -10,7 +10,7 @@ from convert import module, utils, coordinates, paths
 
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
-LOG_LEVEL = log.DEBUG
+LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
@@ -84,19 +84,24 @@ def parse_configuration(filepath):
 
 
 def get_config_section(cfg, name):
-    cfg_section = {'datapath': 'data',
-                   'opipath': name + 'App/opi/opi',
+    # In some cases, the new opi dir will be at moduleNameApp/opi/opi.
+    # In some of those cases, the IOC name may be prefix/moduleName
+    # e.g. CS/CS-RF-IOC-01 but the leading CS needs removing
+    opi_dir = name.split(os.sep)[-1] + 'App/opi/opi'
+    cfg_section = {'edl_dir': 'data',
+                   'opi_dir': opi_dir,
                    'layers': [],
                    'groups': [],
                    'symbols': [],
+                   'extra_deps': [],
                    'version': None}
     try:
         items = cfg.items(name)
         for key, value in items:
-            if key in ('layers', 'groups', 'symbols', 'dependencies'):
+            if key in ('layers', 'groups', 'symbols', 'extra_deps'):
                 cfg_section[key] = [val.strip() for val in value.split(';')
                                     if val != '']
-                if key == 'dependencies':
+                if key == 'extra_deps':
                     cfg_section[key] = [os.path.split(val) for val in
                                         cfg_section[key]]
             else:
@@ -127,25 +132,30 @@ def get_modules(args, gen_cfg, area):
         module_cfg = get_config_section(cfg, module_name)
         # use latest version unless set explicitly in config file
         version = module_cfg.get('version')
-        if version is not None:
+        if version is None:
             version = utils.get_latest_version(os.path.join(root, area, module_name))
 
         coords = coordinates.create(root, area, module_name, version)
-        modules.append(module.Module(coords, module_cfg['datapath'],
-                                     module_cfg['opipath'], mirror))
+        modules.append(module.Module(coords, module_cfg, mirror))
 
     return modules
+
 
 if __name__ == '__main__':
     args = parse_arguments()
     gen_cfg = parse_configuration(args.general_config)
     cfg = parse_configuration(args.module_config)  #ioc.conf or support.conf
     area = 'ioc' if args.ioc else 'support'
-
-    modules = get_modules(args, gen_cfg, area)
     mirror = gen_cfg.get('general', 'mirror_root')
 
+    try:
+        modules = get_modules(args, gen_cfg, area)
+    except ValueError as e:
+        log.fatal('Failed to load modules: %s', e)
+        sys.exit()
+
     for mod in modules:
+        log.info('Preparing conversion of module %s', mod)
         dependencies = mod.get_dependencies()
         edl_dirs = [mod.get_edl_path()]
         for dep, dep_coords in dependencies.items():
@@ -157,4 +167,8 @@ if __name__ == '__main__':
             edl_dirs.append(dep_edl_path)
 
         file_dict = paths.index_paths(edl_dirs, True)
-        mod.convert(file_dict, args.force)
+        try:
+            mod.convert(file_dict, args.force)
+        except ValueError as e:
+            log.warn('Conversion of %s failed:', mod)
+            log.warn('%s', e)

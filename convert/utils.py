@@ -66,7 +66,7 @@ def get_latest_version(filepath):
     if all_parts:
         version_string = max(all_parts)[1]
     else:
-        raise ValueError('No version found in %s', filepath)
+        raise ValueError('No version found in %s' % filepath)
 
     return version_string
 
