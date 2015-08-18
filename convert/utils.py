@@ -12,6 +12,10 @@ IGNORE_DIR_IN_SEARCH = ('.svn', 'Db', 'bin', 'configure', 'data', 'db', 'dbd', '
 EXPECTED_DIR_IN_MODULE = ('bin', 'configure', 'data', 'db', 'etc')
 
 
+class ConfigError(Exception):
+    pass
+
+
 def find_modules(filepath):
     """ Find all modules in the given filepath.
 

@@ -14,14 +14,15 @@ TMP_DIR = './tmp'
 SYMBOLS_DIR = os.path.join(TMP_DIR, 'symbols')
 # Commands in lists for subprocess
 JAVA = '/usr/bin/java'
-CLASSPATH = 'res/conv.jar'
+JAR_FILE = 'res/conv.jar'
 MAIN_CLASS = 'org.csstudio.opibuilder.converter.EdmConverter'
 COLORS_VARIABLE = '-Dedm2xml.colorsFile=res/colors.list'
 SYMBOLS_VARIABLE = '-Dedm2xml.symbolsFile=res/symbols.conf'
-CONVERT_CMD = [JAVA, COLORS_VARIABLE, SYMBOLS_VARIABLE, '-cp', CLASSPATH, MAIN_CLASS]
+CONVERT_CMD = [JAVA, COLORS_VARIABLE, SYMBOLS_VARIABLE, '-cp', JAR_FILE, MAIN_CLASS]
 UPDATE_CMD = ['edm', '-convert']
 SYMBOL_SCRIPT = os.path.join(os.getcwd(), 'res/auto-symb.sh')
 SYMBOL_TO_PNG_CMD = [SYMBOL_SCRIPT]
+
 
 
 class OldEdlError(Exception):
@@ -121,6 +122,10 @@ def convert_edl(filename, destination):
     """
     if is_old_edl(filename):
         raise OldEdlError('EDL file in old format')
+    if not os.path.exists(JAVA):
+        raise utils.ConfigError('Cannot find java executable {}'.format(JAVA))
+    if not os.path.exists(JAR_FILE):
+        raise utils.ConfigError('Cannot find jar file {}'.format(JAR_FILE))
     utils.make_writeable(destination)
     log.debug('Converting %s to %s', filename, destination)
     command = CONVERT_CMD + [filename, destination]

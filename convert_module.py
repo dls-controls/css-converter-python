@@ -55,21 +55,25 @@ if __name__ == '__main__':
         log.fatal('Failed to load modules: %s', e)
         sys.exit()
 
-    for mod in modules:
-        log.info('Preparing conversion of module %s', mod)
-        dependencies = mod.get_dependencies()
-        edl_dirs = [mod.get_edl_path()]
-        for dep, dep_coords in dependencies.items():
-            new_version = utils.increment_version(dep_coords.version)
-            dep_edl_path = os.path.join(mirror,
-                                      coordinates.as_path(dep_coords, False)[1:],
-                                      new_version,
-                                      mod.edl_dir)
-            edl_dirs.append(dep_edl_path)
+    try:
+        for mod in modules:
+            log.info('Preparing conversion of module %s', mod)
+            dependencies = mod.get_dependencies()
+            edl_dirs = [mod.get_edl_path()]
+            for dep, dep_coords in dependencies.items():
+                new_version = utils.increment_version(dep_coords.version)
+                dep_edl_path = os.path.join(mirror,
+                                        coordinates.as_path(dep_coords, False)[1:],
+                                        new_version,
+                                        mod.edl_dir)
+                edl_dirs.append(dep_edl_path)
 
-        file_dict = paths.index_paths(edl_dirs, True)
-        try:
-            mod.convert(file_dict, args.force)
-        except ValueError as e:
-            log.warn('Conversion of %s failed:', mod)
-            log.warn('%s', e)
+            file_dict = paths.index_paths(edl_dirs, True)
+            try:
+                mod.convert(file_dict, args.force)
+            except ValueError as e:
+                log.warn('Conversion of %s failed:', mod)
+                log.warn('%s', e)
+    except utils.ConfigError as e:
+        log.fatal('Incorrect configuration: %s', e)
+        log.fatal('System will exit.')
