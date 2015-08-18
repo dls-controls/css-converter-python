@@ -17,7 +17,7 @@ SVN_ROOT = 'svn+ssh://serv0002.cs.diamond.ac.uk/home/subversion/repos/controls'
 TRUNK = 'diamond/trunk'
 
 
-def checkout_module(name, path, mirror_root):
+def checkout_module(name, version, path, mirror_root):
     mirror_location = os.path.join(mirror_root, path[1:])
     module_type = 'ioc' if 'ioc' in path else 'support'
     module_name = name if name is not None else ''
@@ -29,6 +29,18 @@ def checkout_module(name, path, mirror_root):
         print 'module already present; skipping'
         return
     ret_val = subprocess.call(['svn', 'checkout', svn_location, mirror_location])
+    # Drop VERSION file into configure directory
+    configure_dir = os.path.join(mirror_location, 'configure')
+    try:
+        os.mkdir(configure_dir)
+    except OSError:
+        # configure directory is in SVN
+        pass
+
+    with open(os.path.join(configure_dir, 'VERSION'), 'w') as f:
+        f.write(version)
+        f.write('\n')
+
     if ret_val == 0:
         current_dir = os.curdir
         try:
@@ -56,7 +68,7 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None):
             new_coords = coordinates.create(mcoords.root, mcoords.area,
                                             mcoords.module, new_version)
             new_path = coordinates.as_path(new_coords)
-            checkout_module(new_coords.module, new_path, mirror_root)
+            checkout_module(new_coords.module, new_version, new_path, mirror_root)
         except ValueError:
             print("Can't handle coordinates {}".format(mcoords))
     print('Finished checking out all modules.')
