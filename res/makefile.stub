@@ -1,0 +1,15 @@
+TOP = ../../..
+include $(TOP)/configure/CONFIG
+#----------------------------------------
+#  ADD MACRO DEFINITIONS AFTER THIS LINE
+
+# path to CSS exe (link)#
+CSS_PATH ?= $(shell configure-ioc s -p CSS-gui)
+# strip css off the end and replace with path to intended script
+CONVERTER_SCRIPT := $(subst css,converter/build_runcss.py,$(CSS_PATH))
+
+install:
+	@echo ">>> Building runcss.sh"
+	$(CONVERTER_SCRIPT) $(CURDIR) $(TOP)
+
+include $(TOP)/configure/RULES

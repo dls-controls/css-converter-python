@@ -1,8 +1,10 @@
 import pkg_resources
 pkg_resources.require('dls_epicsparser')
+pkg_resources.require('mock')
+
 import os
-import unittest
 import mock
+import unittest
 from convert import module
 from convert import coordinates
 
@@ -13,13 +15,15 @@ class ModuleTest(unittest.TestCase):
         self.version = '5-3'
         self.new_version = '5-4'
         self.module_path = '/dls_sw/prod/R3.14.12.3/ioc/LI/TI/'
-        self.edl_path = 'MyApp/opi/opi'
+        self.edl_path = 'MyApp/opi/edl'
+        self.opi_path = 'MyApp/opi/opi'
         self.coords = coordinates.from_path2(os.path.join(self.module_path,
                                                           self.version))
         self.mirror_root = '/tmp/mirror'
         self.dummy_cfg = {'edl_dir': self.edl_path,
-                     'opi_dir': '.',
+                     'opi_dir': self.opi_path,
                      'extra_deps': []}
+
         # Avoid checking that the directory exists
         with mock.patch('os.path.exists') as mp:
             mp.return_value = True
@@ -44,6 +48,13 @@ class ModuleTest(unittest.TestCase):
                                 self.new_version,
                                 self.edl_path)
         self.assertEqual(os.path.normpath(edl_path), self.m.get_edl_path())
+
+    def test_get_opi_path(self):
+        opi_path = os.path.join(self.mirror_root,
+                                self.module_path[1:],
+                                self.new_version,
+                                self.opi_path)
+        self.assertEqual(os.path.normpath(opi_path), self.m.get_opi_path())
 
     def test_convert(self):
         """

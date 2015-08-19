@@ -24,6 +24,7 @@ class FileMungingTests(unittest.TestCase):
         for d in sorted(moduledirs):
             print d
 
+"""
     def test_find_module_from_path_returns_path_at_module_version_from_edlfile(self):
         path = "/dls_sw/prod/R3.14.12.3/support/mirror/4-7-3/data/mirrorKBM-I22-HFM.edl"
         expected = "/dls_sw/prod/R3.14.12.3/support/mirror/4-7-3"
@@ -47,7 +48,7 @@ class FileMungingTests(unittest.TestCase):
         actual = utils.find_module_from_path(path)
 
         self.assertEqual(expected, actual)
-        
+
     def test_find_module_from_path_returns_path_at_module_from_midpoint_in_tree(self):
         path = "/dls_sw/prod/R3.14.12.3/ioc/LI"
         expected = "/dls_sw/prod/R3.14.12.3/support/mirror"
@@ -55,7 +56,7 @@ class FileMungingTests(unittest.TestCase):
         actual = utils.find_module_from_path(path)
 
         self.assertEqual(expected, actual)
-        
+
 
     def test_find_module_from_path_does_something_with_versioned_support_module(self):
         path = "/dls_sw/prod/R3.14.12.3/support/mirror/4-7-3"
@@ -75,6 +76,7 @@ class FileMungingTests(unittest.TestCase):
         actual = utils.find_module_from_path(path)
 
         self.assertEqual(path, actual)
+"""
 
 
 class UtilsTest(unittest.TestCase):
@@ -221,14 +223,17 @@ class TestGetModules(unittest.TestCase):
         expected_modules = [
             'LI/LI-DI-IOC-01', 'LI/LI-DI-IOC-02', 'LI/LI-PC-IOC-01',
             'LI/LI-PC-IOC-02', 'LI/PS', 'LI/RF', 'LI/TI', 'LI/VA']
-
-        self.assertSetEqual(set(expected_modules), set(modules))
+        self.assertListEqual(sorted(expected_modules), sorted(modules))
 
     def test_find_modules_returns_module_names_in_support_vacuum(self):
         modules = utils.find_modules("/dls_sw/prod/R3.14.12.3/support/vacuum")
         expected_modules = ['vacuum']
+        self.assertListEqual(expected_modules, modules)
 
-        self.assertSetEqual(set(expected_modules), set(modules))
+    def test_find_modules_returns_empty_list_if_path_does_not_exist(self):
+        modules = utils.find_modules("/dummy/path")
+        expected_modules = []
+        self.assertListEqual(expected_modules, modules)
 
     def test_parse_version_handles_pair_case(self):
         self.assertListEqual([4,2], utils.parse_version("4-2"))

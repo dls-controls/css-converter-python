@@ -46,7 +46,7 @@ def checkout_module(name, version, path, mirror_root):
         try:
             os.chdir(mirror_location)
             subprocess.call(['make'])
-        except OSError:
+        finally:
             os.chdir(current_dir)
 
 

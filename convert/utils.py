@@ -154,7 +154,7 @@ def parse_module_name(filepath):
     elif 'ioc' in parts:
         root_index = parts.index('ioc')
     else:
-        raise ValueError('Module %s not understood' % filepath)
+        raise ValueError('%s contains neither ioc nor support.' % filepath)
 
     v = None
     for i, p in enumerate(parts):
