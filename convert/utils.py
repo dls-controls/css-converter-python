@@ -145,8 +145,7 @@ def parse_module_name(filepath):
     version may be None
     """
     log.debug('Parsing %s.', filepath)
-    filepath = os.path.realpath(filepath)
-    filepath = os.path.normpath(filepath)
+    filepath = os.path.normpath(os.path.realpath(filepath))
     parts = filepath.split('/')
     version = None
 
@@ -155,13 +154,13 @@ def parse_module_name(filepath):
     elif 'ioc' in parts:
         root_index = parts.index('ioc')
     else:
-        log.warn('Module %s not understood', filepath)
-        return filepath, '', '', ''
+        raise ValueError('Module %s not understood' % filepath)
 
     v = None
     for i, p in enumerate(parts):
         if p == '':
             continue
+        # Test for whether string represents a version.
         if p[0].isdigit() or p == 'Rx-y':
             version = p
             v = i

@@ -148,11 +148,7 @@ class UtilsTest(unittest.TestCase):
 
     def test_parse_module_launcher(self):
         path = '/dls_sw/prod/etc/Launcher'
-        module_path, module, version, rel_path = utils.parse_module_name(path)
-        self.assertEquals(module_path, path)
-        self.assertEquals(module, '')
-        self.assertEquals(version, '')
-        self.assertEquals(rel_path, '')
+        self.assertRaises(ValueError, utils.parse_module_name, path)
 
     def test_parse_module_name_no_module(self):
         path = '/dls_sw/prod/R3.14.12.3/support/'
