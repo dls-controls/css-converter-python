@@ -1,3 +1,5 @@
+import pkg_resources
+pkg_resources.require('dls-epicsparser')
 import unittest
 from convert import coordinates
 from convert.dependency import DependencyParser
@@ -75,3 +77,7 @@ class TestDependencies(unittest.TestCase):
         expected = {'test':coordinates.create('/dls_sw/prod/R3.14.12.3', 'support', 'test', '3-1dls4'),
                     'test2':coordinates.create('/dls_sw/prod/R3.14.12.3', 'support', 'test2', '5-2')}
         self.assertDictEqual(expected, depends)
+
+
+if __name__ == '__main__':
+    unittest.main()
