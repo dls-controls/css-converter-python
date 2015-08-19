@@ -77,7 +77,8 @@ def get_opi_path(coord):
 
     return opi_path
 
-def gen_run_script(coord, cwd):
+
+def gen_run_script(coord, new_version=None, prefix="/", opi_dir=None):
     '''
     Generate a wrapper script which updates the appropriate
     links before opening a CSS window.
@@ -85,20 +86,31 @@ def gen_run_script(coord, cwd):
     :param coord: coordindate of module being released, including the release
                     version number. Root should specify the *build* location
     '''
-    opi_dir = get_opi_path(coord)
 
-    script_dir = os.path.join(coordinates.as_path(coord), opi_dir)
+    builder_script_path = os.path.dirname(os.path.realpath(__file__))
+
+    if opi_dir is None:
+        opi_dir = get_opi_path(coord)
+
+    if new_version is None:
+        new_version = coord.version
+
+    script_dir = os.path.join(prefix,
+                              coordinates.as_path(coord, False)[1:],
+                              new_version,
+                              opi_dir)
+
     if not os.path.exists(script_dir):
         os.makedirs(script_dir)
     script_path = os.path.join(script_dir, SCRIPT_FILE)
 
     dependencies = dependency.DependencyParser(coord)
 
-    project_name = "%s_%s" % (coord.module.replace(os.path.sep, '_'), coord.version)
+    project_name = "%s_%s" % (coord.module.replace(os.path.sep, '_'), new_version)
     links_string = build_links(dependencies.find_dependencies(), project_name)
 
     with open(script_path, 'w') as f:
-        with open(os.path.join(cwd, SCRIPT_TEMPLATE)) as template:
+        with open(os.path.join(builder_script_path, SCRIPT_TEMPLATE)) as template:
             content = template.read()
             s = string.Template(content)
             updated_content = s.substitute(links=links_string)
@@ -127,18 +139,20 @@ if __name__ == '__main__':
     working_path = sys.argv[1]
     rel_configuration_path = sys.argv[2]
 
-    builder_script_path = os.path.dirname(os.path.realpath(__file__))
-    print("Running from: {}").format(builder_script_path)
-
     root, area = parse_working_path(working_path)
     print("ROOT: {}, AREA: {}").format(root, area)
 
     configuration_path = os.path.join(working_path, rel_configuration_path)
-    parser = configuration.parse_module_config(configuration_path)
+    module_name = None
+    try:
+        parser = configuration.parse_module_config(configuration_path)
+        module_name = configuration.module_name(parser)
+    except utils.ConfigError as ex:
+        log.error("Error parsing module.ini %s. Aborting", ex.message)
 
-    module_name = configuration.module_name(parser)
-    version = utils.get_version(configuration_path)
-    print("MODULE: {}, VERSION: {}").format(module_name, version)
+    if module_name is not None:
+        version = utils.get_version(configuration_path)
+        print("MODULE: {}, VERSION: {}").format(module_name, version)
 
-    module_coord = coordinates.create(root, area, module_name, version)
-    gen_run_script(module_coord, builder_script_path)
+        module_coord = coordinates.create(root, area, module_name, version)
+        gen_run_script(module_coord)

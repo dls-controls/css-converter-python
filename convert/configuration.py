@@ -19,6 +19,12 @@ def parse_module_config(base_path):
 
 
 def module_name(parser):
+    """ Extract module NAME from the a module.ini parser
+
+    :param parser: Parser
+    :return: Module name
+    :raises ConfigError: when name not found in parser
+    """
 
     try:
         module = parser.get('general', 'name')

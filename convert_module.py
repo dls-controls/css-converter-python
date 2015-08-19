@@ -73,7 +73,12 @@ if __name__ == '__main__':
             file_dict = paths.index_paths(edl_dirs, True)
             try:
                 mod.convert(file_dict, args.force)
-                build_runcss.gen_run_script(mod.coords)
+
+                new_version = utils.increment_version(mod.coords.version)
+                build_runcss.gen_run_script(mod.coords,
+                                            new_version,
+                                            mirror,
+                                            mod.get_opi_path())
             except ValueError as e:
                 log.warn('Conversion of %s failed:', mod)
                 log.warn('%s', e)
