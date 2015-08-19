@@ -107,7 +107,9 @@ def gen_run_script(coord, new_version=None, prefix="/", opi_dir=None):
     dependencies = dependency.DependencyParser(coord)
 
     project_name = "%s_%s" % (coord.module.replace(os.path.sep, '_'), new_version)
-    links_string = build_links(dependencies.find_dependencies(), project_name)
+    deps = dependencies.find_dependencies()
+    deps[coord.module] = coord
+    links_string = build_links(deps, project_name)
 
     with open(script_path, 'w') as f:
         with open(os.path.join(builder_script_path, SCRIPT_TEMPLATE)) as template:
