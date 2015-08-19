@@ -1,9 +1,7 @@
 import argparse
-import ConfigParser
 import logging as log
 import os
 import sys
-
 
 
 IOC_CONFIG = 'ioc.ini'
@@ -68,38 +66,3 @@ def parse_arguments():
         sys.exit()
 
     return arguments
-
-
-def parse_configuration(filepath):
-    config = ConfigParser.ConfigParser()
-    config.read(filepath)
-    return config
-
-
-def get_config_section(cfg, name):
-    # In some cases, the new opi dir will be at moduleNameApp/opi/opi.
-    # In some of those cases, the IOC name may be prefix/moduleName
-    # e.g. CS/CS-RF-IOC-01 but the leading CS needs removing
-    opi_dir = name.split(os.sep)[-1] + 'App/opi/opi'
-    cfg_section = {'edl_dir': 'data',
-                   'opi_dir': opi_dir,
-                   'layers': [],
-                   'groups': [],
-                   'symbols': [],
-                   'extra_deps': [],
-                   'version': None}
-    try:
-        items = cfg.items(name)
-        for key, value in items:
-            if key in ('layers', 'groups', 'symbols', 'extra_deps'):
-                cfg_section[key] = [val.strip() for val in value.split(';')
-                                    if val != '']
-                if key == 'extra_deps':
-                    cfg_section[key] = [os.path.split(val) for val in
-                                        cfg_section[key]]
-            else:
-                cfg_section[key] = value
-    except ConfigParser.NoSectionError:
-        pass
-    return cfg_section
-

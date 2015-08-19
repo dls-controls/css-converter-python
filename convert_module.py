@@ -1,10 +1,12 @@
 import pkg_resources
+import build_runcss
+
 pkg_resources.require('dls_epicsparser')
 
 import os
 import sys
 
-from convert import module, utils, coordinates, paths, arguments
+from convert import module, utils, coordinates, paths, arguments, configuration
 
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
@@ -30,7 +32,7 @@ def get_modules(args, gen_cfg, area):
         all_mods = [args.module]
 
     for module_name in all_mods:
-        module_cfg = arguments.get_config_section(cfg, module_name)
+        module_cfg = configuration.get_config_section(cfg, module_name)
         # use latest version unless set explicitly in config file
         version = module_cfg.get('version')
         if version is None:
@@ -44,8 +46,8 @@ def get_modules(args, gen_cfg, area):
 
 if __name__ == '__main__':
     args = arguments.parse_arguments()
-    gen_cfg = arguments.parse_configuration(args.general_config)
-    cfg = arguments.parse_configuration(args.module_config)  #ioc.conf or support.conf
+    gen_cfg = configuration.parse_configuration(args.general_config)
+    cfg = configuration.parse_configuration(args.module_config)  #ioc.conf or support.conf
     area = 'ioc' if args.ioc else 'support'
     mirror = gen_cfg.get('general', 'mirror_root')
 
@@ -71,6 +73,12 @@ if __name__ == '__main__':
             file_dict = paths.index_paths(edl_dirs, True)
             try:
                 mod.convert(file_dict, args.force)
+
+                new_version = utils.increment_version(mod.coords.version)
+                build_runcss.gen_run_script(mod.coords,
+                                            new_version,
+                                            mirror,
+                                            mod.get_opi_path())
             except ValueError as e:
                 log.warn('Conversion of %s failed:', mod)
                 log.warn('%s', e)
