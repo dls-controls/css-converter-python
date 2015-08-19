@@ -85,8 +85,7 @@ class Module(object):
         """
 
         :param coords: source module co-ord
-        :param edl_dir: directory in module to convert edl files from
-        :param opidir: directory in module to store converted opi files
+        :param cfg_dict: general config info -- extra deps, edl and opi dirs
         :param mirror_root: root of target filesystem
         """
         self.coords = coords
@@ -112,11 +111,18 @@ class Module(object):
         dp = dependency.DependencyParser(self.coords, self.extra_deps)
         return dp.find_dependencies()
 
+    def get_opi_path(self):
+        """
+        :return: Full path to converted OPI files directory
+        """
+        opi_path = os.path.join(self.conversion_root, self.opi_dir)
+        return os.path.normpath(opi_path)
+
     def get_edl_path(self):
         """
         :return: Full path to edl file directory
         """
-        edl_path =  os.path.join(self.conversion_root, self.edl_dir)
+        edl_path = os.path.join(self.conversion_root, self.edl_dir)
         return os.path.normpath(edl_path)
 
     def convert(self, file_dict, force):
@@ -126,10 +132,8 @@ class Module(object):
         :param force: Reconvert if destination exists
         :return:
         """
-        origin = os.path.normpath(os.path.join(self.conversion_root,
-                                               self.edl_dir))
-        destination = os.path.normpath(os.path.join(self.conversion_root,
-                                                    self.opi_dir))
+        origin = self.get_edl_path()
+        destination = self.get_opi_path()
         try:
             os.makedirs(destination)
         except OSError:
