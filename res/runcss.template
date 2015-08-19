@@ -2,9 +2,9 @@
 
 # Generated run script for cs-studio.
 
-prefix = ""
-if [ -z $$CONVERTER_ROOT ]; then
-    prefix = $$CONVERTER_ROOT
+prefix=""
+if [ -n $$CONVERTER_ROOT ]; then
+    prefix=$$CONVERTER_ROOT
 fi
 
 CSSTUDIO=/dls_sw/work/common/CSS/CSS_dls-4.2.x_nightly/cs-studio
