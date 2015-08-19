@@ -5,6 +5,8 @@ import logging as log
 import string
 
 
+VERSION_FILE = 'configure/VERSION'
+
 PROJECT_TEMPLATE = 'res/project.template'
 PROJECT_FILENAME = '.project'
 
@@ -44,6 +46,21 @@ def find_modules(filepath):
     log.debug('Found modules %s', modules)
 
     return list(modules)
+
+
+def get_version(configuration_path):
+    """ Read the current version number from the VERSION file in a fully
+        qualified modulepath (e.g. /dls_sw/..../modulename/version)
+
+        :return Version string (e.g. '4-2dls2')
+    """
+    version = ""
+    path = os.path.join(configuration_path, VERSION_FILE)
+    if os.path.exists(path):
+        with open(path, 'r') as content_file:
+            version = content_file.read()
+
+    return version.rstrip()
 
 
 def get_latest_version(filepath):

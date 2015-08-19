@@ -7,6 +7,7 @@ pkg_resources.require('dls_epicsparser')
 
 from convert import arguments
 from convert import coordinates
+from convert import configuration
 from convert import dependency
 from convert import utils
 import os
@@ -76,9 +77,9 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None):
 
 if __name__ == '__main__':
     args = arguments.parse_arguments()
-    gen_cfg = arguments.parse_configuration(args.general_config)
-    cfg = arguments.parse_configuration(args.module_config)
-    module_cfg = arguments.get_config_section(cfg, args.module)
+    gen_cfg = configuration.parse_configuration(args.general_config)
+    cfg = configuration.parse_configuration(args.module_config)
+    module_cfg = configuration.get_config_section(cfg, args.module)
     area = 'ioc' if args.ioc else 'support'
     prod_root = gen_cfg.get('general', 'prod_root')
     mirror_root = gen_cfg.get('general', 'mirror_root')

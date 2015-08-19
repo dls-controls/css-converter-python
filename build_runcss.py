@@ -14,89 +14,18 @@ pkg_resources.require('dls_epicsparser')
 - list of all module dependencies as { full-path-to-module-version=module-version/moduleApp }
 - take launch opi as an argument 'xxx.opi' or 'yyy/xxx.opi'
 """
-import ConfigParser
 import os
 import logging as log
 import string
 import stat
 
-from convert import dependency, coordinates, utils
+from convert import dependency, coordinates, utils, configuration
 
 SCRIPT_FILE = 'runcss.sh'
 SCRIPT_TEMPLATE = 'res/runcss.template'
 ESCAPE_CHARS = ['.', ':']
 PATH_PREFIX = '${prefix}'
-
-VERSION_FILE = 'configure/VERSION'
-MODULE_INI = 'configure/module.ini'
-
-
-def get_version(configuration_path):
-    """ Read the 'new' version number for the VERSION file
-
-        :return Version string (e.g. '4-2dls2')
-    """
-    version = ""
-    path = os.path.join(configuration_path, VERSION_FILE)
-    if os.path.exists(path):
-        with open(path, 'r') as content_file:
-            version = content_file.read()
-
-    return version.rstrip()
-
-
-def parse_config(base_path):
-    """
-
-    :param base_path: Path to module folder containing configure dir
-    :return:
-    """
-    print "Reading opiPath from %s" % base_path
-
-    module_ini_path = os.path.join(base_path, MODULE_INI)
-
-    if not os.path.exists(module_ini_path):
-        raise utils.ConfigError('Cannot find module.ini {}'.format(module_ini_path))
-
-    parser = ConfigParser.ConfigParser()
-    parser.read(module_ini_path)
-    return parser
-
-
-def get_module_name(parser):
-
-    try:
-        module = parser.get('general', 'name')
-    except ConfigParser.NoSectionError:
-        # file doesn't exist so...
-        raise utils.ConfigError("No module name [general/name] specified in module.ini file")
-
-    return module
-
-def get_opi_path(coord):
-    """ Extract the opi-file location in the module from the module.ini file
-
-    :raises:
-    :param coord: Module coordinate (inc. version)
-    :return: Relative path to OPI files, e.g. MyModuleApp/opi/opi
-    """
-    path = coordinates.as_path(coord)
-    if coord.version is None:
-        raise ValueError("Dependency with unspecified version: %s", path)
-
-    # plausible default...
-    opi_path = "%sApp/opi/opi" % coord.module
-
-    try:
-        parser = parse_config(path)
-        opi_path = parser.get('general', 'opi-location')
-    except utils.ConfigError:
-        print "No module.ini file in %s using default %s" % (path, opi_path)
-    except ConfigParser.NoSectionError:
-        # file doesn't exist so...
-        print "No [files] in module.ini file in %s using default %s" % (path, opi_path)
-
-    return opi_path
+DEFAULT_OPI_PATH = "%sApp/opi/opi"
 
 
 def build_links(dependencies, project_name):
@@ -126,6 +55,27 @@ def build_links(dependencies, project_name):
 
     return links
 
+
+def get_opi_path(coord):
+    """ Extract the relative path to opi files from a module configuration file
+
+    :param coord: Fully qualified Module coord
+    :return: Relative path from module root to the opi files directory
+    :raises ValueError: when <coord> does not include version information
+    """
+    path = coordinates.as_path(coord)
+    if coord.version is None:
+        raise ValueError("Cannot find data for module with unspecified version: %s", path)
+
+    opi_path = DEFAULT_OPI_PATH % coord.module
+    try:
+        mod_parser = configuration.parse_module_config(path)
+        opi_path = configuration.opi_path(mod_parser, opi_path)
+    except utils.ConfigError as ex:
+        log.warn("%s in %s", ex.message, path)
+        pass
+
+    return opi_path
 
 def gen_run_script(coord, cwd):
     '''
@@ -177,18 +127,18 @@ if __name__ == '__main__':
     working_path = sys.argv[1]
     rel_configuration_path = sys.argv[2]
 
-    script_path = os.path.dirname(os.path.realpath(__file__))
-    print("Running from: {}").format(script_path)
+    builder_script_path = os.path.dirname(os.path.realpath(__file__))
+    print("Running from: {}").format(builder_script_path)
 
     root, area = parse_working_path(working_path)
     print("ROOT: {}, AREA: {}").format(root, area)
 
     configuration_path = os.path.join(working_path, rel_configuration_path)
-    parser = parse_config(configuration_path)
+    parser = configuration.parse_module_config(configuration_path)
 
-    module_name = get_module_name(parser)
-    version = get_version(configuration_path)
+    module_name = configuration.module_name(parser)
+    version = utils.get_version(configuration_path)
     print("MODULE: {}, VERSION: {}").format(module_name, version)
 
     module_coord = coordinates.create(root, area, module_name, version)
-    gen_run_script(module_coord, script_path)
+    gen_run_script(module_coord, builder_script_path)

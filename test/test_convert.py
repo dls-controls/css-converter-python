@@ -1,3 +1,5 @@
+from pkg_resources import require
+require('mock')
 
 from convert.converter import Converter
 import unittest
