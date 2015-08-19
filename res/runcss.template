@@ -18,4 +18,4 @@ fi
 
 LINKS="${links}"
 
-$$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI} -share_link $$LINKS"
+$$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI} Position=NEW_SHELL -share_link $$LINKS"
