@@ -78,7 +78,8 @@ if __name__ == '__main__':
                 build_runcss.gen_run_script(mod.coords,
                                             new_version,
                                             mirror,
-                                            mod.get_opi_path())
+                                            mod.get_opi_path(),
+                                            cfg)
             except ValueError as e:
                 log.warn('Conversion of %s failed:', mod)
                 log.warn('%s', e)

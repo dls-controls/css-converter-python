@@ -28,7 +28,7 @@ PATH_PREFIX = '${prefix}'
 DEFAULT_OPI_PATH = "%sApp/opi/opi"
 
 
-def build_links(dependencies, project_name):
+def build_links(dependencies, project_name, prefix, config=None):
     """ Construct a formatted 'links' string.
 
         This is comma separated list of
@@ -43,10 +43,18 @@ def build_links(dependencies, project_name):
 
     links_strings = []
     for dep, dep_coord in dependencies.iteritems():
-        opi_path = get_opi_path(dep_coord)
-        links_strings.append('%s%s=%s' % (PATH_PREFIX,
-                                          os.path.join(coordinates.as_path(dep_coord), opi_path),
-                                          os.path.join('/', project_name, dep)))
+        config_section = configuration.get_config_section(config, dep)
+        new_version = utils.increment_version(dep_coord.version)
+        new_coord = coordinates.create(dep_coord.root, dep_coord.area, dep_coord.module, new_version)
+        try:
+            opi_path = config_section['opi_dir']
+        except (KeyError, AttributeError):
+            opi_path = get_opi_path(dep_coord)
+        fs_dir = os.path.join(coordinates.as_path(new_coord), opi_path)
+        print('The opi path is {}'.format(fs_dir))
+        if os.path.exists(os.path.join(prefix, fs_dir[1:])):
+            links_strings.append('%s%s=%s' % (PATH_PREFIX, fs_dir,
+                                            os.path.join('/', project_name, dep)))
 
     links = ',\\\n'.join(links_strings)
 
@@ -78,7 +86,7 @@ def get_opi_path(coord):
     return opi_path
 
 
-def gen_run_script(coord, new_version=None, prefix="/", opi_dir=None):
+def gen_run_script(coord, new_version=None, prefix="/", opi_dir=None, config=None):
     '''
     Generate a wrapper script which updates the appropriate
     links before opening a CSS window.
@@ -104,12 +112,13 @@ def gen_run_script(coord, new_version=None, prefix="/", opi_dir=None):
         os.makedirs(script_dir)
     script_path = os.path.join(script_dir, SCRIPT_FILE)
 
-    dependencies = dependency.DependencyParser(coord)
+    cfg_section = configuration.get_config_section(config, coord.module)
+    dependencies = dependency.DependencyParser(coord, cfg_section['extra_deps'])
 
     project_name = "%s_%s" % (coord.module.replace(os.path.sep, '_'), new_version)
     deps = dependencies.find_dependencies()
     deps[coord.module] = coord
-    links_string = build_links(deps, project_name)
+    links_string = build_links(deps, project_name, prefix, config)
 
     with open(script_path, 'w') as f:
         with open(os.path.join(builder_script_path, SCRIPT_TEMPLATE)) as template:
