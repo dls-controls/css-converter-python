@@ -19,7 +19,8 @@ class ConfigError(Exception):
 def find_modules(filepath):
     """ Find all modules in the given filepath.
 
-        If path if not IOC or support module raises ValueError
+        If path does not contain any IOCs or support modules returns [].
+        If path does not exist returns [].
 
         "module" is determined as the path section between ioc/support and a
         version number, e.g.
