@@ -12,7 +12,7 @@ class DependencyParser(object):
         """ Parse dependencies for IOC
 
         :param module_coord: tuple containing path to search area, mod name and version
-        :param additional_depends: list of (name, version) tuples for dependencies not in RELEASE
+        :param additional_depends: list of (name, area, version) tuples for dependencies not in RELEASE
         """
         assert module_coord.version is not None, \
             "Cannot find dependencies of module (%s) with no version" % module_coord.module
@@ -35,8 +35,8 @@ class DependencyParser(object):
                 dependencies[dependency.name] = coordinates.from_path(dependency.path)
 
         if self._additional is not None:
-            for (name, version) in self._additional:
-                dependencies[name] = coordinates.create(self._root, 'support', name, version)
+            for (name, area, version) in self._additional:
+                dependencies[name] = coordinates.create(self._root, area, name, version)
 
         return dependencies
 

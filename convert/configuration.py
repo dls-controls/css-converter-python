@@ -89,8 +89,17 @@ def get_config_section(cfg, name):
                 cfg_section[key] = [val.strip() for val in value.split(';')
                                     if val != '']
                 if key == 'extra_deps':
-                    cfg_section[key] = [os.path.split(val) for val in
-                                        cfg_section[key]]
+                    deps = []
+                    for dep in cfg_section[key]:
+                        module, version = os.path.split(dep)
+                        try:
+                            area = cfg.get(module, 'area')
+                        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+                            area = 'support'
+                        deps.append((module, area, version))
+                    cfg_section[key] = deps
+
+
             else:
                 cfg_section[key] = value
     except ConfigParser.NoSectionError:
