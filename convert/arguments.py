@@ -4,8 +4,7 @@ import os
 import sys
 
 
-IOC_CONFIG = 'ioc.ini'
-SUPPORT_CONFIG = 'support.ini'
+MODULE_CONFIG = 'modules.ini'
 GENERAL_CONFIG = 'converter.ini'
 
 
@@ -50,12 +49,7 @@ def parse_arguments():
     arguments = ap.parse_args()
 
     arguments.general_config = os.path.join(arguments.config, GENERAL_CONFIG)
-
-    if arguments.support:
-        arguments.module_config = os.path.join(arguments.config, SUPPORT_CONFIG)
-    else:  # arguments.ioc
-        arguments.module_config = os.path.join(arguments.config, IOC_CONFIG)
-
+    arguments.module_config = os.path.join(arguments.config, MODULE_CONFIG)
 
     if not os.path.exists(arguments.general_config):
         log.warn('Could not locate configuration file %s', arguments.general_config)
