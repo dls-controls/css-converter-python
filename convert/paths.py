@@ -129,10 +129,13 @@ def _update_opi_path(filename, depth, file_index, module, use_rel):
         path_in_module = path_in_module if use_rel else ''
         if file_module != module:
             log.info('Correcting filename %s depth %s', filename, depth)
-            down = '/'.join(['..'] * depth)
+            down = os.sep.join(['..'] * depth)
             rel = os.path.join(down, file_module, path_in_module, filename)
         else:
-            rel = os.path.join(path_in_module, filename)
+            # If path is in the same module we still need to maintain
+            # relative paths if the file is in a subdirectory.
+            down = os.sep.join(['..'] * (len(filename.split(os.sep)) - 1))
+            rel = os.path.join(down, path_in_module, filename)
     else:
         log.debug('Not correcting %s', filename)
 
