@@ -55,6 +55,8 @@ def build_links(dependencies, project_name, prefix, config=None):
         if os.path.exists(os.path.join(prefix, fs_dir[1:])):
             links_strings.append('%s%s=%s' % (PATH_PREFIX, fs_dir,
                                             os.path.join('/', project_name, dep)))
+        else:
+            log.warn('Not creating link for non-existent path %s%s', prefix, fs_dir)
 
     links = ',\\\n'.join(links_strings)
 
