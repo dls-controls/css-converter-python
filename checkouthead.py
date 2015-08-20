@@ -11,6 +11,7 @@ from convert import configuration
 from convert import dependency
 from convert import utils
 import os
+import shutil
 import subprocess
 
 
@@ -51,7 +52,8 @@ def checkout_module(name, version, path, mirror_root):
             os.chdir(current_dir)
 
 
-def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None):
+def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
+                    force=False):
     print('Extra dependencies: %s' % extra_deps)
     print(coordinates.as_path(coords))
     if include_deps:
@@ -69,6 +71,9 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None):
             new_coords = coordinates.create(mcoords.root, mcoords.area,
                                             mcoords.module, new_version)
             new_path = coordinates.as_path(new_coords)
+            if force:
+                print('Removing {} before checking out'.format(new_path))
+                shutil.rmtree(os.path.join(mirror_root, new_path[1:]))
             checkout_module(new_coords.module, new_version, new_path, mirror_root)
         except ValueError:
             print("Can't handle coordinates {}".format(mcoords))
@@ -87,4 +92,5 @@ if __name__ == '__main__':
     version = utils.get_latest_version(coordinates.as_path(coords))
     full_coords = coordinates.create(prod_root, area, args.module, version)
     checkout_coords(full_coords, mirror_root, True,
-                    module_cfg.get('extra_deps', []))
+                    module_cfg.get('extra_deps', []),
+                    args.force)
