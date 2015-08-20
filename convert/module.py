@@ -1,5 +1,7 @@
 import utils
 import files
+import layers
+import groups
 import os
 import shutil
 import dependency
@@ -12,7 +14,7 @@ EDL_EXTENSION = 'edl'
 OPI_EXTENSION = 'opi'
 
 
-def handle_one_file(origin, destination, depth, module, file_index, force):
+def handle_one_file(origin, destination, depth, module, layer, group, file_index, force):
     log.debug('Handling file: %s to %s', origin, destination)
     edl_file = origin.endswith(EDL_EXTENSION)
     if edl_file:
@@ -24,6 +26,10 @@ def handle_one_file(origin, destination, depth, module, file_index, force):
             files.convert_edl(origin, destination)
             paths.update_opi_file(destination, depth, file_index,
                                   module, use_rel=False)
+            if layer:
+                layers.parse(destination)
+            if group:
+                groups.parse(destination)
         else:
             try:
                 shutil.copy2(origin, destination)
@@ -31,7 +37,7 @@ def handle_one_file(origin, destination, depth, module, file_index, force):
                 log.warn('Error trying to copy {}: {}'.format(origin, e))
 
 
-def convert_all(origin, destination, module, file_index, force):
+def convert_all(origin, destination, module, file_index, layer_files, group_files, force):
     """
     Copy each file in origin to destination:
         * if .edl, convert it to .opi
@@ -67,11 +73,13 @@ def convert_all(origin, destination, module, file_index, force):
         destpaths = [os.path.join(destination, rp) for rp in relpaths]
         log.debug('The destination paths are %s', destpaths)
         for o, d, r in zip(originpaths, destpaths, relpaths):
+            layer = o in layer_files
+            group = o in group_files
             eclipse_path = os.path.join(module, r)
             depth = len(eclipse_path.split(os.sep)) - 1
             log.debug('The depth for %s in %s is %s', r, module, depth)
             try:
-                handle_one_file(o, d, depth, module, file_index, force)
+                handle_one_file(o, d, depth, module, layer, group, file_index, force)
             except files.OldEdlError:
                 log.warn('Skipping old edl file %s', o)
                 old_edl_files.append(o)
@@ -92,6 +100,8 @@ class Module(object):
         self.edl_dir = cfg_dict['edl_dir']
         self.opi_dir = cfg_dict['opi_dir']
         self.extra_deps = cfg_dict['extra_deps']
+        self.layers = cfg_dict['layers']
+        self.groups = cfg_dict['groups']
         self.mirror_root = mirror_root
 
         self.new_version = utils.increment_version(coords.version)
@@ -133,13 +143,22 @@ class Module(object):
         :return:
         """
         origin = self.get_edl_path()
+        layer_files = []
+        for l in self.layers:
+            if os.path.exists(os.path.join(origin, l)):
+                layer_files.append(os.path.join(origin, l))
+        group_files = []
+        for g in self.groups:
+            if os.path.exists(os.path.join(origin, g)):
+                group_files.append(os.path.join(origin, g))
         destination = self.get_opi_path()
         try:
             os.makedirs(destination)
         except OSError:
             # directory already exists
             pass
-        convert_all(origin, destination, self.coords.module, file_dict, force)
+        convert_all(origin, destination, self.coords.module, file_dict,
+                    layer_files, group_files, force)
 
     def __str__(self):
         return 'Module at coordinates {}'.format(self.coords)
