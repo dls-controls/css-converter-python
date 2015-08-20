@@ -44,12 +44,39 @@ def get_modules(args, gen_cfg, area):
     return modules
 
 
+def convert_one_module(module, cfg, mirror_root):
+    log.info('Preparing conversion of module %s', mod)
+    dependencies = mod.get_dependencies()
+    edl_dirs = [mod.get_edl_path()]
+    for dep, dep_coords in dependencies.items():
+        new_version = utils.increment_version(dep_coords.version)
+        dep_cfg = configuration.get_config_section(cfg, dep)
+        dep_edl_path = os.path.join(mirror_root,
+                                coordinates.as_path(dep_coords, False)[1:],
+                                new_version,
+                                dep_cfg['edl_dir'])
+        edl_dirs.append(dep_edl_path)
+
+    file_dict = paths.index_paths(edl_dirs, True)
+    try:
+        mod.convert(file_dict, args.force)
+
+        new_version = utils.increment_version(mod.coords.version)
+        build_runcss.gen_run_script(mod.coords,
+                                    new_version,
+                                    mirror_root,
+                                    mod.get_opi_path(),
+                                    cfg)
+    except ValueError as e:
+        log.warn('Conversion of %s failed:', mod)
+        log.warn('%s', e)
+
 if __name__ == '__main__':
     args = arguments.parse_arguments()
     gen_cfg = configuration.parse_configuration(args.general_config)
-    cfg = configuration.parse_configuration(args.module_config)  #ioc.conf or support.conf
+    cfg = configuration.parse_configuration(args.module_config)
     area = 'ioc' if args.ioc else 'support'
-    mirror = gen_cfg.get('general', 'mirror_root')
+    mirror_root = gen_cfg.get('general', 'mirror_root')
 
     try:
         modules = get_modules(args, gen_cfg, area)
@@ -59,31 +86,7 @@ if __name__ == '__main__':
 
     try:
         for mod in modules:
-            log.info('Preparing conversion of module %s', mod)
-            dependencies = mod.get_dependencies()
-            edl_dirs = [mod.get_edl_path()]
-            for dep, dep_coords in dependencies.items():
-                new_version = utils.increment_version(dep_coords.version)
-                dep_cfg = configuration.get_config_section(cfg, dep)
-                dep_edl_path = os.path.join(mirror,
-                                        coordinates.as_path(dep_coords, False)[1:],
-                                        new_version,
-                                        dep_cfg['edl_dir'])
-                edl_dirs.append(dep_edl_path)
-
-            file_dict = paths.index_paths(edl_dirs, True)
-            try:
-                mod.convert(file_dict, args.force)
-
-                new_version = utils.increment_version(mod.coords.version)
-                build_runcss.gen_run_script(mod.coords,
-                                            new_version,
-                                            mirror,
-                                            mod.get_opi_path(),
-                                            cfg)
-            except ValueError as e:
-                log.warn('Conversion of %s failed:', mod)
-                log.warn('%s', e)
+            convert_one_module(mod, cfg, mirror_root)
     except utils.ConfigError as e:
         log.fatal('Incorrect configuration: %s', e)
         log.fatal('System will exit.')
