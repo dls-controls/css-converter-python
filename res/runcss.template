@@ -9,7 +9,9 @@ fi
 
 CSSTUDIO=/dls_sw/work/common/CSS/CSS_dls-4.2.x_nightly/cs-studio
 
-LAUNCH_OPI=$$1
+PROJECT=${project}
+MODULE=${module}
+LAUNCH_OPI=/$$PROJECT/$$MODULE/$$1
 
 if [ -z $$LAUNCH_OPI ]; then
     echo "No OPI specified to launch!"

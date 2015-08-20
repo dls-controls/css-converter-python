@@ -126,7 +126,9 @@ def gen_run_script(coord, new_version=None, prefix="/", opi_dir=None, config=Non
         with open(os.path.join(builder_script_path, SCRIPT_TEMPLATE)) as template:
             content = template.read()
             s = string.Template(content)
-            updated_content = s.substitute(links=links_string)
+            updated_content = s.substitute(links=links_string,
+                                           project=project_name,
+                                           module=coord.module)
             f.write(updated_content)
 
     # Give owner and group execute permissions.
