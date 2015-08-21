@@ -9,4 +9,6 @@ tags
 output/
 tmp/
 edl/
+project/
+.idea/
 symbols/
