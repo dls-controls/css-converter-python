@@ -5,10 +5,6 @@ from convert import utils
 import os
 
 
-APPS_XML = '/dls_sw/prod/etc/Launcher/applications.xml'
-NEW_APPS_XML = 'new_apps.xml'
-
-
 def update_cmd(cmd_dict, mirror_root):
     cmd.interpret()
     p, n, v, rp = utils.parse_module_name(cmd.path_to_run)
@@ -36,7 +32,9 @@ if __name__ == '__main__':
     module_cfg = configuration.parse_configuration('conf/modules.ini')
     gen_cfg = configuration.parse_configuration('conf/converter.ini')
     mirror_root = gen_cfg.get('general', 'mirror_root')
-    lxml = launcher.LauncherXml(APPS_XML, NEW_APPS_XML)
+    apps_xml = gen_cfg.get('launcher', 'apps_xml')
+    new_apps_xml = gen_cfg.get('launcher', 'new_apps_xml')
+    lxml = launcher.LauncherXml(apps_xml, new_apps_xml)
     cmds = lxml.get_cmds()
     cmd_dict = {}
     for cmd in cmds:
@@ -45,5 +43,5 @@ if __name__ == '__main__':
             if new_cmd is not None:
                 cmd_dict[cmd] = new_cmd
         except (spoof.SpoofError, ValueError, TypeError) as e:
-            print('Failed interpreting command: {}'.format(e))
+            print('Failed interpreting command {}: {}'.format(cmd.cmd, e))
     lxml.write_new(cmd_dict)
