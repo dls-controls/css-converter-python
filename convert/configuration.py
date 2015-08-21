@@ -86,8 +86,7 @@ def get_config_section(cfg, name):
         items = cfg.items(name)
         for key, value in items:
             if key in ('layers', 'groups', 'symbols', 'extra_deps'):
-                cfg_section[key] = [val.strip() for val in value.split(';')
-                                    if val != '']
+                cfg_section[key] = filter(None, [val.strip() for val in value.split(';')])
                 if key == 'extra_deps':
                     deps = []
                     for dep in cfg_section[key]:
