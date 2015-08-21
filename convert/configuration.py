@@ -70,6 +70,41 @@ def parse_configuration(filepath):
     return config
 
 
+def split_value_list(value):
+    """ Split a list of ';' separated strings into a list.
+        Empty elements are removed.
+    :param value: Formatted string list of values
+    :return: List of string values
+    """
+    return filter(None, [val.strip() for val in value.split(';')])
+
+
+def parse_dependency_list(dependencies, cfg):
+    """ Parse a list of dependencies, converting into list of
+        'dependency tuples'.
+
+        Note: these are NOT coordinates as they do not
+        include root path information.
+
+        Area is set to 'support' if no inforation can be found in the config
+        file for dependency module.
+
+    :param dependencies: List of dependency strings (module/version)
+    :param cfg: Converter modules config data
+    :return: List of tuples (mod,area,version)
+    """
+    deps = []
+    for dep in dependencies:
+        module, version = os.path.split(dep)
+        try:
+            area = cfg.get(module, 'area')
+        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+            area = 'support'
+
+        deps.append((module, area, version))
+    return deps
+
+
 def get_config_section(cfg, name):
     # In some cases, the new opi dir will be at moduleNameApp/opi/opi.
     # In some of those cases, the IOC name may be prefix/moduleName
@@ -85,20 +120,11 @@ def get_config_section(cfg, name):
     try:
         items = cfg.items(name)
         for key, value in items:
-            if key in ('layers', 'groups', 'symbols', 'extra_deps'):
-                cfg_section[key] = filter(None, [val.strip() for val in value.split(';')])
-                if key == 'extra_deps':
-                    deps = []
-                    for dep in cfg_section[key]:
-                        module, version = os.path.split(dep)
-                        try:
-                            area = cfg.get(module, 'area')
-                        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-                            area = 'support'
-                        deps.append((module, area, version))
-                    cfg_section[key] = deps
-
-
+            if key in ('layers', 'groups', 'symbols'):
+                cfg_section[key] = split_value_list(value)
+            elif key == 'extra_deps':
+                dependencies = split_value_list(value)
+                cfg_section[key] = parse_dependency_list(dependencies, cfg)
             else:
                 cfg_section[key] = value
     except ConfigParser.NoSectionError:
