@@ -235,3 +235,8 @@ class LauncherCommand(object):
             except ValueError:
                 continue
         return module_dict
+
+    def __str__(self):
+        return 'LauncherCommand: {} {} {}'.format(self.name,
+                                                  self.cmd,
+                                                  self.args)
