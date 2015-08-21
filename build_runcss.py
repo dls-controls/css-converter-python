@@ -45,7 +45,7 @@ def build_links(dependencies, project_name, prefix, config=None):
     for dep, dep_coord in dependencies.iteritems():
         config_section = configuration.get_config_section(config, dep)
         new_version = utils.increment_version(dep_coord.version)
-        new_coord = coordinates.create(dep_coord.root, dep_coord.area, dep_coord.module, new_version)
+        new_coord = coordinates.update_version(dep_coord, new_version)
         try:
             opi_path = config_section['opi_dir']
         except (KeyError, AttributeError):

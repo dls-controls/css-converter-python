@@ -68,8 +68,7 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
         try:
             new_version = utils.increment_version(mcoords.version)
             print('new version {}'.format(new_version))
-            new_coords = coordinates.create(mcoords.root, mcoords.area,
-                                            mcoords.module, new_version)
+            new_coords = coordinates.update_version(mcoords, new_version)
             new_path = coordinates.as_path(new_coords)
             if force:
                 print('Removing {} before checking out'.format(new_path))
@@ -90,7 +89,7 @@ if __name__ == '__main__':
     mirror_root = gen_cfg.get('general', 'mirror_root')
     coords = coordinates.create(prod_root, area, args.module)
     version = utils.get_latest_version(coordinates.as_path(coords))
-    full_coords = coordinates.create(prod_root, area, args.module, version)
+    full_coords = coordinates.update_version(coords, version)
     checkout_coords(full_coords, mirror_root, True,
                     module_cfg.get('extra_deps', []),
                     args.force)

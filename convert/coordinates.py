@@ -47,6 +47,15 @@ def create(root, area, module, version=None):
     return ModCoord(root, area, module, version)
 
 
+def update_version(coord, version):
+    """ Generate a new coordinate with updated version
+    :param coord: Base coordinate
+    :param version: New version to set
+    :return: New coord
+    """
+    return create(coord.root, coord.area, coord.module, version)
+
+
 def as_path(coord, include_version=True):
     """ Convert a module coordinate object to a file path
 
