@@ -44,7 +44,12 @@ def get_modules(args, gen_cfg, area):
     return modules
 
 
-def convert_one_module(module, cfg, mirror_root):
+def convert_one_module(mod, cfg, mirror_root):
+    """
+    :param mod: module (object) to convert
+    :param cfg: parsed modules configuration
+    :param mirror_root: base bath for converted files
+    """
     log.info('Preparing conversion of module %s', mod)
     dependencies = mod.get_dependencies()
     edl_dirs = [mod.get_edl_path()]
