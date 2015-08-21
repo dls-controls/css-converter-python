@@ -118,6 +118,9 @@ def gen_run_script(coord, new_version=None, prefix="/", opi_dir=None, config=Non
     dependencies = dependency.DependencyParser(coord, cfg_section['extra_deps'])
 
     project_name = "%s_%s" % (coord.module.replace(os.path.sep, '_'), new_version)
+
+    # a reference to THIS module needed in the links string is required for
+    # correct navigation to add to the dict of
     deps = dependencies.find_dependencies()
     deps[coord.module] = coord
     links_string = build_links(deps, project_name, prefix, config)
