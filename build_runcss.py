@@ -43,20 +43,13 @@ def build_links(dependencies, project_name, prefix, config=None):
 
     links_strings = []
     for dep, dep_coord in dependencies.iteritems():
-        config_section = configuration.get_config_section(config, dep)
-        new_version = utils.increment_version(dep_coord.version)
-        new_coord = coordinates.update_version(dep_coord, new_version)
-        try:
-            opi_path = config_section['opi_dir']
-        except (KeyError, AttributeError):
-            opi_path = get_opi_path(dep_coord)
-        fs_dir = os.path.join(coordinates.as_path(new_coord), opi_path)
-        print('The opi path is {}'.format(fs_dir))
-        if os.path.exists(os.path.join(prefix, fs_dir[1:])):
-            links_strings.append('%s%s=%s' % (PATH_PREFIX, fs_dir,
-                                            os.path.join('/', project_name, dep)))
+        opi_dir = get_link_opi_path(config, dep, dep_coord)
+
+        if os.path.exists(os.path.join(prefix, opi_dir[1:])):
+            links_strings.append('%s%s=%s' % (
+                PATH_PREFIX, opi_dir, os.path.join('/', project_name, dep)))
         else:
-            log.warn('Not creating link for non-existent path %s%s', prefix, fs_dir)
+            log.warn('Not creating link for non-existent path %s%s', prefix, opi_dir)
 
     links = ',\\\n'.join(links_strings)
 
@@ -66,8 +59,37 @@ def build_links(dependencies, project_name, prefix, config=None):
     return links
 
 
+def get_link_opi_path(config, dep, dep_coord):
+    """ Generate the path to opi files for use in a dependency.
+
+        This uses relative opi-path extracted, and an incremented version number
+        The opi-path is extracted from:
+        i) the converter's modules.ini file
+        ii) the module's module.ini
+        iii) best guess from the module path
+
+    :param coord: Fully qualified Module coord
+    :return: Relative path from module root to the opi files directory
+    :raises ValueError: when <coord> does not include version information
+    """
+    config_section = configuration.get_config_section(config, dep)
+    try:
+        opi_path = config_section['opi_dir']
+    except (KeyError, AttributeError):
+        opi_path = get_opi_path(dep_coord)
+
+    new_version = utils.increment_version(dep_coord.version)
+    mod_path = coordinates.as_path(
+        coordinates.update_version(dep_coord, new_version))
+
+    opi_dir = os.path.join(mod_path, opi_path)
+    print('The opi path is {}'.format(opi_dir))
+
+    return opi_dir
+
+
 def get_opi_path(coord):
-    """ Extract the relative path to opi files from a module configuration file
+    """ Extract the relative path to opi files from a module configuration file.
 
     :param coord: Fully qualified Module coord
     :return: Relative path from module root to the opi files directory
@@ -88,13 +110,18 @@ def get_opi_path(coord):
     return opi_path
 
 
-def gen_run_script(coord, new_version=None, prefix="/", opi_dir=None, config=None):
+def gen_run_script(coord, new_version=None, prefix="/",
+                   opi_dir=None, config=None, extra_depends=None):
     '''
     Generate a wrapper script which updates the appropriate
     links before opening a CSS window.
 
     :param coord: coordindate of module being released, including the release
                     version number. Root should specify the *build* location
+    :param new_version: explicit version to override that set in the coord
+    :param prefix: prefix to use in front of coord fullpath
+    :param opi_dir: explicit relative path to opi files, overrides module.ini
+    :param config:
     '''
 
     builder_script_path = os.path.dirname(os.path.realpath(__file__))
@@ -114,8 +141,13 @@ def gen_run_script(coord, new_version=None, prefix="/", opi_dir=None, config=Non
         os.makedirs(script_dir)
     script_path = os.path.join(script_dir, SCRIPT_FILE)
 
-    cfg_section = configuration.get_config_section(config, coord.module)
-    dependencies = dependency.DependencyParser(coord, cfg_section['extra_deps'])
+    if config is not None:
+        cfg_section = configuration.get_config_section(config, coord.module)
+        extra_depends = cfg_section.get('extra_deps', [])
+    if extra_depends is None:
+        extra_depends = []
+
+    dependencies = dependency.DependencyParser(coord, extra_depends)
 
     project_name = "%s_%s" % (coord.module.replace(os.path.sep, '_'), new_version)
 
@@ -149,6 +181,7 @@ def parse_working_path(path):
 
     return path_root, module_area
 
+
 if __name__ == '__main__':
     # Call with:
     #   current working directory (inside the module) and a relative path
@@ -162,9 +195,11 @@ if __name__ == '__main__':
 
     configuration_path = os.path.join(working_path, rel_configuration_path)
     module_name = None
+    extra_deps = None
     try:
         parser = configuration.parse_module_config(configuration_path)
         module_name = configuration.module_name(parser)
+        extra_deps = configuration.opi_depends(parser)
     except utils.ConfigError as ex:
         log.error("Error parsing module.ini %s. Aborting", ex.message)
 
@@ -173,4 +208,4 @@ if __name__ == '__main__':
         print("MODULE: {}, VERSION: {}").format(module_name, version)
 
         module_coord = coordinates.create(root, area, module_name, version)
-        gen_run_script(module_coord)
+        gen_run_script(module_coord, extra_depends=extra_deps)

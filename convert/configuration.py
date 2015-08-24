@@ -1,7 +1,6 @@
 import os
 import ConfigParser
-from convert import utils, coordinates
-
+from convert import utils
 
 MODULE_INI = 'configure/module.ini'
 
@@ -39,19 +38,37 @@ def module_name(parser):
 def opi_path(parser, default):
     """ Extract the opi-file location in the module from the module.ini file
 
-    :raises:
-    :param coord: Module coordinate (inc. version)
+    :param parser: Config file parser
+    :param default: Default value, if location key not found
     :return: Relative path to OPI files, e.g. MyModuleApp/opi/opi
     """
 
     try:
-        opi_path = parser.get('general', 'opi-location')
+        opis = parser.get('general', 'opi-location')
     except ConfigParser.NoSectionError:
         # file doesn't exist so...
-        opi_path = default
-        print "No opi-location in module.ini file, using default %s" % (default)
+        opis = default
+        print "No opi-location in module.ini file, using default %s" % default
 
-    return opi_path
+    return opis
+
+
+def opi_depends(parser):
+    """ Extract the opi-dependencies ("opi-depends") from the module.ini file
+
+    :param parser: Config file parser
+    :return: List of tuples (mod,area,version), empty if none defined
+    """
+    depends = []
+    try:
+        depends_string = parser.get('general', 'opi-depends')
+        depends_list = split_value_list(depends_string)
+        # assume all depends are 'support' not 'ioc'
+        depends = parse_dependency_list(depends_list, None)
+    except ConfigParser.NoSectionError:
+        print "No opi-depends in module.ini file"
+
+    return depends
 
 
 def parse_configuration(filepath):
@@ -133,4 +150,3 @@ def get_config_section(cfg, name):
     except ConfigParser.NoSectionError:
         pass
     return cfg_section
-
