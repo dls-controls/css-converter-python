@@ -144,7 +144,7 @@ def gen_run_script(coord, new_version=None, prefix="/", opi_dir=None, config=Non
 def parse_working_path(path):
     path_root = path
     module_area = ""
-    while module_area not in ('support', 'ioc'):
+    while module_area not in (utils.AREA_SUPPORT, utils.AREA_IOC):
         path_root, module_area = os.path.split(path_root)
 
     return path_root, module_area

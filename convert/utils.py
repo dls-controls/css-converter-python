@@ -4,6 +4,8 @@ import stat
 import logging as log
 import string
 
+AREA_IOC = 'ioc'
+AREA_SUPPORT = 'support'
 
 VERSION_FILE = 'configure/VERSION'
 
@@ -166,10 +168,10 @@ def parse_module_name(filepath):
     parts = filepath.split('/')
     version = None
 
-    if 'support' in parts:
-        root_index = parts.index('support')
-    elif 'ioc' in parts:
-        root_index = parts.index('ioc')
+    if AREA_SUPPORT in parts:
+        root_index = parts.index(AREA_SUPPORT)
+    elif AREA_IOC in parts:
+        root_index = parts.index(AREA_IOC)
     else:
         raise ValueError('%s contains neither ioc nor support.' % filepath)
 

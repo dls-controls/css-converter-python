@@ -21,7 +21,7 @@ TRUNK = 'diamond/trunk'
 
 def checkout_module(name, version, path, mirror_root):
     mirror_location = os.path.join(mirror_root, path[1:])
-    module_type = 'ioc' if 'ioc' in path else 'support'
+    module_type = utils.AREA_IOC if 'ioc' in path else utils.AREA_SUPPORT
     module_name = name if name is not None else ''
     svn_location = os.path.join(SVN_ROOT, TRUNK, module_type, module_name)
     print 'Checkout {} to {}'.format(svn_location, mirror_location)
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     gen_cfg = configuration.parse_configuration(args.general_config)
     cfg = configuration.parse_configuration(args.module_config)
     module_cfg = configuration.get_config_section(cfg, args.module)
-    area = 'ioc' if args.ioc else 'support'
+    area = utils.AREA_IOC if args.ioc else utils.AREA_SUPPORT
     prod_root = gen_cfg.get('general', 'prod_root')
     mirror_root = gen_cfg.get('general', 'mirror_root')
     coords = coordinates.create(prod_root, area, args.module)

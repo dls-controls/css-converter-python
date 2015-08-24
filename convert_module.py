@@ -80,7 +80,7 @@ if __name__ == '__main__':
     args = arguments.parse_arguments()
     gen_cfg = configuration.parse_configuration(args.general_config)
     cfg = configuration.parse_configuration(args.module_config)
-    area = 'ioc' if args.ioc else 'support'
+    area = utils.AREA_IOC if args.ioc else utils.AREA_SUPPORT
     mirror_root = gen_cfg.get('general', 'mirror_root')
 
     try:

@@ -86,20 +86,23 @@ def parse_dependency_list(dependencies, cfg):
         Note: these are NOT coordinates as they do not
         include root path information.
 
-        Area is set to 'support' if no inforation can be found in the config
-        file for dependency module.
+        Area is set to 'support' if no information can be found in the config
+        file for dependency module, of config argument is None.
 
     :param dependencies: List of dependency strings (module/version)
-    :param cfg: Converter modules config data
+    :param cfg: Converter modules config data (may be None)
     :return: List of tuples (mod,area,version)
     """
     deps = []
     for dep in dependencies:
         module, version = os.path.split(dep)
-        try:
-            area = cfg.get(module, 'area')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-            area = 'support'
+        area = utils.AREA_SUPPORT
+
+        if cfg is not None:
+            try:
+                area = cfg.get(module, 'area')
+            except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+                pass
 
         deps.append((module, area, version))
     return deps
