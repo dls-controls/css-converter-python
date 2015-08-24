@@ -19,6 +19,7 @@ class FileMungingTests(unittest.TestCase):
     #     moduledirs = utils.get_all_dirs("/dls_sw/prod/R3.14.12.3/support")
     #     print len(moduledirs)
 
+    @unittest.skip('Not a real test')
     def test_get_all_dirs_returns_list_of_folders_support_module(self):
         moduledirs = utils.get_all_dirs("/dls_sw/prod/R3.14.12.3/support/mirror")
         for d in sorted(moduledirs):
