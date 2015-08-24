@@ -57,7 +57,7 @@ def opi_depends(parser):
     """ Extract the opi-dependencies ("opi-depends") from the module.ini file
 
     :param parser: Config file parser
-    :return: List of tuples (mod,area,version), empty if none defined
+    :return: List of root-less coordinates (area,module,version); empty if none defined
     """
     depends = []
     try:
@@ -108,7 +108,7 @@ def parse_dependency_list(dependencies, cfg):
 
     :param dependencies: List of dependency strings (module/version)
     :param cfg: Converter modules config data (may be None)
-    :return: List of tuples (mod,area,version)
+    :return: List of root-less coordinates (area,module,version)
     """
     deps = []
     for dep in dependencies:
@@ -121,7 +121,7 @@ def parse_dependency_list(dependencies, cfg):
             except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
                 pass
 
-        deps.append((module, area, version))
+        deps.append(coordinates.create_rootless(area, module, version))
     return deps
 
 
