@@ -1,7 +1,10 @@
-import utils
+import colourtweak
 import files
-import layers
 import groups
+import layers
+import mmux
+import utils
+
 import os
 import shutil
 import dependency
@@ -132,12 +135,13 @@ class Module(object):
 
                 paths.update_opi_file(target, depth, file_index,
                                       self.coords.module, use_rel=False)
-
                 if self.is_layer_file(source):
                     layers.parse(target)
-
                 if self.is_group_file(source):
                     groups.parse(target)
+                colourtweak.parse(target)
+                if utils.grep(target, mmux.MENU_MUX_ID):
+                    mmux.parse(target)
             else:
                 try:
                     shutil.copy2(source, target)

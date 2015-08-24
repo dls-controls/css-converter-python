@@ -279,3 +279,12 @@ def generate_project_file(outdir, module_name, version):
             updated_content = s.substitute(module_name=module_name,
                                            version=version)
             f.write(updated_content)
+
+
+def grep(filename, string):
+    with open(filename) as f:
+        for line in f:
+            if string in line:
+                return True
+
+    return False
