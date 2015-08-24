@@ -73,7 +73,13 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
             if force:
                 print('Removing {} before checking out'.format(new_path))
                 shutil.rmtree(os.path.join(mirror_root, new_path[1:]))
+
             checkout_module(new_coords.module, new_version, new_path, mirror_root)
+
+            dep_cfg = configuration.get_config_section(cfg, new_coords.module)
+            configuration.create_module_ini_file(new_coords, mirror_root,
+                    dep_cfg.get('opi_dir'), dep_cfg.get('extra_deps'), force)
+
         except ValueError:
             print("Can't handle coordinates {}".format(mcoords))
     print('Finished checking out all modules.')

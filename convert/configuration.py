@@ -1,8 +1,14 @@
 import os
 import ConfigParser
-from convert import utils
+from convert import utils, coordinates
 
 MODULE_INI = 'configure/module.ini'
+
+SEC_GENERAL = 'general'
+OPI_DEPENDS = 'opi-depends'
+OPI_LOCATION = 'opi-location'
+AREA = 'area'
+MODULE_NAME = 'name'
 
 
 def parse_module_config(base_path):
@@ -150,3 +156,46 @@ def get_config_section(cfg, name):
     except ConfigParser.NoSectionError:
         pass
     return cfg_section
+
+
+def dependency_list_to_string(coord_list):
+    """ Convert a list of dependency coords (area, module, version) to
+        a semicolon separated list of 'module/version' strings suitable for
+        insertion into a module.ini file
+
+        Note: list is NOT terminated by a ';'
+
+    :param coord_list: List to convert
+    :return: formatted string list
+    """
+    return ';'.join(
+        [os.sep.join((coord.module, coord.version)) for coord in coord_list])
+
+
+def create_module_ini_file(coord, mirror_root, opi_location, extra_depends, force):
+    """ Create a module.ini file.
+
+        File is *not* overwritten if it already exists UNLESS the force argument
+        is set
+
+    :param coord: Used for area and name
+    :param opi_location: Relative path to opi files (e.g. xxxApp/opi/opi)
+    :param extra_depends: list of all "extra" dependency coords not in RELEASE
+    """
+    mod_ini_file = os.path.join(mirror_root, coordinates.as_path(coord)[1:], MODULE_INI)
+    if force or not os.path.exists(mod_ini_file):
+
+        dependencies = " ; Unable to lookup dependencies in configuration"
+        if extra_depends is not None:
+            dependencies = dependency_list_to_string(extra_depends)
+
+        config = ConfigParser.ConfigParser()
+        config.add_section(SEC_GENERAL)
+        config.set(SEC_GENERAL, MODULE_NAME, coord.module)
+        config.set(SEC_GENERAL, AREA, coord.area)
+        config.set(SEC_GENERAL, OPI_LOCATION, opi_location)
+        config.set(SEC_GENERAL, OPI_DEPENDS, dependencies)
+
+        # Writing our configuration file to 'example.cfg'
+        with open(mod_ini_file, 'wb') as configfile:
+            config.write(configfile)
