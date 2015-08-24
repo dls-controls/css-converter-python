@@ -190,7 +190,7 @@ class Module(object):
                     pass
 
             for f in filenames:
-                source = os.path.join(dirnames, f)  # full path for source
+                source = os.path.join(dirpath, f)  # full path for source
                 rel = os.path.relpath(source, origin)  # relative path for target
                 target = os.path.join(destination, rel)  # full path for target
                 eclipse_path = os.path.join(self.coords.module, rel)
