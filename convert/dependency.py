@@ -4,6 +4,7 @@ import os
 
 CONFIGURE_RELEASE = 'configure/RELEASE'
 EPICS_BASE = '/dls_sw/epics/R3.14.12.3/base'
+EPICS_11_BASE = '/dls_sw/epics/R3.14.11/base'
 
 
 class DependencyParser(object):
@@ -52,6 +53,7 @@ class DependencyParser(object):
         valid = dependency.path is not None
         valid = valid and dependency.name is not None
         valid = valid and not dependency.path.startswith(EPICS_BASE)
+        valid = valid and not dependency.path.startswith(EPICS_11_BASE)
         valid = valid and not dependency.path == self._module_path
 
         return valid
