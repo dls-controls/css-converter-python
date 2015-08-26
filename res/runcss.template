@@ -13,7 +13,9 @@ CSSTUDIO=/dls_sw/work/common/CSS/CSS_dls-4.2.x_nightly/cs-studio
 
 PROJECT=${project}
 MODULE=${module}
-LAUNCH_OPI=/$$PROJECT/$$MODULE/$$1
+# Escape all periods except the one in the filename.
+escaped=$$(echo $$1 | perl -ne "s|\.(?!opi)|[\\\46]|g; print;")
+LAUNCH_OPI=/$$PROJECT/$$MODULE/$$escaped
 
 
 LINKS="${links}"
