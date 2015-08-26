@@ -17,7 +17,20 @@ MODULE=${module}
 escaped=$$(echo $$1 | perl -ne "s|\.(?!opi)|[\\\46]|g; print;")
 LAUNCH_OPI=/$$PROJECT/$$MODULE/$$escaped
 
+function tokens() {
+    echo $$#
+}
+
+# Only if macros are passed in (separated by a space from the filename)
+# do we need a comma to separate the Position=NEW_SHELL macro from the
+# others.  Otherwise, it's separated by a space.
+toks=$$(tokens $$LAUNCH_OPI)
+if [ $$toks == 1 ]; then
+    delimiter=" "
+else
+    delimiter=","
+fi
 
 LINKS="${links}"
 
-$$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI} Position=NEW_SHELL -share_link $$LINKS"
+$$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI}$${delimiter}Position=NEW_SHELL -share_link $$LINKS"
