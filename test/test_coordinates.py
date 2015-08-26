@@ -12,6 +12,7 @@ class TestGenerateCoord(unittest.TestCase):
         self.assertEqual("mirror", x.module)
         self.assertIsNone(x.version)
 
+    @unittest.skip('Too slow')
     def test_generate_coord_returns_tuple_with_correct_root_area_module_and_version_for_modlevel_support_path_with_simple_version(self):
         x = coordinates.from_path("/dls_sw/prod/R3.14.12.3/support/modulename/2-6")
 
@@ -20,6 +21,7 @@ class TestGenerateCoord(unittest.TestCase):
         self.assertEqual("modulename", x.module)
         self.assertEqual("2-6", x.version)
 
+    @unittest.skip('Too slow')
     def test_generate_coord_returns_tuple_with_correct_root_area_module_and_version_for_modlevel_ioc_path_with_simple_version(self):
         x = coordinates.from_path("/dls_sw/prod/R3.14.12.3/ioc/othermod/3-2-1")
 
@@ -28,6 +30,7 @@ class TestGenerateCoord(unittest.TestCase):
         self.assertEqual("othermod", x.module)
         self.assertEqual("3-2-1", x.version)
 
+    @unittest.skip('Too slow')
     def test_generate_coord_returns_tuple_with_correct_root_area_module_and_version_for_double_modlevel_ioc_path_with_simple_version(self):
         x = coordinates.from_path("/dls_sw/prod/R3.14.12.3/ioc/a/b/3-2-1")
 
@@ -36,6 +39,7 @@ class TestGenerateCoord(unittest.TestCase):
         self.assertEqual("a/b", x.module)
         self.assertEqual("3-2-1", x.version)
 
+    @unittest.skip('Too slow')
     def test_generate_coord_returns_tuple_with_correct_root_area_module_and_version_for_double_modlevel_ioc_path_with_no_version(self):
         x = coordinates.from_path("/dls_sw/prod/R3.14.12.3/ioc/a/b")
 

@@ -48,7 +48,7 @@ class TestDependencies(unittest.TestCase):
 
     def test_depends_parser_includes_additional_dependency_if_one_passed_none_discovered(self):
 
-        additional = [('calc', '3-1')]
+        additional = [coordinates.create_rootless('support', 'calc', '3-1')]
         coord = coordinates.create('/dls_sw/prod/R3.14.12.3', 'dummy', 'LI/TI', '5-3')
         d = DependencyParser(coord, additional)
 
@@ -58,7 +58,7 @@ class TestDependencies(unittest.TestCase):
 
     def test_depends_parser_includes_additional_dependency_if_one_passed_some_discovered(self):
 
-        additional = [('test', '3-1dls4')]
+        additional = [coordinates.create_rootless('support', 'test', '3-1dls4')]
         coord = coordinates.create('/dls_sw/prod/R3.14.12.3', 'support', 'dlsPLC', '1-30')
         d = DependencyParser(coord, additional)
 
@@ -69,7 +69,8 @@ class TestDependencies(unittest.TestCase):
 
     def test_depends_parser_includes_additional_dependencies_if_many_passed_none_discovered(self):
 
-        additional = [('test', '3-1dls4'), ('test2', '5-2')]
+        additional = [coordinates.create_rootless('support', 'test', '3-1dls4'),
+                      coordinates.create_rootless('support', 'test2', '5-2')]
         coord = coordinates.create('/dls_sw/prod/R3.14.12.3', 'support', 'dummy', '1-30')
         d = DependencyParser(coord, additional)
 
