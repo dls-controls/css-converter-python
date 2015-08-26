@@ -118,7 +118,7 @@ def convert_edl(filename, destination):
     Try to convert .edl file.  If it fails, try updating .edl file
     using edm before converting again.
 
-    Return the conversion return code.
+    Return True if conversion successful, False if a non-zero return code produced.
     """
     if is_old_edl(filename):
         raise OldEdlError('EDL file in old format')
@@ -126,9 +126,17 @@ def convert_edl(filename, destination):
         raise utils.ConfigError('Cannot find java executable {}'.format(JAVA))
     if not os.path.exists(JAR_FILE):
         raise utils.ConfigError('Cannot find jar file {}'.format(JAR_FILE))
+
     utils.make_writeable(destination)
     log.debug('Converting %s to %s', filename, destination)
     command = CONVERT_CMD + [filename, destination]
     log.debug('Conversion command {}'.format(' '.join(command)))
+
     returncode = subprocess.call(command)
-    return returncode
+    if returncode != 0:
+        log.warn('Conversion of {0} failed with code {1}.'.format(filename, returncode))
+        success = False
+    else:
+        success = True
+
+    return success

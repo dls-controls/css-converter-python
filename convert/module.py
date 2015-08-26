@@ -131,17 +131,16 @@ class Module(object):
             log.info('Skipping existing file {}'.format(target))
         else:
             if edl_file:
-                files.convert_edl(source, target)
-
-                paths.update_opi_file(target, depth, file_index,
-                                      self.coords.module, use_rel=False)
-                if self.is_layer_file(source):
-                    layers.parse(target)
-                if self.is_group_file(source):
-                    groups.parse(target)
-                colourtweak.parse(target)
-                if utils.grep(target, mmux.MENU_MUX_ID):
-                    mmux.parse(target)
+                if files.convert_edl(source, target):
+                    paths.update_opi_file(target, depth, file_index,
+                                          self.coords.module, use_rel=False)
+                    if self.is_layer_file(source):
+                        layers.parse(target)
+                    if self.is_group_file(source):
+                        groups.parse(target)
+                    colourtweak.parse(target)
+                    if utils.grep(target, mmux.MENU_MUX_ID):
+                        mmux.parse(target)
             else:
                 try:
                     shutil.copy2(source, target)
