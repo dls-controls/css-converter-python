@@ -15,6 +15,10 @@ import os
 import shutil
 import subprocess
 
+import logging as log
+LOG_FORMAT = '%(levelname)s:  %(message)s'
+LOG_LEVEL = log.INFO
+log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 SVN_ROOT = 'svn+ssh://serv0002.cs.diamond.ac.uk/home/subversion/repos/controls'
 TRUNK = 'diamond/trunk'
@@ -29,7 +33,7 @@ def checkout_module(name, version, path, mirror_root, git):
     try:
         os.makedirs(mirror_location)
     except OSError:
-        print 'module already present; skipping'
+        log.info('%s already present at %s; skipping', name, mirror_location)
         return
     if git:
         vcs_location = os.path.join(GIT_ROOT, module_type, module_name)
@@ -37,7 +41,7 @@ def checkout_module(name, version, path, mirror_root, git):
     else:
         vcs_location = os.path.join(SVN_ROOT, TRUNK, module_type, module_name)
         ret_val = subprocess.call(['svn', 'checkout', vcs_location, mirror_location])
-    print 'Checkout {} to {}'.format(vcs_location, mirror_location)
+    log.info('Checkout %s to %s', vcs_location, mirror_location)
     # Drop VERSION file into configure directory
     configure_dir = os.path.join(mirror_location, 'configure')
     try:
@@ -61,8 +65,8 @@ def checkout_module(name, version, path, mirror_root, git):
 
 def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
                     force=False):
-    print('Extra dependencies: %s' % extra_deps)
-    print(coordinates.as_path(coords))
+    log.info('Coordinates: %s', coords)
+    log.info('Extra dependencies: %s', extra_deps)
     if include_deps:
         dp = dependency.DependencyParser(coords, extra_deps)
         to_checkout = dp.find_dependencies()
@@ -74,11 +78,11 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
     for module, mcoords in to_checkout.items():
         try:
             new_version = utils.increment_version(mcoords.version)
-            print('new version {}'.format(new_version))
+            log.info('New version %s', new_version)
             new_coords = coordinates.update_version(mcoords, new_version)
             new_path = coordinates.as_path(new_coords)
             if force:
-                print('Removing {} before checking out'.format(new_path))
+                log.info('Removing %s before checking out', new_path)
                 shutil.rmtree(os.path.join(mirror_root, new_path[1:]))
 
             dep_cfg = configuration.get_config_section(cfg, new_coords.module)
@@ -89,8 +93,8 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
                     dep_cfg.get('opi_dir'), dep_cfg.get('extra_deps'), force)
 
         except ValueError:
-            print("Can't handle coordinates {}".format(mcoords))
-    print('Finished checking out all modules.')
+            log.warn('Cannot handle coordinates %s', mcoords)
+    log.info('Finished checking out all modules.')
 
 if __name__ == '__main__':
     args = arguments.parse_arguments()
@@ -104,7 +108,7 @@ if __name__ == '__main__':
 
     if args.all:
         all_mods = utils.find_modules(os.path.join(prod_root, area))
-        print("Dependency checkout suppressed")
+        log.info('Dependency checkout suppressed')
         get_depends = False
     else:
         all_mods = [args.module]
