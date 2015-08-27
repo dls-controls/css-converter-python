@@ -3,9 +3,6 @@ import dls_epicsparser.releaseparser
 import os
 
 import logging as log
-LOG_FORMAT = '%(levelname)s:  %(message)s'
-LOG_LEVEL = log.INFO
-log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 CONFIGURE_RELEASE = 'configure/RELEASE'
 EPICS_BASE = '/dls_sw/epics/R3.14.12.3/base'
