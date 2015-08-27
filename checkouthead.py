@@ -84,18 +84,30 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
             print("Can't handle coordinates {}".format(mcoords))
     print('Finished checking out all modules.')
 
-
 if __name__ == '__main__':
     args = arguments.parse_arguments()
+
     gen_cfg = configuration.parse_configuration(args.general_config)
     cfg = configuration.parse_configuration(args.module_config)
-    module_cfg = configuration.get_config_section(cfg, args.module)
     area = utils.AREA_IOC if args.ioc else utils.AREA_SUPPORT
+
     prod_root = gen_cfg.get('general', 'prod_root')
     mirror_root = gen_cfg.get('general', 'mirror_root')
-    coords = coordinates.create(prod_root, area, args.module)
-    version = utils.get_latest_version(coordinates.as_path(coords))
-    full_coords = coordinates.update_version(coords, version)
-    checkout_coords(full_coords, mirror_root, True,
-                    module_cfg.get('extra_deps', []),
-                    args.force)
+
+    if args.all:
+        all_mods = utils.find_modules(os.path.join(prod_root, area))
+        print("Dependency checkout suppressed")
+        get_depends = False
+    else:
+        all_mods = [args.module]
+        get_depends = True
+
+    for mod in all_mods:
+        module_cfg = configuration.get_config_section(cfg, mod)
+        coords = coordinates.create(prod_root, area, mod)
+        version = utils.get_latest_version(coordinates.as_path(coords))
+        full_coords = coordinates.update_version(coords, version)
+
+        checkout_coords(full_coords, mirror_root, get_depends,
+                        module_cfg.get('extra_deps', []),
+                        args.force)
