@@ -6,7 +6,6 @@ import string
 
 AREA_IOC = 'ioc'
 AREA_SUPPORT = 'support'
-PROD_ROOT = '/dls_sw/prod/R3.14.12.3/'
 
 VERSION_FILE = 'configure/VERSION'
 
@@ -65,11 +64,6 @@ def get_version(configuration_path):
             version = content_file.read()
 
     return version.rstrip()
-
-
-def get_prod_version(area, module):
-    filepath = os.path.join(PROD_ROOT, area, module)
-    return get_latest_version(filepath)
 
 
 def get_latest_version(filepath):
