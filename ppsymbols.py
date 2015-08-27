@@ -131,7 +131,7 @@ def process_symbol(name, mod, path, cfg, prod_root, mirror_root):
     destination = os.path.dirname(os.path.join(mirror_path, opi_path, name))
     log.info('Destination directory is {}'.format(destination))
     if os.path.exists(destination):
-        for f in os.listdir(os.path.dirname(destination)):
+        for f in os.listdir(destination):
             n = os.path.split(name)[1]
             n = '.'.join(n.split('.')[:-1])
             if f.startswith(n) and f.endswith('png'):

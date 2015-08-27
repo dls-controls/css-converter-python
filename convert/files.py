@@ -66,8 +66,7 @@ def convert_symbol(symbol_file, destinations):
         log.debug("... copy to %s", destination)
         try:
             utils.make_writeable(destination)
-            destdir = os.path.dirname(destination)
-            absfilename = os.path.join(destdir, filename)
+            absfilename = os.path.join(destination, filename)
 
             utils.make_writeable(absfilename)
             shutil.copyfile(source, absfilename)

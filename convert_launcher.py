@@ -46,6 +46,7 @@ def process_symbol_files(symbol_paths, convert_symbols):
             symbol_count += 1
             log.info('Processed %s of %s symbol files.', symbol_count, len(symbol_paths))
             try:
+                destinations = [os.path.dirname(d for d in destinations)]
                 files.convert_symbol(path, destinations)
             except (IndexError, AssertionError) as e:
                 log.warn('Failed to convert symbol %s: %s', path, e)
