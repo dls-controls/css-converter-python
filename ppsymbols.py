@@ -1,3 +1,11 @@
+"""
+Post processing script to locate all the symbol widgets in converted
+EDM panels and change them into DLS symbol widgets.
+As part of the process, create the necessary PNG files.
+
+Since this grabs screen attention, it can be run after all other conversion
+steps are complete.
+"""
 import pkg_resources
 pkg_resources.require('dls_epicsparser')
 from convert import configuration
@@ -35,7 +43,7 @@ def get_edl_dirs(module):
 
 def edit_symbol_node(node, filename):
     size = int(re.findall('\d+', filename)[-1])
-    print('Filename {}; size {}'.format(filename, size))
+    log.info('New filename %s; size %s'.format(filename, size))
     node.set('typeId', SYMBOL_ID)
     node.find('name').text = 'DLS symbol'
     pv_name = node.find('.//pv').text
@@ -80,9 +88,7 @@ def update_symbols(filename, file_dict, module, cfg, prod_root, mirror_root):
         new_path = paths._update_opi_path(symbol_file, 1,
                                           file_dict, module, False)
         if png_file is not None:
-            print('New path: {}'.format(new_path))
             new_path = os.sep.join(os.path.split(new_path)[:-1] + (png_file,))
-            print('New path: {}'.format(new_path))
             edit_symbol_node(widget, new_path)
     tree.write(filename, encoding='utf-8', xml_declaration=True)
 
@@ -110,7 +116,6 @@ def build_filelist(basepath):
 
 
 def process_symbol(name, mod, path, cfg, prod_root, mirror_root):
-    print('name is {}'.format(name))
     mod_cfg = configuration.get_config_section(cfg, mod)
     area = mod_cfg['area']
     version = mod_cfg['version']
@@ -120,22 +125,20 @@ def process_symbol(name, mod, path, cfg, prod_root, mirror_root):
     edl_path = mod_cfg['edl_dir']
     opi_path = mod_cfg['opi_dir']
     coords = coordinates.create(prod_root, area, mod, version)
-    print(edl_path, name)
-    print(coords)
-    print(coordinates.as_path(coords))
     mirror_path = os.path.join(mirror_root, coordinates.as_path(coords)[1:])
     full_path = os.path.join(mirror_path, edl_path, name[:-3] + 'edl')
-    destination = os.path.join(mirror_path, opi_path, name)
-    print('Destination is {}'.format(destination))
-    try:
+    destination = os.path.dirname(os.path.join(mirror_path, opi_path, name))
+    log.info('Destination directory is {}'.format(destination))
+    if os.path.exists(destination):
         for f in os.listdir(os.path.dirname(destination)):
             n = os.path.split(name)[1]
             n = '.'.join(n.split('.')[:-1])
             if f.startswith(n) and f.endswith('png'):
-                print('Destination already exists: {}'.format(f))
+                log.info('Symbol png already exists: %s', f)
                 return f
-    except OSError as e:
-        print('Failed: {}'.format(e))
+    else:
+        log.warn('Failed to process symbol: %s does not exist', destination)
+        return
     if os.path.exists(full_path):
         return files.convert_symbol(full_path, [destination])
     else:
@@ -143,7 +146,6 @@ def process_symbol(name, mod, path, cfg, prod_root, mirror_root):
 
 
 if __name__ == '__main__':
-    filename = '/tmp/symbols/old_sym.opi'
     all_cfg = configuration.parse_configuration('conf/modules.ini')
     gen_cfg = configuration.parse_configuration('conf/converter.ini')
     mirror_root = gen_cfg.get('general', 'mirror_root')
