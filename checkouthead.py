@@ -18,19 +18,25 @@ import subprocess
 SVN_ROOT = 'svn+ssh://serv0002.cs.diamond.ac.uk/home/subversion/repos/controls'
 TRUNK = 'diamond/trunk'
 
+GIT_ROOT = 'ssh://dascgitolite@dasc-git.diamond.ac.uk/controls'
 
-def checkout_module(name, version, path, mirror_root):
+
+def checkout_module(name, version, path, mirror_root, git):
     mirror_location = os.path.join(mirror_root, path[1:])
     module_type = utils.AREA_IOC if 'ioc' in path else utils.AREA_SUPPORT
     module_name = name if name is not None else ''
-    svn_location = os.path.join(SVN_ROOT, TRUNK, module_type, module_name)
-    print 'Checkout {} to {}'.format(svn_location, mirror_location)
     try:
         os.makedirs(mirror_location)
     except OSError:
         print 'module already present; skipping'
         return
-    ret_val = subprocess.call(['svn', 'checkout', svn_location, mirror_location])
+    if git:
+        vcs_location = os.path.join(GIT_ROOT, module_type, module_name)
+        ret_val = subprocess.call(['git', 'clone', vcs_location, mirror_location])
+    else:
+        vcs_location = os.path.join(SVN_ROOT, TRUNK, module_type, module_name)
+        ret_val = subprocess.call(['svn', 'checkout', vcs_location, mirror_location])
+    print 'Checkout {} to {}'.format(vcs_location, mirror_location)
     # Drop VERSION file into configure directory
     configure_dir = os.path.join(mirror_location, 'configure')
     try:
@@ -74,9 +80,10 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
                 print('Removing {} before checking out'.format(new_path))
                 shutil.rmtree(os.path.join(mirror_root, new_path[1:]))
 
-            checkout_module(new_coords.module, new_version, new_path, mirror_root)
-
             dep_cfg = configuration.get_config_section(cfg, new_coords.module)
+            checkout_module(new_coords.module, new_version, new_path,
+                            mirror_root, dep_cfg.get('vcs') == 'git')
+
             configuration.create_module_ini_file(new_coords, mirror_root,
                     dep_cfg.get('opi_dir'), dep_cfg.get('extra_deps'), force)
 
