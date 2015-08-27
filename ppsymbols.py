@@ -152,10 +152,10 @@ if __name__ == '__main__':
     prod_root = gen_cfg.get('general', 'prod_root')
     symbol_opis = build_filelist(mirror_root)
     for opi_path in symbol_opis:
-        r, m, v, rp = utils.parse_module_name(opi_path)
-        cfg = configuration.get_config_section(all_cfg, m)
+        _, mod_name, _, _ = utils.parse_module_name(opi_path)
+        cfg = configuration.get_config_section(all_cfg, mod_name)
         version = cfg.get('version')
-        coords = coordinates.create(prod_root, cfg['area'], m, version)
+        coords = coordinates.create(prod_root, cfg['area'], mod_name, version)
         mod = module.Module(coords, cfg, mirror_root)
         edl_dirs = get_edl_dirs(mod)
 
