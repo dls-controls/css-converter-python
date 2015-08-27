@@ -155,9 +155,6 @@ if __name__ == '__main__':
         r, m, v, rp = utils.parse_module_name(opi_path)
         cfg = configuration.get_config_section(all_cfg, m)
         version = cfg.get('version')
-        if version is None:
-            version = utils.get_latest_version(os.path.join(prod_root,
-                                                            cfg['area'], m))
         coords = coordinates.create(prod_root, cfg['area'], m, version)
         mod = module.Module(coords, cfg, mirror_root)
         edl_dirs = get_edl_dirs(mod)

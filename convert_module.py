@@ -35,9 +35,6 @@ def get_modules(args, gen_cfg, area):
         module_cfg = configuration.get_config_section(cfg, module_name)
         # use latest version unless set explicitly in config file
         version = module_cfg.get('version')
-        if version is None:
-            version = utils.get_latest_version(os.path.join(root, area, module_name))
-
         coords = coordinates.create(root, area, module_name, version)
         modules.append(module.Module(coords, module_cfg, mirror))
 

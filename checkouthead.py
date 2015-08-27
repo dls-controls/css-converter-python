@@ -112,10 +112,7 @@ if __name__ == '__main__':
     for mod in all_mods:
         module_cfg = configuration.get_config_section(cfg, mod)
         coords = coordinates.create(prod_root, area, mod)
-        if module_cfg.get('version') is not None:
-            version = module_cfg.get('version')
-        else:
-            version = utils.get_latest_version(coordinates.as_path(coords))
+        version = module_cfg.get('version')
         full_coords = coordinates.update_version(coords, version)
 
         checkout_coords(full_coords, mirror_root, get_depends,
