@@ -2,22 +2,35 @@
 
 # Generated run script for cs-studio.
 
-prefix=""
-if [ -n $$CONVERTER_ROOT ]; then
-    prefix=$$CONVERTER_ROOT
+prefix=$${CONVERTER_ROOT:-}
+
+if [ -z "$$1" ]; then
+    echo "No OPI specified to launch!"
+    exit 1
 fi
 
 CSSTUDIO=/dls_sw/work/common/CSS/CSS_dls-4.2.x_nightly/cs-studio
 
 PROJECT=${project}
 MODULE=${module}
-LAUNCH_OPI=/$$PROJECT/$$MODULE/$$1
+# Escape all periods except the one in the filename.
+escaped=$$(echo $$1 | perl -ne "s|\.(?!opi)|[\\\46]|g; print;")
+LAUNCH_OPI=/$$PROJECT/$$MODULE/$$escaped
 
-if [ -z $$LAUNCH_OPI ]; then
-    echo "No OPI specified to launch!"
-    exit 1
+function tokens() {
+    echo $$#
+}
+
+# Only if macros are passed in (separated by a space from the filename)
+# do we need a comma to separate the Position=NEW_SHELL macro from the
+# others.  Otherwise, it's separated by a space.
+toks=$$(tokens $$LAUNCH_OPI)
+if [ $$toks == 1 ]; then
+    delimiter=" "
+else
+    delimiter=","
 fi
 
 LINKS="${links}"
 
-$$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI} Position=NEW_SHELL -share_link $$LINKS"
+$$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI}$${delimiter}Position=NEW_SHELL -share_link $$LINKS"

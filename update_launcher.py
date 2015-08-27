@@ -4,6 +4,11 @@ from convert import spoof
 from convert import utils
 import os
 
+import logging as log
+LOG_FORMAT = '%(levelname)s:  %(message)s'
+LOG_LEVEL = log.WARNING
+log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
+
 
 def update_cmd(cmd_dict, mirror_root):
     cmd.interpret()
@@ -25,6 +30,8 @@ def update_cmd(cmd_dict, mirror_root):
             run_opi = rel_path[:-3] + 'opi'
             macros = ','.join('{}={}'.format(a, b) for a, b in cmd.macros.items())
             return runcss_path, ['{} {}'.format(run_opi, macros)]
+    else:
+        log.warning('No mirror path %s; xml not updated', mirror_path)
 
 
 if __name__ == '__main__':
@@ -43,5 +50,6 @@ if __name__ == '__main__':
             if new_cmd is not None:
                 cmd_dict[cmd] = new_cmd
         except (spoof.SpoofError, ValueError, TypeError) as e:
-            print('Failed interpreting command {}: {}'.format(cmd.cmd, e))
+            log.warning('Failed interpreting command {}: {}'.format(cmd.cmd, e))
     lxml.write_new(cmd_dict)
+    print('Wrote new launcher XML file to {}'.format(new_apps_xml))
