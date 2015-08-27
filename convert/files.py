@@ -74,6 +74,8 @@ def convert_symbol(symbol_file, destinations):
         except Exception as e:
             log.error("Failed copying file: %s", str(e))
 
+    return filename
+
 
 def is_old_edl(filename):
     """
