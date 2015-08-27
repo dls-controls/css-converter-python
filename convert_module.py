@@ -34,10 +34,12 @@ def get_modules(args, gen_cfg, area):
 
     for module_name in all_mods:
         module_cfg = configuration.get_config_section(cfg, module_name)
-        # use latest version unless set explicitly in config file
         version = module_cfg.get('version')
-        coords = coordinates.create(root, area, module_name, version)
-        modules.append(module.Module(coords, module_cfg, mirror))
+        if version is not None:
+            coords = coordinates.create(root, area, module_name, version)
+            modules.append(module.Module(coords, module_cfg, mirror))
+        else:
+            log.warn('Could not find any version of %s module %s', area, module_name)
 
     return modules
 

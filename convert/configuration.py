@@ -157,7 +157,12 @@ def get_config_section(cfg, name):
     except ConfigParser.NoSectionError:
         pass
     if cfg_section.get('version') is None:
-        cfg_section['version'] = utils.get_prod_version(cfg_section['area'], name)
+        try:
+            cfg_section['version'] = utils.get_prod_version(cfg_section['area'], name)
+        except ValueError:
+            # No prod version found
+            pass
+
     return cfg_section
 
 
