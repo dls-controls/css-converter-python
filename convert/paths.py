@@ -93,10 +93,10 @@ def index_paths(directories, recurse):
                     log.warn('clash: %s in %s and %s',
                             entry, new_index[entry], index[entry])
         except (OSError, ValueError) as e:
-            log.warn('Skipping indexing for %s: %s', directory, e)
+            log.warn('Skipping indexing: %s', e)
             continue
 
-    log.info('Indexed OPI paths: %s', index)
+    log.debug('Indexed OPI paths: %s', index)
     return index
 
 
@@ -128,7 +128,7 @@ def _update_opi_path(filename, depth, file_index, module, use_rel):
         # the opi directory.
         path_in_module = path_in_module if use_rel else ''
         if file_module != module:
-            log.info('Correcting filename %s depth %s', filename, depth)
+            log.debug('Correcting filename %s depth %s', filename, depth)
             down = os.sep.join(['..'] * depth)
             rel = os.path.join(down, file_module, path_in_module, filename)
         else:
@@ -155,7 +155,7 @@ def _update_script(script_text, depth, file_index, module, use_rel):
         m = p.search(script_text)
         old_path = m.group(1)
         new_path = _update_opi_path(old_path, depth, file_index, module, use_rel)
-        log.info("Updated path in script: %s" % new_path)
+        log.debug("Updated path in script: %s" % new_path)
         script_text = script_text.replace(m.group(1), new_path)
 
     return script_text

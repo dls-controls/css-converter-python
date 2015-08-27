@@ -40,7 +40,7 @@ class DependencyParser(object):
         dependencies = {}
 
         cr_path = os.path.join(self._module_path, CONFIGURE_RELEASE)
-        log.info(">Parsing %s" % cr_path)
+        log.debug(">Parsing %s" % cr_path)
 
         try:
             r = dls_epicsparser.releaseparser.Release(cr_path)

@@ -44,7 +44,7 @@ def get_edl_dirs(module):
 
 def edit_symbol_node(node, filename):
     size = int(re.findall('\d+', filename)[-1])
-    log.info('New filename %s; size %s'.format(filename, size))
+    log.info('New filename %s; size %s', filename, size)
     node.set('typeId', SYMBOL_ID)
     node.find('name').text = 'DLS symbol'
     pv_name = node.find('.//pv').text
@@ -69,7 +69,7 @@ def edit_symbol_node(node, filename):
 def update_symbols(filename, file_dict, module, cfg, prod_root, mirror_root):
 
     symbol_files = {}
-    log.warn('Updating symbols in %s', filename)
+    log.info('Updating symbols in %s', filename)
     tree = et.parse(filename)
     root = tree.getroot()
     for widget in root.findall(".//widget[name='EDM Symbol']"):
@@ -85,7 +85,7 @@ def update_symbols(filename, file_dict, module, cfg, prod_root, mirror_root):
                                       cfg, prod_root, mirror_root)
             symbol_files[(symbol_file, smodule)] = png_file
             file_dict[png_file] = (smodule, '')
-        log.info('Module for %s is %s', symbol_file, smodule)
+        log.debug('Module for %s is %s', symbol_file, smodule)
         new_path = paths._update_opi_path(symbol_file, 1,
                                           file_dict, module, False)
         if png_file is not None:
