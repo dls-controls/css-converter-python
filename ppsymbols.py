@@ -34,10 +34,17 @@ def get_edl_dirs(module):
 
 
 def edit_symbol_node(node, filename):
-    size = int(re.findall('\d+', filename)[0])
+    size = int(re.findall('\d+', filename)[-1])
     print('Filename {}; size {}'.format(filename, size))
     node.set('typeId', SYMBOL_ID)
     node.find('name').text = 'DLS symbol'
+    pv_name = node.find('.//pv').text
+    pv_element = et.Element('pv_name')
+    pv_element.text = pv_name
+    node.append(pv_element)
+    rule_element = node.find('.//rule')
+    rule_element.set('prop_id', 'pv_value')
+    rule_element.set('out_exp', 'true')
     file_element = et.Element('image_file')
     file_element.text = filename
     num_element = et.Element('symbol_number')
@@ -58,15 +65,19 @@ def update_symbols(filename, file_dict, module, cfg, prod_root, mirror_root):
     root = tree.getroot()
     for widget in root.findall(".//widget[name='EDM Symbol']"):
         symbol_file = widget.find('opi_file').text
-        module, path = file_dict[symbol_file]
-        if (symbol_file, module) in symbol_files:
-            png_file = symbol_files[(symbol_file, module)]
+        try:
+            smodule, spath = file_dict[symbol_file]
+        except KeyError:
+            continue
+        if (symbol_file, smodule) in symbol_files:
+            png_file = symbol_files[(symbol_file, smodule)]
         else:
-            png_file = process_symbol(symbol_file, module, path,
+            png_file = process_symbol(symbol_file, smodule, spath,
                                       cfg, prod_root, mirror_root)
-            symbol_files[(symbol_file, module)] = png_file
-        log.info('Module for %s is %s', symbol_file, module)
-        new_path = paths._update_opi_path(symbol_file, 0,
+            symbol_files[(symbol_file, smodule)] = png_file
+            file_dict[png_file] = (smodule, '')
+        log.info('Module for %s is %s', symbol_file, smodule)
+        new_path = paths._update_opi_path(symbol_file, 1,
                                           file_dict, module, False)
         if png_file is not None:
             print('New path: {}'.format(new_path))
@@ -116,6 +127,15 @@ def process_symbol(name, mod, path, cfg, prod_root, mirror_root):
     full_path = os.path.join(mirror_path, edl_path, name[:-3] + 'edl')
     destination = os.path.join(mirror_path, opi_path, name)
     print('Destination is {}'.format(destination))
+    try:
+        for f in os.listdir(os.path.dirname(destination)):
+            n = os.path.split(name)[1]
+            n = '.'.join(n.split('.')[:-1])
+            if f.startswith(n) and f.endswith('png'):
+                print('Destination already exists: {}'.format(f))
+                return f
+    except OSError as e:
+        print('Failed: {}'.format(e))
     if os.path.exists(full_path):
         return files.convert_symbol(full_path, [destination])
     else:
