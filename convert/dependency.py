@@ -2,10 +2,24 @@ from convert import coordinates
 import dls_epicsparser.releaseparser
 import os
 
+import logging as log
+LOG_FORMAT = '%(levelname)s:  %(message)s'
+LOG_LEVEL = log.INFO
+log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
+
 CONFIGURE_RELEASE = 'configure/RELEASE'
 EPICS_BASE = '/dls_sw/epics/R3.14.12.3/base'
 EPICS_11_BASE = '/dls_sw/epics/R3.14.11/base'
 
+KNOWN_PARSE_ISSUES = [
+    "/dls_sw/prod/R3.14.12.3/ioc/BL18B/BL/3-47/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/ioc/BL03I/BL03I-MO-IOC-02/3-0/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/ioc/BL24I/BL/3-1/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/ADBinaries/2-2dls2/configure/RELEASE", #EPICS_HOST_ARCH
+    "/dls_sw/prod/R3.14.12.3/support/adUtil/2-0/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/aravisGigE/2-0/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/ffmpegServer/3-0dls0-1/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/ADCore/2-2dls3/configure/RELEASE"]
 
 class DependencyParser(object):
 
@@ -29,15 +43,24 @@ class DependencyParser(object):
         dependencies = {}
 
         cr_path = os.path.join(self._module_path, CONFIGURE_RELEASE)
-        r = dls_epicsparser.releaseparser.Release(cr_path)
+        log.info(">Parsing %s" % cr_path)
 
-        for dependency in r.flatten():
-            if self.is_valid(dependency):
-                dependencies[dependency.name] = coordinates.from_path(dependency.path)
+        try:
+            r = dls_epicsparser.releaseparser.Release(cr_path)
 
-        if self._additional is not None:
-            for acoord in self._additional:
-                dependencies[acoord.module] = coordinates.update_root(acoord, self._root)
+            for dependency in r.flatten():
+                if self.is_valid(dependency):
+                    dependencies[dependency.name] = coordinates.from_path(dependency.path)
+
+            if self._additional is not None:
+                for acoord in self._additional:
+                    dependencies[acoord.module] = coordinates.update_root(acoord, self._root)
+        except (dls_epicsparser.releaseparser.ParseException, KeyError) as ex:
+            log.error("Failed to parse RELEASE for %s: %s", cr_path, ex.message)
+            print ex
+
+            if cr_path not in KNOWN_PARSE_ISSUES:
+                raise ex
 
         return dependencies
 
