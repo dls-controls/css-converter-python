@@ -1,3 +1,4 @@
+#!/usr/bin/env dls-python
 '''
 Input: IOC name, mirror root.
 Output: checkout IOC and dependencies to mirror location.

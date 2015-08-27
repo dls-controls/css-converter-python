@@ -1,3 +1,4 @@
+#!/usr/bin/env dls-python
 import pkg_resources
 import build_runcss
 

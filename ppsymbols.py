@@ -1,3 +1,4 @@
+#!/usr/bin/env dls-python
 """
 Post processing script to locate all the symbol widgets in converted
 EDM panels and change them into DLS symbol widgets.

@@ -1,3 +1,4 @@
+#!/usr/bin/env dls-python
 from convert import configuration
 from convert import launcher
 from convert import spoof
