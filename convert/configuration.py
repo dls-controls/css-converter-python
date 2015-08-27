@@ -138,6 +138,7 @@ def get_config_section(cfg, name):
     opi_dir = name.split(os.sep)[-1] + 'App/opi/opi'
     cfg_section = {'edl_dir': 'data',
                    'opi_dir': opi_dir,
+                   'area': utils.AREA_SUPPORT,
                    'layers': [],
                    'groups': [],
                    'symbols': [],
