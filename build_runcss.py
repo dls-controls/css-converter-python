@@ -84,7 +84,6 @@ def get_link_opi_path(config, dep, dep_coord):
         coordinates.update_version(dep_coord, new_version))
 
     opi_dir = os.path.join(mod_path, opi_path)
-    print('The opi path is {}'.format(opi_dir))
 
     return opi_dir
 
@@ -188,11 +187,13 @@ if __name__ == '__main__':
     #   current working directory (inside the module) and a relative path
     #   to 'parent of the configure' dirctory
     assert len(sys.argv) == 3, "Require modulepath, TOP as arguments"
+    # Set up logging if run as script.
+    log.basicConfig(level=log.INFO)
     working_path = sys.argv[1]
     rel_configuration_path = sys.argv[2]
 
     root, area = parse_working_path(working_path)
-    print("ROOT: {}, AREA: {}").format(root, area)
+    log.info("ROOT: %s AREA: %s", root, area)
 
     configuration_path = os.path.join(working_path, rel_configuration_path)
     module_name = None
@@ -206,7 +207,7 @@ if __name__ == '__main__':
 
     if module_name is not None:
         version = utils.get_version(configuration_path)
-        print("MODULE: {}, VERSION: {}").format(module_name, version)
+        log.info("MODULE: %s, VERSION: %s", module_name, version)
 
         module_coord = coordinates.create(root, area, module_name, version)
         gen_run_script(module_coord, extra_depends=extra_deps)
