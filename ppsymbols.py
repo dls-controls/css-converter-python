@@ -118,9 +118,7 @@ def build_filelist(basepath):
 def process_symbol(name, mod, path, cfg, prod_root, mirror_root):
     mod_cfg = configuration.get_config_section(cfg, mod)
     area = mod_cfg['area']
-    version = mod_cfg['version']
-    if version is None:
-        version = utils.get_latest_version(os.path.join(prod_root, area, mod))
+    version = utils.get_module_version(prod_root, area, mod, mod_cfg.get('version'))
     version = utils.increment_version(version)
     edl_path = mod_cfg['edl_dir']
     opi_path = mod_cfg['opi_dir']
@@ -155,9 +153,9 @@ if __name__ == '__main__':
         _, mod_name, _, _ = utils.parse_module_name(opi_path)
         module_cfg = configuration.get_config_section(all_cfg, mod_name)
         area = module_cfg.get('area')
-        version = utils.get_module_version(prod_root, area, mod_name, module_cfg.get('version'))
+        version = utils.get_module_version(prod_root, area, mod_name,
+                                           module_cfg.get('version'))
         coords = coordinates.create(prod_root, area, mod_name, version)
-
         mod = module.Module(coords, module_cfg, mirror_root)
         edl_dirs = get_edl_dirs(mod)
 
