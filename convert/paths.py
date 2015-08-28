@@ -100,7 +100,7 @@ def index_paths(directories, recurse):
     return index
 
 
-def _update_opi_path(filename, depth, file_index, module, use_rel):
+def update_opi_path(filename, depth, file_index, module, use_rel):
     '''
     Return the corrected path according to the contents of the
     file_index.
@@ -154,7 +154,7 @@ def _update_script(script_text, depth, file_index, module, use_rel):
         p = re.compile(pattern)
         m = p.search(script_text)
         old_path = m.group(1)
-        new_path = _update_opi_path(old_path, depth, file_index, module, use_rel)
+        new_path = update_opi_path(old_path, depth, file_index, module, use_rel)
         log.debug("Updated path in script: %s" % new_path)
         script_text = script_text.replace(m.group(1), new_path)
 
@@ -166,10 +166,10 @@ def _update_paths(node, depth, file_index, module, use_rel):
     Recursively update all paths in the opi file to project-relative ones.
     """
     if node.tag in TAGS_TO_UPDATE:
-        node.text = _update_opi_path(node.text, depth, file_index, module, use_rel)
+        node.text = update_opi_path(node.text, depth, file_index, module, use_rel)
     if node.tag == 'command':
         cmd_parts = node.text.split()
-        updated_cmd = _update_opi_path(cmd_parts[0], depth, file_index, module, use_rel)
+        updated_cmd = update_opi_path(cmd_parts[0], depth, file_index, module, use_rel)
         node.text = ' '.join([updated_cmd] + cmd_parts[1:])
     if node.tag == 'scriptText':
         node.text = _update_script(node.text, depth, file_index, module, use_rel)

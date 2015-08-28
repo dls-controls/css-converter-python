@@ -86,8 +86,7 @@ def update_symbols(filename, file_dict, module, cfg, prod_root, mirror_root):
             symbol_files[(symbol_file, smodule)] = png_file
             file_dict[png_file] = (smodule, '')
         log.debug('Module for %s is %s', symbol_file, smodule)
-        new_path = paths._update_opi_path(symbol_file, 1,
-                                          file_dict, module, False)
+        new_path = paths.update_opi_path(symbol_file, 1, file_dict, module, False)
         if png_file is not None:
             new_path = os.sep.join(os.path.split(new_path)[:-1] + (png_file,))
             edit_symbol_node(widget, new_path)
