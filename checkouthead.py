@@ -107,6 +107,7 @@ if __name__ == '__main__':
     mirror_root = gen_cfg.get('general', 'mirror_root')
 
     if args.all:
+        log.info("Searching for all '%s' modules for checkout.", area)
         all_mods = utils.find_modules(os.path.join(prod_root, area))
         log.info('Dependency checkout suppressed')
         get_depends = False
