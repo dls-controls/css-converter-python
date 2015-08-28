@@ -51,6 +51,21 @@ def find_modules(filepath):
     return list(modules)
 
 
+def get_module_version(root, area, module_name, config_version):
+    """ Use "latest version" as determined from PROD file system, unless set explicitly in config file.
+
+    :param config_version: explicit version number from ConfigFile (may be None)
+    :param root: PROD root
+    :param area: module area
+    :param module_name: module name
+    :return: Version number
+    """
+    version = config_version
+    if version is None:
+        version = get_latest_version(os.path.join(root, area, module_name))
+    return version
+
+
 def get_version(configuration_path):
     """ Read the current version number from the VERSION file in a fully
         qualified modulepath (e.g. /dls_sw/..../modulename/version)

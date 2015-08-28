@@ -154,14 +154,12 @@ if __name__ == '__main__':
     symbol_opis = build_filelist(mirror_root)
     for opi_path in symbol_opis:
         _, mod_name, _, _ = utils.parse_module_name(opi_path)
-        cfg = configuration.get_config_section(all_cfg, mod_name)
-        version = cfg.get('version')
-        if version is None:
-            version = utils.get_latest_version(os.path.join(prod_root,
-                                                            cfg['area'], m))
-        coords = coordinates.create(prod_root, cfg['area'], m, version)
+        module_cfg = configuration.get_config_section(all_cfg, mod_name)
+        area = module_cfg.get('area')
+        version = utils.get_module_version(prod_root, area, mod_name, module_cfg.get('version'))
+        coords = coordinates.create(prod_root, area, mod_name, version)
 
-        mod = module.Module(coords, cfg, mirror_root)
+        mod = module.Module(coords, module_cfg, mirror_root)
         edl_dirs = get_edl_dirs(mod)
 
         file_dict = paths.index_paths(edl_dirs, True)
