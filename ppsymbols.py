@@ -28,7 +28,12 @@ import xml.etree.ElementTree as et
 SYMBOL_ID = 'org.csstudio.opibuilder.widgets.edm.symbolwidget'
 
 
-def get_edl_dirs(module):
+def get_edl_dirs(mod):
+    """ Find list of edl data files in all dependencies for the passed module
+
+    :param mod: Module to search
+    :return:
+    """
     dependencies = mod.get_dependencies()
     edl_dirs = [mod.get_edl_path()]
     for dep, dep_coords in dependencies.items():
@@ -43,6 +48,12 @@ def get_edl_dirs(module):
 
 
 def edit_symbol_node(node, filename):
+    """ Update the symbol XML node
+
+        NOTE: the input 'node' argument is modified by this function!!
+    :param node: Node to update
+    :param filename: Image filename
+    """
     size = int(re.findall('\d+', filename)[-1])
     log.info('New filename %s; size %s', filename, size)
     node.set('typeId', SYMBOL_ID)
@@ -66,7 +77,7 @@ def edit_symbol_node(node, filename):
     node.remove(node.find('opi_file'))
 
 
-def update_symbols(filename, file_dict, module, cfg, prod_root, mirror_root):
+def update_symbols(filename, file_dict, all_cfg, prod_root, mirror_root):
 
     symbol_files = {}
     log.info('Updating symbols in %s', filename)
@@ -75,21 +86,24 @@ def update_symbols(filename, file_dict, module, cfg, prod_root, mirror_root):
     for widget in root.findall(".//widget[name='EDM Symbol']"):
         symbol_file = widget.find('opi_file').text
         try:
-            smodule, spath = file_dict[symbol_file]
+            smodule, _ = file_dict[symbol_file]
         except KeyError:
             continue
+
         if (symbol_file, smodule) in symbol_files:
             png_file = symbol_files[(symbol_file, smodule)]
         else:
-            png_file = process_symbol(symbol_file, smodule, spath,
-                                      cfg, prod_root, mirror_root)
+            png_file = process_symbol(symbol_file, smodule, all_cfg,
+                                      prod_root, mirror_root)
             symbol_files[(symbol_file, smodule)] = png_file
             file_dict[png_file] = (smodule, '')
+
         log.debug('Module for %s is %s', symbol_file, smodule)
         new_path = paths.update_opi_path(symbol_file, 1, file_dict, module, False)
         if png_file is not None:
             new_path = os.sep.join(os.path.split(new_path)[:-1] + (png_file,))
             edit_symbol_node(widget, new_path)
+
     tree.write(filename, encoding='utf-8', xml_declaration=True)
 
 
@@ -115,13 +129,16 @@ def build_filelist(basepath):
     return files
 
 
-def process_symbol(name, mod, path, cfg, prod_root, mirror_root):
-    mod_cfg = configuration.get_config_section(cfg, mod)
+def process_symbol(name, mod, all_cfg, prod_root, mirror_root):
+    mod_cfg = configuration.get_config_section(all_cfg, mod)
+
     area = mod_cfg['area']
     version = utils.get_module_version(prod_root, area, mod, mod_cfg.get('version'))
     version = utils.increment_version(version)
+
     edl_path = mod_cfg['edl_dir']
     opi_path = mod_cfg['opi_dir']
+
     coords = coordinates.create(prod_root, area, mod, version)
     mirror_path = os.path.join(mirror_root, coordinates.as_path(coords)[1:])
     full_path = os.path.join(mirror_path, edl_path, name[:-3] + 'edl')
@@ -149,6 +166,7 @@ if __name__ == '__main__':
     mirror_root = gen_cfg.get('general', 'mirror_root')
     prod_root = gen_cfg.get('general', 'prod_root')
     symbol_opis = build_filelist(mirror_root)
+
     for opi_path in symbol_opis:
         _, mod_name, _, _ = utils.parse_module_name(opi_path)
         module_cfg = configuration.get_config_section(all_cfg, mod_name)
@@ -160,5 +178,5 @@ if __name__ == '__main__':
         edl_dirs = get_edl_dirs(mod)
 
         file_dict = paths.index_paths(edl_dirs, True)
-        update_symbols(opi_path, file_dict, coords.module,
+        update_symbols(opi_path, file_dict,
                        all_cfg, prod_root, mirror_root)
