@@ -28,8 +28,11 @@ def get_modules(args, gen_cfg, area):
     mirror = gen_cfg.get('general', 'mirror_root')
 
     if args.all:
-        log.info("Searching for all '%s' modules for conversion...", area)
-        all_mods = utils.find_modules(os.path.join(root, area))
+        mirror_root_dir = os.path.join(mirror, root[1:])
+        log.info("Searching for all '{}' modules in {} for conversion...".format(area, mirror_root_dir))
+        all_mods = utils.find_modules(os.path.join(mirror_root_dir, area))
+
+        log.info("Found: {}".format(', '.join(all_mods)))
     else:
         log.info("Converting single '%s' module: %s", area, args.module)
         all_mods = [args.module]

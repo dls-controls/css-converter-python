@@ -34,7 +34,7 @@ def find_modules(filepath):
     :param filepath:
     :return: list of module_names
     """
-    log.debug('Finding modules in: %s', filepath)
+    log.info('Finding all modules in: %s', filepath)
     all_paths = get_all_dirs(filepath)
     modules = set()
 
