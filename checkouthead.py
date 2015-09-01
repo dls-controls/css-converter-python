@@ -78,7 +78,7 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
     for module, mcoords in to_checkout.items():
         try:
             new_version = utils.increment_version(mcoords.version)
-            log.info('New version %s', new_version)
+            log.info('New version %s/%s: %s', mcoords.area, mcoords.module, new_version)
             new_coords = coordinates.update_version(mcoords, new_version)
             new_path = coordinates.as_path(new_coords)
             if force:
