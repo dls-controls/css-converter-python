@@ -14,7 +14,7 @@ TMP_DIR = './tmp'
 SYMBOLS_DIR = os.path.join(TMP_DIR, 'symbols')
 # Commands in lists for subprocess
 JAVA = '/usr/bin/java'
-JAR_FILE = 'res/conv.jar'
+JAR_FILE = 'res/converter.jar'
 MAIN_CLASS = 'org.csstudio.opibuilder.converter.EdmConverter'
 COLORS_VARIABLE = '-Dedm2xml.colorsFile=res/colors.list'
 SYMBOLS_VARIABLE = '-Dedm2xml.symbolsFile=res/symbols.conf'
