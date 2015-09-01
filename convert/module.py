@@ -144,7 +144,7 @@ class Module(object):
             else:
                 try:
                     shutil.copy2(source, target)
-                except IOError as e:
+                except shutil.Error as e:
                     log.warn('Error trying to copy {}: {}'.format(source, e))
 
     def is_layer_file(self, f):
