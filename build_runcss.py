@@ -45,11 +45,12 @@ def build_links(dependencies, project_name, prefix, config=None):
     for dep, dep_coord in dependencies.iteritems():
         opi_dir = get_link_opi_path(config, dep, dep_coord)
 
-        if os.path.exists(os.path.join(prefix, opi_dir[1:])):
-            links_strings.append('%s%s=%s' % (
-                PATH_PREFIX, opi_dir, os.path.join('/', project_name, dep)))
-        else:
-            log.warn('Not creating link for non-existent path %s%s', prefix, opi_dir)
+        links_strings.append('%s%s=%s' % (PATH_PREFIX,
+                                          opi_dir,
+                                          os.path.join('/', project_name, dep)))
+
+        if not os.path.exists(os.path.join(prefix, opi_dir[1:])):
+            log.warn('Creating link for non-existent path %s%s', prefix, opi_dir)
 
     links = ',\\\n'.join(links_strings)
 
