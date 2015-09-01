@@ -120,6 +120,11 @@ if __name__ == '__main__':
 
         version = utils.get_module_version(prod_root, area, mod, module_cfg.get('version'))
         coords = coordinates.create(prod_root, area, mod, version)
-        checkout_coords(coords, mirror_root, get_depends,
-                        module_cfg.get('extra_deps', []),
-                        args.force)
+
+        mod_path = coordinates.as_path(coords)
+        if os.path.exists(mod_path):
+            checkout_coords(coords, mirror_root, get_depends,
+                            module_cfg.get('extra_deps', []),
+                            args.force)
+        else:
+            log.error("Module doesn't exist: {}".format(mod_path))
