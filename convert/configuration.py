@@ -10,6 +10,8 @@ OPI_LOCATION = 'opi-location'
 AREA = 'area'
 MODULE_NAME = 'name'
 
+VCS_SVN = 'svn'
+VCS_GIT = 'git'
 
 def parse_module_config(base_path):
     """ Parse the module configuration file
@@ -131,6 +133,15 @@ def parse_dependency_list(dependencies, cfg):
     return deps
 
 
+def is_git(cfg):
+    """ Is the source in Git or SVN?
+
+    :param cfg: Configuration dictionary to examine
+    :return: True if VCS is specified as Git
+    """
+    return cfg.get('vcs', VCS_SVN).lower() == VCS_GIT
+
+
 def get_config_section(cfg, name):
     # In some cases, the new opi dir will be at moduleNameApp/opi/opi.
     # In some of those cases, the IOC name may be prefix/moduleName
@@ -143,6 +154,7 @@ def get_config_section(cfg, name):
                    'groups': [],
                    'symbols': [],
                    'extra_deps': [],
+                   'vcs': VCS_SVN,
                    'version': None}
     try:
         items = cfg.items(name)
