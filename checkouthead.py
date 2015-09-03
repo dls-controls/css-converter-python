@@ -43,6 +43,10 @@ def checkout_module(name, version, path, mirror_root, git):
     else:
         vcs_location = os.path.join(SVN_ROOT, TRUNK, module_type, module_name)
         ret_val = subprocess.call(['svn', 'checkout', vcs_location, mirror_location])
+        # call returns '1' if the SVN checkout 'fails'
+        if ret_val != 0:
+            log.error("SVN checkout of %s/%s failed. Module may have moved to Git", module_type, module_name)
+
     log.info('Checkout %s to %s', vcs_location, mirror_location)
 
     # Drop VERSION file into configure directory
