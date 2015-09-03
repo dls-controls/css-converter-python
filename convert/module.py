@@ -143,7 +143,9 @@ class Module(object):
                         mmux.parse(target)
             else:
                 try:
-                    shutil.copy2(source, target)
+                    # don't attempt to copy a file onto itself
+                    if source != target:
+                        shutil.copy2(source, target)
                 except shutil.Error as e:
                     log.warn('Error trying to copy {}: {}'.format(source, e))
 
