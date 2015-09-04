@@ -118,7 +118,7 @@ def build_filelist(basepath):
     Returns:
         iterator over relative filepaths
     """
-    log.info("Building list of files containing EDM symbols.")
+    log.info("Building list of files containing EDM symbols in %s", basepath)
     files = []
     for dirpath, dirnames, filenames in os.walk(basepath):
         for filename in filenames:
