@@ -54,30 +54,35 @@ def convert_one_module(mod, cfg, mirror_root):
     :param mirror_root: base bath for converted files
     """
     log.info('Preparing conversion of module %s', mod)
-    dependencies = mod.get_dependencies()
-    edl_dirs = [mod.get_edl_path()]
-    for dep, dep_coords in dependencies.items():
-        new_version = utils.increment_version(dep_coords.version)
-        dep_cfg = configuration.get_config_section(cfg, dep)
-        dep_edl_path = os.path.join(mirror_root,
-                                coordinates.as_path(dep_coords, False)[1:],
-                                new_version,
-                                dep_cfg['edl_dir'])
-        edl_dirs.append(dep_edl_path)
-
-    file_dict = paths.index_paths(edl_dirs, True)
-    try:
-        mod.convert(file_dict, args.force)
-
-        new_version = utils.increment_version(mod.coords.version)
-        build_runcss.gen_run_script(mod.coords,
+    mod_config = configuration.get_config_section(cfg, mod.coords.module)
+    if configuration.has_opis(mod_config):
+        dependencies = mod.get_dependencies()
+        edl_dirs = [mod.get_edl_path()]
+        for dep, dep_coords in dependencies.items():
+            dep_cfg = configuration.get_config_section(cfg, dep)
+            new_version = utils.increment_version(dep_coords.version)
+            dep_edl_path = os.path.join(mirror_root,
+                                    coordinates.as_path(dep_coords, False)[1:],
                                     new_version,
-                                    mirror_root,
-                                    mod.get_opi_path(),
-                                    cfg)
-    except ValueError as e:
-        log.warn('Conversion of %s failed:', mod)
-        log.warn('%s', e)
+                                    dep_cfg['edl_dir'])
+            edl_dirs.append(dep_edl_path)
+
+        file_dict = paths.index_paths(edl_dirs, True)
+        try:
+            mod.convert(file_dict, args.force)
+
+            new_version = utils.increment_version(mod.coords.version)
+            build_runcss.gen_run_script(mod.coords,
+                                        new_version,
+                                        mirror_root,
+                                        mod.get_opi_path(),
+                                        cfg)
+        except ValueError as e:
+            log.warn('Conversion of %s failed:', mod)
+            log.warn('%s', e)
+    else:
+        log.info('Skipping conversion, no OPIs in module %s', mod)
+
 
 if __name__ == '__main__':
     args = arguments.parse_arguments()

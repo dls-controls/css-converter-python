@@ -36,6 +36,9 @@ def build_links(dependencies, project_name, prefix, config=None):
 
         Set of characters, e.g. '.' are replaced with the ascii representations
 
+        Links are NOT added for any module marked as containing no OPIs
+        e.g. support/utilities
+
     :param dependencies: dictionary of dependencies (name, coordinate)
     :param project_name:
     :return: Formatted links string
@@ -43,14 +46,15 @@ def build_links(dependencies, project_name, prefix, config=None):
 
     links_strings = []
     for dep, dep_coord in dependencies.iteritems():
+
         opi_dir = get_link_opi_path(config, dep, dep_coord)
+        if opi_dir is not None:
+            links_strings.append('%s%s=%s' % (PATH_PREFIX,
+                                              opi_dir,
+                                              os.path.join('/', project_name, dep)))
 
-        links_strings.append('%s%s=%s' % (PATH_PREFIX,
-                                          opi_dir,
-                                          os.path.join('/', project_name, dep)))
-
-        if not os.path.exists(os.path.join(prefix, opi_dir[1:])):
-            log.warn('Creating link for non-existent path %s%s', prefix, opi_dir)
+            if not os.path.exists(os.path.join(prefix, opi_dir[1:])):
+                log.warn('Creating link for non-existent path %s%s', prefix, opi_dir)
 
     links = ',\\\n'.join(links_strings)
 
@@ -69,8 +73,10 @@ def get_link_opi_path(config, dep, dep_coord):
         ii) the module's module.ini
         iii) best guess from the module path
 
+        If the link doesn't contain OPIs, None is returned.
+
     :param coord: Fully qualified Module coord
-    :return: Relative path from module root to the opi files directory
+    :return: None or relative path from module root to the opi files directory
     :raises ValueError: when <coord> does not include version information
     """
     config_section = configuration.get_config_section(config, dep)
@@ -79,11 +85,13 @@ def get_link_opi_path(config, dep, dep_coord):
     except (KeyError, AttributeError):
         opi_path = get_opi_path(dep_coord)
 
-    new_version = utils.increment_version(dep_coord.version)
-    mod_path = coordinates.as_path(
-        coordinates.update_version(dep_coord, new_version))
-
-    opi_dir = os.path.join(mod_path, opi_path)
+    if configuration.has_opis(config_section):
+        new_version = utils.increment_version(dep_coord.version)
+        mod_path = coordinates.as_path(
+            coordinates.update_version(dep_coord, new_version))
+        opi_dir = os.path.join(mod_path, opi_path)
+    else:
+        opi_dir = None
 
     return opi_dir
 

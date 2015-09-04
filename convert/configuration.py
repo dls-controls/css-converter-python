@@ -142,6 +142,15 @@ def is_git(cfg):
     return cfg.get('vcs', VCS_SVN).lower() == VCS_GIT
 
 
+def has_opis(cfg):
+    """ Does the module have OPIs
+        If not, the version number should not be updated, runcss dropped etc..
+    :param cfg: Configuration dictionary to examine
+    :return: True if module contains OPIs
+    """
+    return cfg.get('has_opi')
+
+
 def get_config_section(cfg, name):
     # In some cases, the new opi dir will be at moduleNameApp/opi/opi.
     # In some of those cases, the IOC name may be prefix/moduleName
@@ -155,6 +164,7 @@ def get_config_section(cfg, name):
                    'symbols': [],
                    'extra_deps': [],
                    'vcs': VCS_SVN,
+                   'has_opi': True,
                    'version': None}
     try:
         items = cfg.items(name)
@@ -164,6 +174,8 @@ def get_config_section(cfg, name):
             elif key == 'extra_deps':
                 dependencies = split_value_list(value)
                 cfg_section[key] = parse_dependency_list(dependencies, cfg)
+            elif key == 'has_opi':
+                cfg_section[key] = cfg.getboolean(name, key)
             else:
                 cfg_section[key] = value
     except ConfigParser.NoSectionError:

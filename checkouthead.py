@@ -84,15 +84,24 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
 
     for module, mcoords in to_checkout.items():
         try:
+
+            dep_cfg = configuration.get_config_section(cfg, mcoords.module)
+
+            if not configuration.has_opis(dep_cfg):
+                log.info('Skipping checkout of module with no OPIs: %s/%s (%s)',
+                            mcoords.area, mcoords.module, mcoords.version)
+                continue
+
             new_version = utils.increment_version(mcoords.version)
             log.info('New version %s/%s: %s', mcoords.area, mcoords.module, new_version)
             new_coords = coordinates.update_version(mcoords, new_version)
-            new_path = coordinates.as_path(new_coords)
-            if force:
-                log.info('Removing %s before checking out', new_path)
-                shutil.rmtree(os.path.join(mirror_root, new_path[1:]))
 
-            dep_cfg = configuration.get_config_section(cfg, new_coords.module)
+            new_path = coordinates.as_path(new_coords)
+            checkout_path = os.path.join(mirror_root, new_path[1:])
+            if force and os.path.exists(checkout_path):
+                log.info('Removing %s before checking out', new_path)
+                shutil.rmtree(checkout_path)
+
             checkout_module(new_coords.module, new_version, new_path,
                             mirror_root, configuration.is_git(dep_cfg))
 
