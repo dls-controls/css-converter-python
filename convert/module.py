@@ -116,18 +116,21 @@ class Module(object):
             Layer and group post process performed only on files listed in the
             layers and groups sections of the modules configuration file
 
+            File metadata is preserved for non-EDL files
+
         :param source: source file (relative path)
         :param target: target file (relative path)
         :param depth: file 'depth' relative to eclipse link base
         :param file_index: dictionary of file paths
-        :param force: if True, force reconversion
+        :param force: if True, force reconversion and copy
         """
         log.debug('Handling file: %s to %s', source, target)
         edl_file = source.endswith(EDL_EXTENSION)
         if edl_file:
             target = target[:-len(EDL_EXTENSION)] + OPI_EXTENSION
 
-        if not force and os.path.exists(target):
+        target_exists = os.path.exists(target)
+        if not force and target_exists:
             log.info('Skipping existing file {}'.format(target))
         else:
             if edl_file:
@@ -145,6 +148,11 @@ class Module(object):
                 try:
                     # don't attempt to copy a file onto itself
                     if source != target:
+                        # if not writable before copy an error will be raised
+                        # and file will not update
+                        if target_exists:
+                            utils.make_writeable(target)
+
                         shutil.copy2(source, target)
                 except shutil.Error as e:
                     log.warn('Error trying to copy {}: {}'.format(source, e))
