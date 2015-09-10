@@ -127,17 +127,16 @@ def update_opi_path(filename, depth, file_index, module, use_rel):
         # Path in module is not relevant if Eclipse links are directly to
         # the opi directory.
         path_in_module = path_in_module if use_rel else ''
-        if file_module != module:
-            log.debug('Correcting filename %s depth %s', filename, depth)
-            down = os.sep.join(['..'] * depth)
-            rel = os.path.join(down, file_module, path_in_module, filename)
-        else:
-            # If path is in the same module we still need to maintain
-            # relative paths if the file is in a subdirectory.
-            down = os.sep.join(['..'] * (len(filename.split(os.sep)) - 1))
-            if down == '':
-                down = './'
-            rel = os.path.join(down, path_in_module, filename)
+        # If the file is in the same module, go down one less directory
+        # and don't put the module name in the relative path.
+        if file_module == module:
+            file_module = ''
+            depth = depth - 1
+        log.debug('Correcting filename %s depth %s', filename, depth)
+        down = os.sep.join(['..'] * depth)
+        if down == '':
+            down = './'
+        rel = os.path.join(down, file_module, path_in_module, filename)
     else:
         log.debug('Not correcting %s', filename)
 
