@@ -1,4 +1,4 @@
-from convert import coordinates
+from convert import coordinates, configuration, utils
 import dls_epicsparser.releaseparser
 import os
 
@@ -47,7 +47,13 @@ class DependencyParser(object):
 
             for dependency in r.flatten():
                 if self.is_valid(dependency):
-                    dependencies[dependency.name] = coordinates.from_path(dependency.path)
+                    try:
+                        module_cfg = configuration.parse_module_config(dependency.path)
+                        name = configuration.module_name(module_cfg)
+                    except utils.ConfigError:
+                        name = dependency.name
+
+                    dependencies[name] = coordinates.from_path(dependency.path)
 
             if self._additional is not None:
                 for acoord in self._additional:
