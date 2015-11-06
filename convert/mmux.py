@@ -102,8 +102,6 @@ def try_replace(text, symbols):
 
         Returns:
             - name mangled string to use
-            - boolean flag for "simple" subsitition (i.e. returned value should
-                not be wrapped)
     """
 
     updated = text
@@ -156,7 +154,7 @@ def try_replace(text, symbols):
 
     if matched:
         updated = '=pv(%s)' % updated
-    return updated, matched
+    return updated
 
 
 def replace_symbols(node, symbols):
@@ -168,8 +166,7 @@ def replace_symbols(node, symbols):
     if len(node) == 0:
         if node.text is not None and not node.text.isspace():
             if '$' in node.text and not (node.tag in EXCLUDED_TAGS):
-                updated_text, _  = try_replace(node.text, symbols)
-                node.text = updated_text
+                node.text = try_replace(node.text, symbols)
 
                 if node.tag in NON_PV_TAGS:
                     warning = True
