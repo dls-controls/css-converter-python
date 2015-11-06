@@ -77,10 +77,10 @@ def edit_symbol_node(node, filename):
     node.remove(node.find('opi_file'))
 
 
-def update_symbols(filename, file_dict, all_cfg, prod_root, mirror_root):
+def update_symbols(filename, depth, file_dict, all_cfg, prod_root, mirror_root):
 
     symbol_files = {}
-    log.info('Updating symbols in %s', filename)
+    log.info('Updating symbols in %s depth %s', filename, depth)
     tree = et.parse(filename)
     root = tree.getroot()
     for widget in root.findall(".//widget[name='EDM Symbol']"):
@@ -99,7 +99,7 @@ def update_symbols(filename, file_dict, all_cfg, prod_root, mirror_root):
             file_dict[png_file] = (smodule, '')
 
         log.debug('Module for %s is %s', symbol_file, smodule)
-        new_path = paths.update_opi_path(symbol_file, 1, file_dict, module, False)
+        new_path = paths.update_opi_path(symbol_file, depth, file_dict, module, False)
         if png_file is not None:
             new_path = os.sep.join(os.path.split(new_path)[:-1] + (png_file,))
             edit_symbol_node(widget, new_path)
@@ -168,15 +168,19 @@ if __name__ == '__main__':
     symbol_opis = build_filelist(mirror_root)
 
     for opi_path in symbol_opis:
-        _, mod_name, _, _ = utils.parse_module_name(opi_path)
+        _, mod_name, _, rel_path = utils.parse_module_name(opi_path)
         module_cfg = configuration.get_config_section(all_cfg, mod_name)
         area = module_cfg.get('area')
         version = utils.get_module_version(prod_root, area, mod_name,
                                            module_cfg.get('version'))
         coords = coordinates.create(prod_root, area, mod_name, version)
-        mod = module.Module(coords, module_cfg, mirror_root)
-        edl_dirs = get_edl_dirs(mod)
+        depth = len(os.path.split(rel_path))
+        try:
+            mod = module.Module(coords, module_cfg, mirror_root)
+            edl_dirs = get_edl_dirs(mod)
 
-        file_dict = paths.index_paths(edl_dirs, True)
-        update_symbols(opi_path, file_dict,
-                       all_cfg, prod_root, mirror_root)
+            file_dict = paths.index_paths(edl_dirs, True)
+            update_symbols(opi_path, depth, file_dict,
+                        all_cfg, prod_root, mirror_root)
+        except ValueError as e:
+            log.warn('Error updating symbols in %s: %s', mod_name, e)

@@ -70,7 +70,7 @@ def find_mm_symbols(node):
                             # Update the target text to be a (private) locPV
                             target.text = create_loc_pv(target.text)
                 except AttributeError as e:
-                    log.warn("Error parsing MenuMux: ", e)
+                    log.warn("Error parsing MenuMux: %s", e)
             else:
                 symbols.update(find_mm_symbols(child))
 
@@ -102,12 +102,10 @@ def try_replace(text, symbols):
 
         Returns:
             - name mangled string to use
-            - boolean flag for "simple" subsitition (i.e. returned value should
-                not be wrapped)
     """
 
-    substituted = text
-    simple_match = True
+    updated = text
+    matched = False
 
     for sym, value in symbols.iteritems():
         sym_rep = '$(%s)' % sym
@@ -115,40 +113,48 @@ def try_replace(text, symbols):
         sym_loc_ts = "toString('%s')" % sym_loc
 
         if sym_rep == text:
-            substituted = sym_loc
+            matched = True
+            updated = sym_loc
             # can abort here as we've finished
             break
 
-        elif sym_rep in substituted:
+        elif sym_rep in updated:
 
-            simple_match = False
+            matched = True
             # Three cases:
             # i) the pattern is at the start of the string
             # ii) the pattern is at the end of the string
             # iii) the pattern is somewhere in the middle
             length = len(sym_rep)
-            index = substituted.index(sym_rep)
+            index = updated.index(sym_rep)
 
             if index == 0:  # match at the start
-                body = '%s, "%s"' % (sym_loc_ts, substituted[length:])
-            elif index + length == len(substituted):  # match at the end
-                body = '"%s", %s' % (substituted[:-length], sym_loc_ts)
+                body = '%s, "%s"' % (sym_loc_ts, updated[length:])
+            elif index + length == len(updated):  # match at the end
+                body = '"%s", %s' % (updated[:-length], sym_loc_ts)
             else:  # match in the middle
-                body = '"%s", %s, "%s"' % (substituted[:index], sym_loc_ts, substituted[index+length:])
+                body = '"%s", %s, "%s"' % (updated[:index], sym_loc_ts, updated[index+length:])
 
-            if substituted.startswith('concat('):
-                substituted = body[1:-1]  # strip start/end quotes
+            if updated.startswith('concat('):
+                updated = body[1:-1]  # strip start/end quotes
             else:
-                substituted = 'concat(%s)' % body
+                updated = 'concat(%s)' % body
 
             ## remove any empty strings
-            substituted = substituted.replace(', ""', '')
-            substituted = substituted.replace('"", ', '')
+            updated = updated.replace(', ""', '')
+            updated = updated.replace('"", ', '')
 
-    if not text == substituted:
-        log.info("Converted %s to %s" % (text, substituted))
+    if not text == updated:
+        log.info("Converted %s to %s", text, updated)
 
-    return substituted, simple_match
+    # A concat() function does not need to be in quotes
+    # in the pv() function; a local PV does.
+    if updated.startswith("loc"):
+        updated = "'%s'" % updated
+
+    if matched:
+        updated = '=pv(%s)' % updated
+    return updated
 
 
 def replace_symbols(node, symbols):
@@ -160,15 +166,10 @@ def replace_symbols(node, symbols):
     if len(node) == 0:
         if node.text is not None and not node.text.isspace():
             if '$' in node.text and not (node.tag in EXCLUDED_TAGS):
-                substituted_text, simple_match = try_replace(node.text, symbols)
+                node.text = try_replace(node.text, symbols)
 
-                if simple_match:
-                    node.text = substituted_text
-                elif node.tag in NON_PV_TAGS:
+                if node.tag in NON_PV_TAGS:
                     warning = True
-                    node.text = '=%s' % substituted_text
-                else:
-                    node.text = '=pv(%s)' % substituted_text
     else:
         for child in node:
             if replace_symbols(child, symbols):

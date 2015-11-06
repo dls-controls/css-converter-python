@@ -1,15 +1,15 @@
 #!/usr/bin/env dls-python
 """
-Ordering of elements in BOY screens are determined only by their 
+Ordering of elements in BOY screens are determined only by their
 position in the xml file.
 
-Create an invisible Rectangle on top of any clickable 
+Create an invisible Rectangle on top of any clickable
 area which has the same click action.  Keep track of x and y
-position of any parent grouping containers, so that the 
+position of any parent grouping containers, so that the
 new Rectangle ends up in the correct place.
 
-Run this script after transforming all the relevant areas.  Note 
-that since the widgets it makes are clickable, running this 
+Run this script after transforming all the relevant areas.  Note
+that since the widgets it makes are clickable, running this
 script again will make yet more widgets!
 """
 
@@ -25,6 +25,7 @@ GROUP = 'org.csstudio.opibuilder.widgets.groupingContainer'
 RECTANGLE = 'org.csstudio.opibuilder.widgets.Rectangle'
 BOOL_BUTTON = 'org.csstudio.opibuilder.widgets.BoolButton'
 ACTION_BUTTON = 'org.csstudio.opibuilder.widgets.ActionButton'
+MENU_BUTTON = 'org.csstudio.opibuilder.widgets.MenuButton'
 
 REL_NAME = 'EDM related display'
 SHELL_NAME = 'EDM shell command'
@@ -33,7 +34,7 @@ SHELL_NAME = 'EDM shell command'
 def clickable_widget(node):
     anode = node.find('actions')
     if anode is not None:
-        if node.attrib['typeId'] in [ACTION_BUTTON, BOOL_BUTTON]:
+        if node.attrib['typeId'] in [ACTION_BUTTON, BOOL_BUTTON, MENU_BUTTON]:
             return True
         else:
             return anode.attrib['hook'] == 'true'
@@ -68,42 +69,54 @@ def find_clickables(node, x, y):
 
 def create_new_clicker(node, x, y):
     """
-    Create new transparent rectangle.  Fetch the appropriate children of 
-    the node and copy them to the new widget.
+    If the node is a menu button, it is already invisible.  A copy
+    can be put on top.
+
+    Otherwise, create new transparent rectangle.  Fetch the appropriate
+    children of the node and copy them to the new widget.
+
     Change position to that relative to any grouping containers.
     """
-    rect = et.Element('widget')
-    rect.attrib['typeId'] = RECTANGLE
-    v = et.SubElement(rect, 'transparent')
-    v.text = 'true'
-    n = et.SubElement(rect, 'name')
-    n.text = 'Duplicate EDM widget'
 
-    atag = node.find('actions')
-    new_atag = copy.deepcopy(atag)
-    new_atag.attrib['hook'] = 'true'
-    rect.append(new_atag)
+    if node.attrib['typeId'] == MENU_BUTTON:
+        nnode = copy.deepcopy(node)
+        xtag = nnode.find('x')
+        xtag.text = str(int(xtag.text) + x)
+        ytag = nnode.find('y')
+        ytag.text = str(int(ytag.text) + y)
+    else:
+        nnode = et.Element('widget')
+        nnode.attrib['typeId'] = RECTANGLE
+        v = et.SubElement(nnode, 'transparent')
+        v.text = 'true'
+        n = et.SubElement(nnode, 'name')
+        n.text = 'Duplicate EDM widget'
 
-    pvtag = node.find('pv_name')
-    if pvtag is not None:
-        rect.append(pvtag)
+        atag = node.find('actions')
+        new_atag = copy.deepcopy(atag)
+        new_atag.attrib['hook'] = 'true'
+        nnode.append(new_atag)
 
-    new_xtag = et.SubElement(rect, 'x')
-    xtag = node.find('x')
-    new_xtag.text = str(int(xtag.text) + x)
-    rect.append(new_xtag)
+        pvtag = node.find('pv_name')
+        if pvtag is not None:
+            nnode.append(pvtag)
 
-    new_ytag = et.SubElement(rect, 'y')
-    ytag = node.find('y')
-    new_ytag.text = str(int(ytag.text) + y)
-    rect.append(new_ytag)
+        new_xtag = et.SubElement(nnode, 'x')
+        xtag = node.find('x')
+        new_xtag.text = str(int(xtag.text) + x)
+        nnode.append(new_xtag)
 
-    widthtag = node.find('width')
-    rect.append(widthtag)
-    heighttag = node.find('height')
-    rect.append(heighttag)
+        new_ytag = et.SubElement(nnode, 'y')
+        ytag = node.find('y')
+        new_ytag.text = str(int(ytag.text) + y)
+        nnode.append(new_ytag)
 
-    return rect
+        widthtag = node.find('width')
+        nnode.append(widthtag)
+        heighttag = node.find('height')
+        nnode.append(heighttag)
+
+    return nnode
 
 
 def parse(path):

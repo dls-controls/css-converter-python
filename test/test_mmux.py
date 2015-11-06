@@ -114,9 +114,8 @@ class TryReplaceTest(unittest.TestCase):
         symbols = {"num": "val01"}
         text = "$(d)"
 
-        replaced, simple = try_replace(text, symbols)
+        replaced = try_replace(text, symbols)
 
-        self.assertTrue(simple)
         self.assertEqual(text, replaced)
 
     def test_try_replace_sets_loc_pv_if_straight_match(self):
@@ -125,98 +124,89 @@ class TryReplaceTest(unittest.TestCase):
 
         symbols = {"d": "val01"}
         text = "$(d)"
-        expected = 'loc://$(DID)%s("%s")' % ("d", symbols["d"])
+        expected = "=pv('loc://$(DID)%s(\"%s\")')" % ("d", symbols["d"])
 
-        replaced, simple = try_replace(text, symbols)
+        replaced = try_replace(text, symbols)
 
-        self.assertTrue(simple)
         self.assertEqual(expected, replaced)
 
     def test_try_replace_sets_concat_loc_pv_if_prefixing_match(self):
 
         symbols = {"d": "val01"}
         text = "$(d)MYPVNAME"
-        expected = "concat(toString('loc://$(DID)%s(\"%s\")\'), \"MYPVNAME\")" % ("d", symbols["d"])
+        expected = "=pv(concat(toString('loc://$(DID)%s(\"%s\")\'), \"MYPVNAME\"))" % ("d", symbols["d"])
 
-        replaced, simple = try_replace(text, symbols)
+        replaced = try_replace(text, symbols)
 
-        self.assertFalse(simple)
         self.assertEqual(expected, replaced)
 
     def test_try_replace_sets_concat_loc_pv_if_appending_match(self):
 
         symbols = {"d": "val01"}
         text = "MYPVNAME$(d)"
-        expected = "concat(\"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\'))" % ("d", symbols["d"])
+        expected = "=pv(concat(\"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\')))" % ("d", symbols["d"])
 
-        replaced, simple = try_replace(text, symbols)
+        replaced = try_replace(text, symbols)
 
-        self.assertFalse(simple)
         self.assertEqual(expected, replaced)
 
     def test_try_replace_sets_concat_loc_pv_if_inserting_single_match(self):
 
         symbols = {"d": "val01"}
         text = "MYPVNAME$(d)SUFFIX"
-        expected = "concat(\"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\'), \"SUFFIX\")" % ("d", symbols["d"])
+        expected = "=pv(concat(\"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\'), \"SUFFIX\"))" % ("d", symbols["d"])
 
-        replaced, simple = try_replace(text, symbols)
+        replaced = try_replace(text, symbols)
 
-        self.assertFalse(simple)
         self.assertEqual(expected, replaced)
 
     def test_try_replace_sets_concat_loc_pv_if_inserting_two_matches(self):
 
         symbols = {"d": "val01", "e": "val2"}
         text = "$(d)$(e)"
-        expected = "concat(toString('loc://$(DID)%s(\"%s\")\'), toString('loc://$(DID)%s(\"%s\")\'))"  % ("d", symbols["d"], "e", symbols["e"])
+        expected = "=pv(concat(toString('loc://$(DID)%s(\"%s\")\'), toString('loc://$(DID)%s(\"%s\")\')))"  % ("d", symbols["d"], "e", symbols["e"])
 
-        replaced, simple = try_replace(text, symbols)
+        replaced = try_replace(text, symbols)
 
-        self.assertFalse(simple)
         self.assertEqual(expected, replaced)
 
     def test_try_replace_sets_concat_loc_pv_if_inserting_two_matches_at_end_in_order(self):
         symbols = {"d": "val01", "e": "val2"}
         text = "MYPVNAME$(d)$(e)"
-        expected = "concat(\"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\'), toString('loc://$(DID)%s(\"%s\")\'))" % ("d", symbols["d"], "e", symbols["e"])
+        expected = "=pv(concat(\"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\'), toString('loc://$(DID)%s(\"%s\")\')))" % ("d", symbols["d"], "e", symbols["e"])
 
-        replaced, simple = try_replace(text, symbols)
+        replaced = try_replace(text, symbols)
 
-        self.assertFalse(simple)
         self.assertEqual(expected, replaced)
 
     def test_try_replace_sets_concat_loc_pv_if_inserting_two_matches_at_end_out_of_order(self):
 
         symbols = {"d": "val01", "e": "val2"}
         text = "MYPVNAME$(e)$(d)"
-        expected = "concat(\"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\'), toString('loc://$(DID)%s(\"%s\")\'))" % ("e", symbols["e"], "d", symbols["d"])
+        expected = "=pv(concat(\"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\'), toString('loc://$(DID)%s(\"%s\")\')))" % ("e", symbols["e"], "d", symbols["d"])
 
-        replaced, simple = try_replace(text, symbols)
+        replaced = try_replace(text, symbols)
 
-        self.assertFalse(simple)
         self.assertEqual(expected, replaced)
 
     def test_try_replace_sets_concat_loc_pv_if_inserting_two_matches_at_start_and_end_in_order(self):
 
         symbols = {"d": "val01", "e": "val2"}
         text = "$(d)MYPVNAME$(e)"
-        expected = "concat(toString('loc://$(DID)%s(\"%s\")\'), \"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\'))" % ("d", symbols["d"], "e", symbols["e"])
+        expected = "=pv(concat(toString('loc://$(DID)%s(\"%s\")\'), \"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\')))" % ("d", symbols["d"], "e", symbols["e"])
 
-        replaced, simple = try_replace(text, symbols)
+        replaced = try_replace(text, symbols)
 
-        self.assertFalse(simple)
         self.assertEqual(expected, replaced)
 
     def test_try_replace_sets_concat_loc_pv_if_inserting_two_matches_at_start_and_end_out_of_order(self):
 
         symbols = {"d": "val01", "e": "val2"}
         text = "$(e)MYPVNAME$(d)"
-        expected = "concat(toString('loc://$(DID)%s(\"%s\")\'), \"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\'))" % ("e", symbols["e"], "d", symbols["d"])
+        expected = "=pv(concat(toString('loc://$(DID)%s(\"%s\")\'), \"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\')))" % ("e", symbols["e"], "d", symbols["d"])
 
-        replaced, simple = try_replace(text, symbols)
+        replaced = try_replace(text, symbols)
 
-        self.assertFalse(simple)
         self.assertEqual(expected, replaced)
 
 if __name__ == '__main__':

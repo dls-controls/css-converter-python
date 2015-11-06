@@ -1,6 +1,6 @@
 
 # converter jar file
-res/conv.jar
+res/converter.jar
 # compiled python
 *.pyc
 # vim ctags file
