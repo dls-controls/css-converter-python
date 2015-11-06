@@ -8,7 +8,9 @@ Since this grabs screen attention, it can be run after all other conversion
 steps are complete.
 """
 import pkg_resources
-pkg_resources.require('dls_epicsparser')
+#pkg_resources.require('dls_epicsparser')
+import sys
+sys.path.append('/dls_sw/work/common/python/dls_epicsparser')
 from convert import configuration
 from convert import coordinates
 from convert import files

@@ -2,7 +2,9 @@
 import pkg_resources
 import build_runcss
 
-pkg_resources.require('dls_epicsparser')
+#pkg_resources.require('dls_epicsparser')
+import sys
+sys.path.append('/dls_sw/work/common/python/dls_epicsparser')
 
 import os
 import sys
