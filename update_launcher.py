@@ -1,3 +1,11 @@
+"""
+Script that iterates over the items in the Launcher's applications.xml file
+and converts any commands it determines to be running EDM to equivalent
+commands to run a CSS screen.
+
+Updates are only made if the converted CSS screen is located in the
+mirror filesystem.
+"""
 #!/usr/bin/env dls-python
 from convert import configuration
 from convert import launcher
@@ -12,6 +20,19 @@ log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
 def update_cmd(cmd_dict, mirror_root):
+    '''
+    Attempt to convert an EDM command into the appropriate command
+    to run the equivalent CSS screen.
+
+    Args:
+        cmd_dict: a convert.launcher.LauncherCommand objects
+        mirror_root: path to root of mirror filesystem
+
+    Returns:
+        (path, [args]): where
+             - path is the path of the runcss.sh script
+             - args is one string: the opi to run followd by any macros
+    '''
     cmd.interpret()
     p, n, v, rp = utils.parse_module_name(cmd.path_to_run)
     # Switch back to edl extension
@@ -51,6 +72,6 @@ if __name__ == '__main__':
             if new_cmd is not None:
                 cmd_dict[cmd] = new_cmd
         except (spoof.SpoofError, ValueError, TypeError) as e:
-            log.warning('Failed interpreting command {}: {}'.format(cmd.cmd, e))
+            log.info('Failed interpreting command {}: {}'.format(cmd.cmd, e))
     lxml.write_new(cmd_dict)
     print('Wrote new launcher XML file to {}'.format(new_apps_xml))
