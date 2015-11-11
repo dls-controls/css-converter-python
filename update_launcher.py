@@ -19,7 +19,7 @@ LOG_LEVEL = log.WARNING
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
-def update_cmd(cmd, mirror_root):
+def update_cmd(cmd, mirror_root, module_cfg):
     """
     Attempt to convert an EDM command into the appropriate command
     to run the equivalent CSS screen.
@@ -58,8 +58,13 @@ def update_cmd(cmd, mirror_root):
         log.warning('No mirror path %s; xml not updated', mirror_path)
 
 
-if __name__ == '__main__':
+def update_xml():
+    """
+    Parse configuration files, create a LauncherXml object and use its
+    command objects to determine the new commands.
 
+    Write the new commands back to a new XML file.
+    """
     module_cfg = configuration.parse_configuration('conf/modules.ini')
     gen_cfg = configuration.parse_configuration('conf/converter.ini')
     mirror_root = gen_cfg.get('general', 'mirror_root')
@@ -70,10 +75,14 @@ if __name__ == '__main__':
     cmd_dict = {}
     for cmd in cmds:
         try:
-            new_cmd = update_cmd(cmd, mirror_root)
+            new_cmd = update_cmd(cmd, mirror_root, module_cfg)
             if new_cmd is not None:
                 cmd_dict[cmd] = new_cmd
         except (spoof.SpoofError, ValueError, TypeError) as e:
             log.info('Failed interpreting command {}: {}'.format(cmd.cmd, e))
     lxml.write_new(cmd_dict)
     print('Wrote new launcher XML file to {}'.format(new_apps_xml))
+
+
+if __name__ == '__main__':
+    update_xml()
