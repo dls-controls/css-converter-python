@@ -2,13 +2,6 @@
 
 # from pkg_resources import require
 # require("dls_css_converter")
-import pkg_resources
-import sys
-
-#pkg_resources.require('dls_epicsparser')
-import sys
-sys.path.append('/dls_sw/work/common/python/dls_epicsparser')
-
 
 """ This script populates a runcss.template with
 

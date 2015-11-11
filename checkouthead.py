@@ -3,11 +3,6 @@
 Input: IOC name, mirror root.
 Output: checkout IOC and dependencies to mirror location.
 '''
-import pkg_resources
-#pkg_resources.require('dls_epicsparser')
-import sys
-sys.path.append('/dls_sw/work/common/python/dls_epicsparser')
-
 from convert import arguments
 from convert import coordinates
 from convert import configuration
