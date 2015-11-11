@@ -52,7 +52,8 @@ def find_modules(filepath):
 
 
 def get_module_version(root, area, module_name, config_version):
-    """ Use "latest version" as determined from PROD file system, unless set explicitly in config file.
+    """ Use "latest version" as determined from PROD file system, unless set
+        explicitly in config file.
 
     :param config_version: explicit version number from ConfigFile (may be None)
     :param root: PROD root
@@ -62,7 +63,11 @@ def get_module_version(root, area, module_name, config_version):
     """
     version = config_version
     if version is None:
+        log.debug("get_module_version: %s", os.path.join(root, area, module_name))
         version = get_latest_version(os.path.join(root, area, module_name))
+    else:
+        log.debug("get_module_version (config): %s", config_version)
+
     return version
 
 

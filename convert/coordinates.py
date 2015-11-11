@@ -27,6 +27,9 @@ def from_path(filepath):
     base, module = os.path.split(base)
     root, area = os.path.split(base)
 
+    if "utility" in filepath:
+        print "Parsed %s to %s %s %s %s" % (filepath, root, area, module, version)
+
     return create(root, area, module, version)
 
 

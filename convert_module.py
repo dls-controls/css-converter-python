@@ -8,7 +8,7 @@ import sys
 from convert import module, utils, coordinates, paths, arguments, configuration
 
 import logging as log
-LOG_FORMAT = '%(levelname)s:  %(message)s'
+LOG_FORMAT = '%(levelname)s:%(pathname)s: %(message)s'
 LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 

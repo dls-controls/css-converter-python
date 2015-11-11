@@ -43,7 +43,7 @@ class DependencyParser(object):
         dependencies = {}
 
         cr_path = os.path.join(self._module_path, CONFIGURE_RELEASE)
-        log.debug(">Parsing %s" % cr_path)
+        log.debug(">Parsing %s", cr_path)
 
         try:
             r = dls_epicsparser.releaseparser.Release(cr_path)
@@ -60,6 +60,7 @@ class DependencyParser(object):
 
             if self._additional is not None:
                 for acoord in self._additional:
+                    log.info("Adding %s/%s", acoord.module, acoord.version)
                     dependencies[acoord.module] = coordinates.update_root(acoord, self._root)
         except (dls_epicsparser.releaseparser.ParseException, KeyError) as ex:
             log.error("Failed to parse RELEASE for %s: %s", cr_path, ex.message)

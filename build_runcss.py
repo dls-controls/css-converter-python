@@ -2,6 +2,7 @@
 
 # from pkg_resources import require
 # require("dls_css_converter")
+import sys
 
 """ This script populates a runcss.template with
 
@@ -81,11 +82,13 @@ def get_link_opi_path(config, dep, dep_coord):
         opi_path = get_opi_path(dep_coord)
 
     if configuration.has_opis(config_section):
+        log.info("Adding link to :%s:%s:", dep_coord.area, dep_coord.module)
         new_version = utils.increment_version(dep_coord.version)
         mod_path = coordinates.as_path(
             coordinates.update_version(dep_coord, new_version))
         opi_dir = os.path.join(mod_path, opi_path)
     else:
+        log.info("Skipping link to :%s:%s: - no OPIs", dep_coord.area, dep_coord.module)
         opi_dir = None
 
     return opi_dir
