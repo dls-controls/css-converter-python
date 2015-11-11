@@ -7,8 +7,6 @@ As part of the process, create the necessary PNG files.
 Since this grabs screen attention, it can be run after all other conversion
 steps are complete.
 """
-import pkg_resources
-pkg_resources.require('dls_epicsparser')
 from convert import configuration
 from convert import coordinates
 from convert import files

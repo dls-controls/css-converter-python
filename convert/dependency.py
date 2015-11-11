@@ -1,3 +1,6 @@
+import sys
+sys.path.append('/dls_sw/work/common/python/dls_epicsparser')
+
 from convert import coordinates, configuration, utils
 import dls_epicsparser.releaseparser
 import os

@@ -2,8 +2,6 @@
 import pkg_resources
 import build_runcss
 
-pkg_resources.require('dls_epicsparser')
-
 import os
 import sys
 
