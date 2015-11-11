@@ -154,7 +154,7 @@ class LauncherCommand(object):
         try:
             _, module_name, version, _ = utils.parse_module_name(working_dir)
         except ValueError:
-            log.warn("Didn't understand script's working directory!")
+            log.warn("Didn't understand script's working directory: {}".format(cmd))
             module_name = os.path.basename(cmd)
             version = None
 
