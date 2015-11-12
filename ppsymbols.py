@@ -35,11 +35,10 @@ def get_edl_dirs(mod):
     dependencies = mod.get_dependencies()
     edl_dirs = [mod.get_edl_path()]
     for dep, dep_coords in dependencies.items():
-        new_version = utils.increment_version(dep_coords.version)
         dep_cfg = configuration.get_config_section(all_cfg, dep)
-        dep_edl_path = os.path.join(mirror_root,
-                                    coordinates.as_path(dep_coords, False)[1:],
-                                    new_version,
+
+        dep_edl_path = os.path.join(coordinates.as_path(dep_coords, False)[1:],
+                                    dep_coords.version,
                                     dep_cfg['edl_dir'])
         edl_dirs.append(dep_edl_path)
     return edl_dirs
@@ -152,6 +151,7 @@ def process_symbol(name, mod, all_cfg, prod_root, mirror_root):
     else:
         log.warn('Failed to process symbol: %s does not exist', destination)
         return
+
     if os.path.exists(full_path):
         return files.convert_symbol(full_path, [destination])
     else:
@@ -166,15 +166,15 @@ if __name__ == '__main__':
     symbol_opis = build_filelist(mirror_root)
 
     for opi_path in symbol_opis:
-        _, mod_name, _, rel_path = utils.parse_module_name(opi_path)
+        _, mod_name, version, rel_path = utils.parse_module_name(opi_path)
         module_cfg = configuration.get_config_section(all_cfg, mod_name)
         area = module_cfg.get('area')
-        version = utils.get_module_version(prod_root, area, mod_name,
-                                           module_cfg.get('version'))
+
+        # shadow_path = os.path.join(mirror_root, prod_root[1:])
         coords = coordinates.create(prod_root, area, mod_name, version)
         depth = len(os.path.split(rel_path))
         try:
-            mod = module.Module(coords, module_cfg, mirror_root)
+            mod = module.Module(coords, module_cfg, mirror_root, increment_version=False)
             edl_dirs = get_edl_dirs(mod)
 
             file_dict = paths.index_paths(edl_dirs, True)

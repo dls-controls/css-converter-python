@@ -19,7 +19,7 @@ OPI_EXTENSION = 'opi'
 
 class Module(object):
 
-    def __init__(self, coords, cfg_dict, mirror_root):
+    def __init__(self, coords, cfg_dict, mirror_root, increment_version=True):
         """
 
         :param coords: source module co-ord
@@ -34,7 +34,11 @@ class Module(object):
         self.groups = cfg_dict['groups']
         self.mirror_root = mirror_root
 
-        self.new_version = utils.increment_version(coords.version)
+        if increment_version:
+            self.new_version = utils.increment_version(coords.version)
+        else:
+            self.new_version = coords.version
+
         prod_path = coordinates.as_path(coords, False)
         # prod_path[1:] strips leading / to allow creation of shadow
         # file system INSIDE a containing dir /.../dls_sw/prod/R3...
