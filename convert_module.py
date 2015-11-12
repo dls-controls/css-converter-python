@@ -53,6 +53,8 @@ def convert_one_module(mod, cfg, mirror_root):
     """
     log.info('Preparing conversion of module %s', mod)
     mod_config = configuration.get_config_section(cfg, mod.coords.module)
+    extra_depends = []
+
     if configuration.has_opis(mod_config):
         dependencies = mod.get_dependencies()
         edl_dirs = [mod.get_edl_path()]
@@ -64,6 +66,7 @@ def convert_one_module(mod, cfg, mirror_root):
                                     new_version,
                                     dep_cfg['edl_dir'])
             edl_dirs.append(dep_edl_path)
+            extra_depends.append(dep_cfg.get('extra_deps', []))
 
         file_dict = paths.index_paths(edl_dirs, True)
         try:
@@ -72,9 +75,10 @@ def convert_one_module(mod, cfg, mirror_root):
             new_version = utils.increment_version(mod.coords.version)
             build_runcss.gen_run_script(mod.coords,
                                         new_version,
-                                        mirror_root,
-                                        mod.get_opi_path(),
-                                        cfg)
+                                        prefix=mirror_root,
+                                        opi_dir=mod.get_opi_path(),
+                                        config=cfg,
+                                        extra_depends=extra_depends)
         except ValueError as e:
             log.warn('Conversion of %s failed:', mod)
             log.warn('%s', e)
