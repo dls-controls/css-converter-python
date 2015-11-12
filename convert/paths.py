@@ -127,11 +127,14 @@ def update_opi_path(filename, depth, file_index, module, use_rel):
         # Path in module is not relevant if Eclipse links are directly to
         # the opi directory.
         path_in_module = path_in_module if use_rel else ''
-        # If the file is in the same module, go down one less directory
-        # and don't put the module name in the relative path.
+        # If the file is in the same module, the relative path should
+        # not exit and return into the same module:
+        # ../module/display.opi  # WRONG
+        # ./display.opi  # RIGHT
         if file_module == module:
             file_module = ''
-            depth = depth - 1
+            pieces_in_module_name = len(module.strip(os.path.sep).split(os.path.sep))
+            depth -= pieces_in_module_name
         log.debug('Correcting filename %s depth %s', filename, depth)
         down = os.sep.join(['..'] * depth)
         if down == '':
