@@ -53,21 +53,28 @@ def edit_symbol_node(node, filename):
     """
     size = int(re.findall('\d+', filename)[-1])
     log.info('New filename %s; size %s', filename, size)
+
     node.set('typeId', SYMBOL_ID)
     node.find('name').text = 'DLS symbol'
+
     pv_name = node.find('.//pv').text
     pv_element = et.Element('pv_name')
     pv_element.text = pv_name
     node.append(pv_element)
+
     rule_element = node.find('.//rule')
     rule_element.set('prop_id', 'pv_value')
     rule_element.set('out_exp', 'true')
+
     file_element = et.Element('image_file')
     file_element.text = filename
+
     num_element = et.Element('symbol_number')
     num_element.text = '0'
+
     img_size_element = et.Element('sub_image_width')
     img_size_element.text = str(size)
+
     node.append(file_element)
     node.append(num_element)
     node.append(img_size_element)
@@ -116,27 +123,36 @@ def build_filelist(basepath):
         iterator over relative filepaths
     """
     log.info("Building list of files containing EDM symbols in %s", basepath)
-    files = []
-    for dirpath, dirnames, filenames in os.walk(basepath):
-        for filename in filenames:
-            if filename.endswith(".opi"):
-                if utils.grep(os.path.join(dirpath, filename), "EDM Symbol"):
-                    files.append(os.path.join(dirpath, filename))
+    symbol_files = []
+    for dir_path, _, file_names in os.walk(basepath):
+        for filename in file_names:
+            if filename.endswith(".opi") and utils.grep(os.path.join(dir_path, filename), "EDM Symbol"):
+                symbol_files.append(os.path.join(dir_path, filename))
 
-    return files
+    return symbol_files
 
 
 def process_symbol(name, mod, all_cfg, prod_root, mirror_root):
+    """
+    :param name:
+    :param mod:
+    :param all_cfg:
+    :param prod_root:
+    :param mirror_root:
+    :return: PNG filename if successful, None if any error occurred
+    """
     mod_cfg = configuration.get_config_section(all_cfg, mod)
 
     area = mod_cfg['area']
-    version = utils.get_module_version(prod_root, area, mod, mod_cfg.get('version'))
-    version = utils.increment_version(version)
-
+    working_path = os.path.join(mirror_root, prod_root[1:])
+    mod_version = utils.get_module_version(working_path, area, mod, mod_cfg.get('version'))
+    # version = utils.increment_version(version)
+    log.debug("%s", working_path)
+    log.warning("FOUND VERSION %s", mod_version)
     edl_path = mod_cfg['edl_dir']
     opi_path = mod_cfg['opi_dir']
 
-    coords = coordinates.create(prod_root, area, mod, version)
+    coords = coordinates.create(prod_root, area, mod, mod_version)
     mirror_path = os.path.join(mirror_root, coordinates.as_path(coords)[1:])
     full_path = os.path.join(mirror_path, edl_path, name[:-3] + 'edl')
     destination = os.path.dirname(os.path.join(mirror_path, opi_path, name))
