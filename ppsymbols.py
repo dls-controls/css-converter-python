@@ -32,11 +32,13 @@ def get_edl_dirs(mod):
     :param mod: Module to search
     :return:
     """
+    log.info("Fetching dependencies for %s", coordinates.as_path(mod.coords))
     dependencies = mod.get_dependencies()
     edl_dirs = [mod.get_edl_path()]
     for dep, dep_coords in dependencies.items():
         dep_cfg = configuration.get_config_section(all_cfg, dep)
 
+        log.info("Dependency: %s", coordinates.as_path(dep_coords))
         dep_edl_path = os.path.join(coordinates.as_path(dep_coords, False)[1:],
                                     dep_coords.version,
                                     dep_cfg['edl_dir'])
