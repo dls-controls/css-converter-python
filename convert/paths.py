@@ -131,7 +131,8 @@ def update_opi_path(filename, depth, file_index, module, use_rel):
         # and don't put the module name in the relative path.
         if file_module == module:
             file_module = ''
-            depth = depth - 1
+            pieces_in_module_name = len(module.strip(os.path.sep).split(os.path.sep))
+            depth -= pieces_in_module_name
         log.debug('Correcting filename %s depth %s', filename, depth)
         down = os.sep.join(['..'] * depth)
         if down == '':
