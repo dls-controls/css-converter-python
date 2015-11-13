@@ -30,6 +30,9 @@ def _get_macros(edm_args):
 
 
 class LauncherXml(object):
+    """
+    Class representing an XML file as used by the launcher.
+    """
 
     def __init__(self, old_apps_xml, new_apps_xml):
         self.old_apps_xml = old_apps_xml
@@ -46,20 +49,20 @@ class LauncherXml(object):
         return cmds
 
     def write_new(self, cmd_dict):
-        '''
+        """
         Given updated commands in apps_dict, write a new launcher XML file.
-        '''
+        """
         self._update_node(self._xml_root, cmd_dict)
         self._xml_tree.write(self.new_apps_xml, encoding='utf-8',
                              xml_declaration=True)
 
     def _apps_from_node(self, node):
-        '''
+        """
         Recursively retrieve all commands and arguments from the specified
         node in the launcher XML file.
 
         Return a list of tuples (name, cmd, args).
-        '''
+        """
         apps = []
         if node.tag == 'button':
             name = node.get('text')
@@ -87,6 +90,9 @@ class LauncherXml(object):
 
 
 class LauncherCommand(object):
+    """
+    Class representing one command from the launcher XML file.
+    """
 
     def __init__(self, name, cmd, args):
         self.name = name
@@ -109,11 +115,11 @@ class LauncherCommand(object):
         return 3*hash(self.name) * 5*hash(self.cmd) % 7*hash(tuple(self.args))
 
     def interpret(self):
-        '''
+        """
         Given a command and arguments from the launcher, determine
         various properties about the command, useful for conversion.
         If the command was not an EDM script, raise SpoofError.
-        '''
+        """
         log.info("Updating command: %s, %s", self.cmd, self.args)
         self._spoof_command(self.cmd, self.args, LAUNCHER_DIR)
         path_to_run = paths.full_path(self.all_dirs, self.edl_file)
@@ -154,7 +160,7 @@ class LauncherCommand(object):
         try:
             _, module_name, version, _ = utils.parse_module_name(working_dir)
         except ValueError:
-            log.warn("Didn't understand script's working directory!")
+            log.warn("Didn't understand script's working directory: {}".format(cmd))
             module_name = os.path.basename(cmd)
             version = None
 
@@ -187,13 +193,13 @@ class LauncherCommand(object):
         return run_cmd
 
     def gen_run_script(self, root_dir):
-        '''
+        """
         Generate a wrapper script which updates the appropriate
         links before opening a CSS window.
 
-        Arguments:
-            - root_dir - the root of the output directory
-        '''
+        Args:
+            root_dir: path to root of mirror filesystem
+        """
         rel_dir = os.path.dirname(self.path_to_run.lstrip('/'))
         script_dir = os.path.join(root_dir, rel_dir)
         if not os.path.exists(script_dir):
@@ -220,9 +226,12 @@ class LauncherCommand(object):
         return script_path
 
     def _get_module_dict(self, root_dir):
-        '''
+        """
         Create a mapping from output path to module name.
-        '''
+
+        Args:
+            root_dir: path to root of mirror filesystem
+        """
         module_dict = {}
         for directory in self.all_dirs:
             try:
