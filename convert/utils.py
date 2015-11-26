@@ -130,6 +130,22 @@ def parse_version(version_string):
     return [int(m) for m in matches]
 
 
+def newer_version(v1, v2):
+    """ Determine if v1 is newer than v2.
+
+    Args:
+        v1: first version string to compare
+        v2: second version string to compare
+
+    Returns:
+        True if v1 is newer than v2
+    """
+    for i, j in zip(parse_version(v1), parse_version(v2)):
+        if i > j:
+            return True
+    return False
+
+
 def get_all_dirs(filepath):
     """ Walk the file system from specified start point terminating at the iocBoot level
 
