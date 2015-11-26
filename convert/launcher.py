@@ -144,10 +144,10 @@ class LauncherCommand(object):
         self.path_to_run = path_to_run
 
     def _spoof_command(self, cmd, args, directory):
-        log.info('Launcher command: %s', cmd)
+        log.debug('Launcher command: %s', cmd)
         if not os.path.isabs(cmd) and cmd in os.listdir(directory):
             cmd = os.path.join(directory, cmd)
-        log.info('Command corrected to %s', cmd)
+        log.debug('Command corrected to %s', cmd)
         # Spoof EDM to find EDMDATAFILES and PATH
         # Index these directories to find which modules
         # relative paths may be in.

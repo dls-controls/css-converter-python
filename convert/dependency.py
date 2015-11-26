@@ -21,13 +21,15 @@ KNOWN_PARSE_ISSUES = [
     "/dls_sw/prod/R3.14.12.3/support/ffmpegServer/3-0dls0-1/configure/RELEASE",
     "/dls_sw/prod/R3.14.12.3/support/ADCore/2-2dls3/configure/RELEASE"]
 
+
 class DependencyParser(object):
 
     def __init__(self, module_coord, additional_depends=None):
         """ Parse dependencies for IOC
 
-        :param module_coord: tuple containing path to search area, mod name and version
-        :param additional_depends: list of rootless coords for dependencies not in RELEASE
+        Args:
+            module_coord: tuple containing path to search area, mod name and version
+            additional_depends: list of rootless coords for dependencies not in RELEASE
         """
         assert module_coord.version is not None, \
             "Cannot find dependencies of module (%s) with no version" % module_coord.module
@@ -38,7 +40,8 @@ class DependencyParser(object):
     def find_dependencies(self):
         """ Generate a dictionary of dependencies for this module
 
-        :return Dictionary of {dependency name => (path to module, version)
+        Returns:
+            Dictionary of {dependency name => (path to module, version)}
         """
         dependencies = {}
 
@@ -60,11 +63,10 @@ class DependencyParser(object):
 
             if self._additional is not None:
                 for acoord in self._additional:
-                    log.info("Adding %s/%s", acoord.module, acoord.version)
+                    log.info("Additional dependency %s/%s", acoord.module, acoord.version)
                     dependencies[acoord.module] = coordinates.update_root(acoord, self._root)
         except (dls_epicsparser.releaseparser.ParseException, KeyError) as ex:
             log.error("Failed to parse RELEASE for %s: %s", cr_path, ex.message)
-            print ex
 
             if cr_path not in KNOWN_PARSE_ISSUES:
                 raise ex
@@ -77,8 +79,11 @@ class DependencyParser(object):
                 not EPICS base, or a child
                 not the searched module
 
-        :param dependency: Dependency to check with .path and .name attributes
-        :return: True if valid dependency
+        Args:
+            dependency: Dependency to check with .path and .name attributes
+
+        Returns:
+            True if valid dependency
         """
         valid = dependency.path is not None
         valid = valid and dependency.name is not None
