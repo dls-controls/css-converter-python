@@ -1,0 +1,24 @@
+
+body {
+    font-family: sans-serif;
+}
+
+th {
+    font-weight: bold;
+}
+
+td {
+    cursor: default;
+}
+
+.configured {
+    background-color: #F6F28B;
+}
+
+.out-of-date {
+    background-color: #FBA799;
+}
+
+.dep-col {
+    border-left: 1px solid black;
+}
