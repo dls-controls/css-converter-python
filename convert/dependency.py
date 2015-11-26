@@ -41,7 +41,7 @@ class DependencyParser(object):
         """ Generate a dictionary of dependencies for this module
 
         Returns:
-            Dictionary of {dependency name => (path to module, version)}
+            Dictionary of {dependency name => ModCoord}
         """
         dependencies = {}
 
