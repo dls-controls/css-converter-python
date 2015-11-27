@@ -5,7 +5,9 @@ Inspired by Tom's /dls/cs-www/reports/scripts/list_ioc_support_modules.py
 from convert import configuration
 from convert import coordinates
 from convert import dependency
+from convert import launcher
 from convert import utils
+import update_launcher
 
 import os
 from collections import namedtuple
@@ -25,14 +27,14 @@ REPORT = 'deps.html'
 DEPENDENCY_HEADERS = '<th class="dep-col">Dependency {}</th><th>Requested Version</th>'
 DEPENDENCY_CELLS = '<td class="dep-col">{name}</td><td title="Latest version {latest}" class="{req_class}">{requested}</td>'
 EMPTY_DEP_CELLS = '<td class="dep-col"></td><td></td>'
-MODULE_CELLS = '<tr><td>{name}</td><td class="{version_class}">{latest}</td>'
+MODULE_CELLS = '<tr><td>{name}</td><td class="{version_class}">{latest}</td><td class="{lversion_class}">{lversion}</td>'
 
 # CSS classes
 OUT_OF_DATE = 'out-of-date'
 CONFIGURED = 'configured'
 
 # Named tuple to store details about a module, versions and dependencies.
-ModDetails = namedtuple('ModDetails', 'name, requested, latest_release, config_version, deps')
+ModDetails = namedtuple('ModDetails', 'name, requested, latest_release, config_version, launcher_version, deps')
 
 # Start with support modules.
 
@@ -88,7 +90,7 @@ def find_support_modules():
     return os.listdir(SUPPORT)
 
 
-def handle_one_module(module_cfg, module_name, area):
+def handle_one_module(module_cfg, module_name, launcher_version, area):
     coords = coordinates.ModCoord('/dls_sw/prod/R3.14.12.3/', area, module_name, None)
     latest_release, config_version = get_versions(module_cfg, coords)
     extra_deps = configuration.get_config_section(module_cfg, module_name)['extra_deps']
@@ -107,28 +109,37 @@ def handle_one_module(module_cfg, module_name, area):
         dep_latest, dep_cfg = get_versions(module_cfg, dep_coord)
         dep_requested = dep_coord.version
         version_deps[dep_coord] = ModDetails(dep_coord.module, dep_requested,
-                                              dep_latest, dep_cfg, None)
+                                             dep_latest, dep_cfg,
+                                             launcher_version, None)
         log.debug('{}: {}, {}'.format(dep_coord.module, dep_latest, dep_cfg))
 
-    return ModDetails(module_name, None, latest_release, config_version, version_deps)
+    return ModDetails(module_name, None, latest_release, config_version,
+                      launcher_version, version_deps)
 
 
-def get_deps():
-    gen_cfg, module_cfg = get_config()
+def get_deps(module_cfg, cmd_dict):
+    """Locate all support modules and iocs and return their dependencies.
+
+    Returns:
+        dict mapping module name (e.g. 'LI/TI') to dict of dependencies.
+    """
     support_modules = find_support_modules()
     iocs = find_iocs()
 
     module_details = {}
     for module in support_modules:
+        launcher_version = cmd_dict.get(module, None)
+        print('Launcher version {}'.format(launcher_version))
         try:
-            module_details[module] = handle_one_module(module_cfg, module, 'support')
+            module_details[module] = handle_one_module(module_cfg, module, launcher_version, 'support')
         except AssertionError as e:
             print(e.__class__)
             log.warn('Failed on {}: {}'.format(module, e))
 
     for module in iocs:
+        launcher_version = cmd_dict.get(module, None)
         try:
-            module_details[module] = handle_one_module(module_cfg, module, 'ioc')
+            module_details[module] = handle_one_module(module_cfg, module, launcher_version, 'ioc')
         except AssertionError as e:
             print(e.__class__)
             log.warn('Failed on {}: {}'.format(module, e))
@@ -150,13 +161,19 @@ def table_line(mod_details, max_deps):
     subs = {'name': mod_details.name,
             'latest': mod_details.latest_release,
             'config': mod_details.config_version,
-            'version_class': 'ok'}
+            'lversion': mod_details.launcher_version,
+            'version_class': 'ok',
+            'lversion_class': 'ok'}
     if mod_details.config_version is not None:
         if utils.newer_version(mod_details.latest_release,
                                mod_details.config_version):
             subs['version_class'] = OUT_OF_DATE
         else:
             subs['version_class'] = CONFIGURED
+    if mod_details.launcher_version is not None:
+        if utils.newer_version(mod_details.latest_release,
+                               mod_details.launcher_version):
+            subs['lversion_class'] = OUT_OF_DATE
     line = MODULE_CELLS.format(**subs)
     for dep in mod_details.deps:
         mod_version = mod_details.deps[dep]
@@ -169,7 +186,7 @@ def table_line(mod_details, max_deps):
         line += DEPENDENCY_CELLS.format(**dep_subs)
     for i in range(max_deps - len(mod_details.deps)):
         line += EMPTY_DEP_CELLS
-    line +='</tr>'
+    line += '</tr>'
     return line
 
 
@@ -180,11 +197,32 @@ def get_max_deps(module_details):
 def generate_headers(max_deps):
     header = ''
     for tag in ('thead', 'tfoot'):
-        header += '<{}><tr><th>Module</th><th>Latest Version</th>'.format(tag)
+        header += '<{}><tr><th>Module</th><th>Latest Version</th><th>Launcher Version</th>'.format(tag)
         for d in range(max_deps):
             header += DEPENDENCY_HEADERS.format(d + 1)
         header += '</tr></{}>'.format(tag)
     return header
+
+
+def versions_from_cmd_dict(cmd_dict):
+    versions = {}
+    for cmd in cmd_dict:
+        script, args = cmd_dict[cmd]
+        module = cmd.module_name
+        version = cmd.version
+        versions[module] = version
+    return versions
+
+
+def get_launcher_versions(gen_cfg, module_cfg):
+    mirror_root = gen_cfg.get('general', 'mirror_root')
+    apps_xml = gen_cfg.get('launcher', 'apps_xml')
+    new_apps_xml = gen_cfg.get('launcher', 'new_apps_xml')
+    lxml = launcher.LauncherXml(apps_xml, new_apps_xml)
+    cmds = lxml.get_cmds()
+    cmd_dict = update_launcher.get_updated_cmds(cmds, module_cfg, mirror_root)
+    launcher_versions = versions_from_cmd_dict(cmd_dict)
+    return launcher_versions
 
 
 def generate_table(module_details, max_deps):
@@ -196,7 +234,9 @@ def generate_table(module_details, max_deps):
 
 
 def start():
-    module_details = get_deps()
+    gen_cfg, module_cfg = get_config()
+    launcher_versions = get_launcher_versions(gen_cfg)
+    module_details = get_deps(module_cfg, launcher_versions)
     max_deps = get_max_deps(module_details)
     print('Max dependencies: {}'.format(max_deps))
     headers = generate_headers(max_deps)
