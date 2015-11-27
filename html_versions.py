@@ -2,6 +2,10 @@
 Inspired by Tom's /dls/cs-www/reports/scripts/list_ioc_support_modules.py
 """
 
+import pkg_resources
+pkg_resources.require('jinja2')
+import jinja2
+
 from convert import configuration
 from convert import coordinates
 from convert import dependency
@@ -10,8 +14,6 @@ from convert import utils
 import update_launcher
 
 import os
-from collections import namedtuple
-import string
 import subprocess
 import ConfigParser
 import logging as log
@@ -25,18 +27,37 @@ HTML_TEMPLATE = 'res/template.html'
 REPORT = 'deps.html'
 CFG_IOC_CMD = ["configure-ioc", "l"]
 
-# HTML templates
-DEPENDENCY_HEADERS = '<th class="dep-col">Dependency {}</th><th>Requested Version</th>'
-DEPENDENCY_CELLS = '<td class="dep-col">{name}</td><td title="Latest version {latest}" class="{req_class}">{requested}</td>'
-EMPTY_DEP_CELLS = '<td class="dep-col"></td><td></td>'
-MODULE_CELLS = '<tr><td>{name}</td><td class="{version_class}">{latest}</td><td class="{lversion_class}">{lversion}</td>'
 
-# CSS classes
-OUT_OF_DATE = 'out-of-date'
-CONFIGURED = 'configured'
+class ModDetails(object):
+    OK = 'ok'
+    OUT_OF_DATE = 'out-of-date'
+    CONFIGURED = 'configured'
 
-# Named tuple to store details about a module, versions and dependencies.
-ModDetails = namedtuple('ModDetails', 'name, requested, latest_release, config_version, launcher_version, deps')
+    def __init__(self, name, requested, latest_release, config_version):
+        self.name = name
+        self.requested = requested
+        self.latest_release = latest_release
+        self.config_version = config_version
+        self.launcher_version = None
+        self.cfg_ioc_version = None
+        self.deps = {}
+        self.version_class = ModDetails.OK
+        self.lversion_class = ModDetails.OK
+        self.cversion_class = ModDetails.OK
+        self.rversion_class = ModDetails.OK
+
+    def assess_versions(self):
+        if self.config_version is not None:
+            if utils.newer_version(self.latest_release, self.config_version):
+                self.version_class = ModDetails.OUT_OF_DATE
+            else:
+                self.version_class = ModDetails.CONFIGURED
+        if self.launcher_version is not None:
+            if utils.newer_version(self.latest_release, self.launcher_version):
+                self.lversion_class = ModDetails.OUT_OF_DATE
+        if self.requested is not None:
+            if utils.newer_version(self.latest_release, self.requested):
+                self.rversion_class = ModDetails.OUT_OF_DATE
 
 
 def get_config_item(cfg, section, option):
@@ -102,13 +123,17 @@ def handle_one_module(module_cfg, module_name, launcher_version, area):
         # find versions here too.
         dep_latest, dep_cfg = get_versions(module_cfg, dep_coord)
         dep_requested = dep_coord.version
-        version_deps[dep_coord] = ModDetails(dep_coord.module, dep_requested,
-                                             dep_latest, dep_cfg,
-                                             launcher_version, None)
+        dmd = ModDetails(dep_coord.module, dep_requested, dep_latest, dep_cfg)
+        dmd.launcher_version = launcher_version
+        dmd.assess_versions()
+        version_deps[dep_coord.module] = dmd
         log.debug('{}: {}, {}'.format(dep_coord.module, dep_latest, dep_cfg))
 
-    return ModDetails(module_name, None, latest_release, config_version,
-                      launcher_version, version_deps)
+    md = ModDetails(module_name, None, latest_release, config_version)
+    md.launcher_version = launcher_version
+    md.deps = version_deps
+    md.assess_versions()
+    return md
 
 
 def get_deps(module_cfg, launcher_versions):
@@ -119,7 +144,8 @@ def get_deps(module_cfg, launcher_versions):
     """
     support_modules = find_support_modules()
     cfg_ioc_versions = get_configure_ioc_versions(support_modules)
-    iocs = find_iocs()
+    #iocs = find_iocs()
+    iocs = []
     cfg_ioc_versions.update(get_configure_ioc_versions(iocs))
 
     module_details = {}
@@ -145,47 +171,15 @@ def get_deps(module_cfg, launcher_versions):
     return module_details
 
 
-def render(table_headers, table_content):
-    with open(HTML_TEMPLATE) as f:
-        html = f.read()
-        template = string.Template(html)
-        full_html = template.substitute(headers=table_headers,
-                                        table=table_content)
+def render(max_deps, table):
+    env = jinja2.Environment(loader=jinja2.PackageLoader('html_versions', 'res'))
+    template = env.get_template('template.html')
+    header_tags = ['thead', 'tfoot']
+    full_html = template.render(header_tags=header_tags, nheaders=max_deps,
+                                mod_details=table)
+
     with open(REPORT, 'w') as f:
         f.write(full_html)
-
-
-def table_line(mod_details, max_deps):
-    subs = {'name': mod_details.name,
-            'latest': mod_details.latest_release,
-            'config': mod_details.config_version,
-            'lversion': mod_details.launcher_version,
-            'version_class': 'ok',
-            'lversion_class': 'ok'}
-    if mod_details.config_version is not None:
-        if utils.newer_version(mod_details.latest_release,
-                               mod_details.config_version):
-            subs['version_class'] = OUT_OF_DATE
-        else:
-            subs['version_class'] = CONFIGURED
-    if mod_details.launcher_version is not None:
-        if utils.newer_version(mod_details.latest_release,
-                               mod_details.launcher_version):
-            subs['lversion_class'] = OUT_OF_DATE
-    line = MODULE_CELLS.format(**subs)
-    for dep in mod_details.deps:
-        mod_version = mod_details.deps[dep]
-        dep_subs = {'name': mod_version.name,
-                    'latest': mod_version.latest_release,
-                    'requested': mod_version.requested,
-                    'req_class': 'ok'}
-        if utils.newer_version(mod_version.latest_release, mod_version.requested):
-            dep_subs['req_class'] = OUT_OF_DATE
-        line += DEPENDENCY_CELLS.format(**dep_subs)
-    for i in range(max_deps - len(mod_details.deps)):
-        line += EMPTY_DEP_CELLS
-    line += '</tr>'
-    return line
 
 
 def get_max_deps(module_details):
@@ -238,12 +232,12 @@ def get_configure_ioc_versions(ioc_names):
     return versions
 
 
-def generate_table(module_details, max_deps):
+def sort_module_details(module_details):
     lines = []
     for module in sorted(module_details.keys()):
         mod_details = module_details[module]
-        lines.append(table_line(mod_details, max_deps))
-    return '\n'.join(lines)
+        lines.append(mod_details)
+    return lines
 
 
 def start():
@@ -252,10 +246,9 @@ def start():
     module_details = get_deps(module_cfg, launcher_versions)
     max_deps = get_max_deps(module_details)
     print('Max dependencies: {}'.format(max_deps))
-    headers = generate_headers(max_deps)
-    table = generate_table(module_details, max_deps)
-    render(headers, table)
+    table = sort_module_details(module_details)
+    render(max_deps, table)
 
 
 if __name__ == '__main__':
-     start()
+    start()
