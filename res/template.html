@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- This page uses Jinja2 for rendering. -->
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="res/table.css">
@@ -22,7 +23,10 @@
       {% for tag in header_tags %}
       <{{tag}}>
         <tr>
-          <th>Module name</th><th>Latest Version</th>
+          <th>Module name</th>
+          <th>Latest Version</th>
+          <th>Launcher Version</th>
+          <th>Configure IOC Version</th>
           {% for n in range(nheaders) %}
           <th class="dep-col">Dependency {{n}}</th><th>Version</th>
           {% endfor %}
@@ -31,7 +35,11 @@
       {% endfor %}
       <tbody>
         {% for md in mod_details %}
-          <tr><td>{{md.name}}<td class="{{md.version_class}}">{{md.latest_release}}</td>
+        <tr>
+          <td>{{md.name}}</td>
+          <td class="{{md.version_class}}">{{md.latest_release}}</td>
+          <td class="{{md.lversion_class}}">{{md.launcher_version}}</td>
+          <td class="{{md.cversion_class}}">{{md.cfg_ioc_version}}</td>
             {% for dep in md.deps %}
             <td class="dep-col">{{md.deps[dep].name}}</td>
             <td title="Latest release {{md.deps[dep].latest_release}}" class="{{md.deps[dep].rversion_class}}">{{md.deps[dep].requested}}</td>

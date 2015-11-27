@@ -23,7 +23,6 @@ log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 SUPPORT = '/dls_sw/prod/R3.14.12.3/support'
 IOC = '/dls_sw/prod/R3.14.12.3/ioc'
-HTML_TEMPLATE = 'res/template.html'
 REPORT = 'deps.html'
 CFG_IOC_CMD = ["configure-ioc", "l"]
 
@@ -105,7 +104,7 @@ def find_support_modules():
     return os.listdir(SUPPORT)
 
 
-def handle_one_module(module_cfg, module_name, launcher_version, area):
+def handle_one_module(module_cfg, module_name, launcher_version, cfg_ioc_version, area):
     coords = coordinates.ModCoord('/dls_sw/prod/R3.14.12.3/', area, module_name, None)
     latest_release, config_version = get_versions(module_cfg, coords)
     extra_deps = configuration.get_config_section(module_cfg, module_name)['extra_deps']
@@ -131,6 +130,7 @@ def handle_one_module(module_cfg, module_name, launcher_version, area):
 
     md = ModDetails(module_name, None, latest_release, config_version)
     md.launcher_version = launcher_version
+    md.cfg_ioc_version = cfg_ioc_version
     md.deps = version_deps
     md.assess_versions()
     return md
@@ -144,26 +144,25 @@ def get_deps(module_cfg, launcher_versions):
     """
     support_modules = find_support_modules()
     cfg_ioc_versions = get_configure_ioc_versions(support_modules)
-    #iocs = find_iocs()
-    iocs = []
+    iocs = find_iocs()
     cfg_ioc_versions.update(get_configure_ioc_versions(iocs))
 
     module_details = {}
     for module in support_modules:
         launcher_version = launcher_versions.get(module, None)
-        cfg_ioc_version = launcher_versions.get(module, None)
+        cfg_ioc_version = cfg_ioc_versions.get(module, None)
         print('Launcher version {}'.format(launcher_version))
         try:
-            module_details[module] = handle_one_module(module_cfg, module, launcher_version, 'support')
+            module_details[module] = handle_one_module(module_cfg, module, launcher_version, cfg_ioc_version, 'support')
         except AssertionError as e:
             print(e.__class__)
             log.warn('Failed on {}: {}'.format(module, e))
 
     for module in iocs:
         launcher_version = launcher_versions.get(module, None)
-        cfg_ioc_version = launcher_versions.get(module, None)
+        cfg_ioc_version = cfg_ioc_versions.get(module, None)
         try:
-            module_details[module] = handle_one_module(module_cfg, module, launcher_version, 'ioc')
+            module_details[module] = handle_one_module(module_cfg, module, launcher_version, cfg_ioc_version, 'ioc')
         except AssertionError as e:
             print(e.__class__)
             log.warn('Failed on {}: {}'.format(module, e))
