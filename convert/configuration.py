@@ -5,6 +5,9 @@ import logging as log
 
 MODULE_INI = 'configure/module.ini'
 
+GEN_CONF = 'conf/converter.ini'
+MODULE_CONF = 'conf/modules.ini'
+
 SEC_GENERAL = 'general'
 OPI_DEPENDS = 'opi-depends'
 OPI_LOCATION = 'opi-location'
@@ -242,3 +245,9 @@ def create_module_ini_file(coord, mirror_root, opi_location, extra_depends, forc
         # Writing our configuration file to 'example.cfg'
         with open(mod_ini_file, 'wb') as configfile:
             config.write(configfile)
+
+
+def get_configs():
+    gen_cfg = parse_configuration(GEN_CONF)
+    module_cfg = parse_configuration(MODULE_CONF)
+    return gen_cfg, module_cfg

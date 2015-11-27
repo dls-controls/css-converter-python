@@ -101,8 +101,7 @@ def update_xml():
 
     Write the new commands back to a new XML file.
     """
-    module_cfg = configuration.parse_configuration('conf/modules.ini')
-    gen_cfg = configuration.parse_configuration('conf/converter.ini')
+    gen_cfg, module_cfg = configuration.get_configs()
     mirror_root = gen_cfg.get('general', 'mirror_root')
     apps_xml = gen_cfg.get('launcher', 'apps_xml')
     new_apps_xml = gen_cfg.get('launcher', 'new_apps_xml')

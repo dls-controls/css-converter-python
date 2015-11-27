@@ -36,14 +36,6 @@ CONFIGURED = 'configured'
 # Named tuple to store details about a module, versions and dependencies.
 ModDetails = namedtuple('ModDetails', 'name, requested, latest_release, config_version, launcher_version, deps')
 
-# Start with support modules.
-
-
-def get_config():
-    gen_cfg = configuration.parse_configuration('conf/converter.ini')
-    module_cfg = configuration.parse_configuration('conf/modules.ini')
-    return gen_cfg, module_cfg
-
 
 def get_config_item(cfg, section, option):
     try:
@@ -234,8 +226,8 @@ def generate_table(module_details, max_deps):
 
 
 def start():
-    gen_cfg, module_cfg = get_config()
-    launcher_versions = get_launcher_versions(gen_cfg)
+    gen_cfg, module_cfg = configuration.get_configs()
+    launcher_versions = get_launcher_versions(gen_cfg, module_cfg)
     module_details = get_deps(module_cfg, launcher_versions)
     max_deps = get_max_deps(module_details)
     print('Max dependencies: {}'.format(max_deps))
