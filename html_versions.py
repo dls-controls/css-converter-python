@@ -136,7 +136,7 @@ def handle_one_module(module_cfg, module_name, launcher_version, cfg_ioc_version
     return md
 
 
-def get_deps(module_cfg, launcher_versions):
+def get_module_details(module_cfg, launcher_versions):
     """Locate all support modules and iocs and return their dependencies.
 
     Returns:
@@ -151,11 +151,9 @@ def get_deps(module_cfg, launcher_versions):
     for module in support_modules:
         launcher_version = launcher_versions.get(module, None)
         cfg_ioc_version = cfg_ioc_versions.get(module, None)
-        print('Launcher version {}'.format(launcher_version))
         try:
             module_details[module] = handle_one_module(module_cfg, module, launcher_version, cfg_ioc_version, 'support')
         except AssertionError as e:
-            print(e.__class__)
             log.warn('Failed on {}: {}'.format(module, e))
 
     for module in iocs:
@@ -164,7 +162,6 @@ def get_deps(module_cfg, launcher_versions):
         try:
             module_details[module] = handle_one_module(module_cfg, module, launcher_version, cfg_ioc_version, 'ioc')
         except AssertionError as e:
-            print(e.__class__)
             log.warn('Failed on {}: {}'.format(module, e))
 
     return module_details
@@ -218,16 +215,18 @@ def get_launcher_versions(gen_cfg, module_cfg):
 
 def get_configure_ioc_versions(ioc_names):
     cfg_ioc = subprocess.check_output(CFG_IOC_CMD).strip().split('\n')
-    print(cfg_ioc)
     ioc_paths = [path for _, path in (line.split() for line in cfg_ioc)]
     versions = {}
     for ioc_name in ioc_names:
         for ioc_path in ioc_paths:
             if ioc_name in ioc_path:
-                index = ioc_path.index(ioc_name)
-                end = ioc_path[index+len(ioc_name)+1:]
-                version = end.split(os.path.sep)[0]
-                versions[ioc_name] = version
+                if '/work/' in ioc_path:
+                    versions[ioc_name] = 'work'
+                else:
+                    index = ioc_path.index(ioc_name)
+                    end = ioc_path[index+len(ioc_name)+1:]
+                    version = end.split(os.path.sep)[0]
+                    versions[ioc_name] = version
     return versions
 
 
@@ -242,9 +241,8 @@ def sort_module_details(module_details):
 def start():
     gen_cfg, module_cfg = configuration.get_configs()
     launcher_versions = get_launcher_versions(gen_cfg, module_cfg)
-    module_details = get_deps(module_cfg, launcher_versions)
+    module_details = get_module_details(module_cfg, launcher_versions)
     max_deps = get_max_deps(module_details)
-    print('Max dependencies: {}'.format(max_deps))
     table = sort_module_details(module_details)
     render(max_deps, table)
 
