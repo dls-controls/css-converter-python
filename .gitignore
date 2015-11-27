@@ -1,5 +1,7 @@
-# backup
+# editor temporary files
 *~
+*.swp
+*.swo
 # converter jar file
 res/converter.jar
 # compiled python
