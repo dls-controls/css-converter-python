@@ -69,10 +69,11 @@ def checkout_module(name, version, path, mirror_root, git):
 
 def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
                     force=False):
-    log.info('Coordinates: %s', coords)
+    log.info('Checking out module at: %s', coords)
     log.info('Extra dependencies: %s', extra_deps)
     if include_deps:
         dp = dependency.DependencyParser(coords, extra_deps)
+        log.info('Finding dependencies of %s', coords)
         to_checkout = dp.find_dependencies()
     else:
         to_checkout = {}
@@ -90,7 +91,7 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
                 continue
 
             new_version = utils.increment_version(mcoords.version)
-            log.info('New version %s/%s: %s', mcoords.area, mcoords.module, new_version)
+            log.info('Updated version %s/%s: %s', mcoords.area, mcoords.module, new_version)
             new_coords = coordinates.update_version(mcoords, new_version)
 
             new_path = coordinates.as_path(new_coords)

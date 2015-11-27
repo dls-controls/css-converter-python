@@ -138,8 +138,7 @@ def spoof_edm(script_file, args=[]):
         pwd = lines[-4].strip()
     if len(lines) > 4:
         args = lines[-5].strip().split()
-    log.info('EDMDATAFILES: %s', edmdatafiles)
-    log.info('PATH: %s', path)
-    log.info('Script working directory: %s', pwd)
-    log.info('Script arguments: %s', args)
+    log.debug('EDMDATAFILES: %s', edmdatafiles)
+    log.debug('PATH: %s', path)
+    log.debug('Script arguments: %s', args)
     return edmdatafiles, path, pwd, args

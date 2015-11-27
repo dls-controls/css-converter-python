@@ -1,6 +1,7 @@
 import os
 import ConfigParser
 from convert import utils, coordinates
+import logging as log
 
 MODULE_INI = 'configure/module.ini'
 
@@ -20,7 +21,7 @@ def parse_module_config(base_path):
     :return: ConfigParser
     :raises utils.ConfigError if module.ini file not found
     """
-    print "Reading opiPath from %s" % base_path
+    log.info("Reading opiPath from %s", base_path)
     module_ini_path = os.path.join(base_path, MODULE_INI)
     return parse_configuration(module_ini_path)
 
@@ -46,9 +47,12 @@ def module_name(parser):
 def opi_path(parser, default):
     """ Extract the opi-file location in the module from the module.ini file
 
-    :param parser: Config file parser
-    :param default: Default value, if location key not found
-    :return: Relative path to OPI files, e.g. MyModuleApp/opi/opi
+    Args:
+        parser: Config file parser
+        default: Default value, if location key not found
+
+    Returns:
+        Relative path to OPI files, e.g. MyModuleApp/opi/opi
     """
 
     try:
@@ -56,7 +60,7 @@ def opi_path(parser, default):
     except ConfigParser.NoSectionError:
         # file doesn't exist so...
         opis = default
-        print "No opi-location in module.ini file, using default %s" % default
+        log.info("No opi-location in module.ini file, using default %s", default)
 
     return opis
 
@@ -64,8 +68,12 @@ def opi_path(parser, default):
 def opi_depends(parser):
     """ Extract the opi-dependencies ("opi-depends") from the module.ini file
 
-    :param parser: Config file parser
-    :return: List of root-less coordinates (area,module,version); empty if none defined
+    Args:
+        parser: Config file parser
+
+    Returns:
+        List of root-less coordinates (area, module, version);
+            empty if none defined
     """
     depends = []
     try:
@@ -74,7 +82,7 @@ def opi_depends(parser):
         # assume all depends are 'support' not 'ioc'
         depends = parse_dependency_list(depends_list, None)
     except ConfigParser.NoSectionError:
-        print "No opi-depends in module.ini file"
+        log.info("No opi-depends in module.ini file")
 
     return depends
 
@@ -82,9 +90,14 @@ def opi_depends(parser):
 def parse_configuration(filepath):
     """ Open and parse a configuration file (*.ini)
 
-    :param filepath: File to open
-    :return: ConfigParser object
-    :raises ConfigError: when specified file does not exist
+    Args:
+        filepath: File to open
+
+    Returns:
+        ConfigParser object
+
+    Raises:
+        ConfigError: when specified file does not exist
     """
 
     if not os.path.exists(filepath):

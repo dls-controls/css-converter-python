@@ -15,7 +15,7 @@ import os
 
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
-LOG_LEVEL = log.WARNING
+LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
@@ -55,7 +55,22 @@ def update_cmd(cmd, mirror_root, module_cfg):
             macros = ','.join('{}={}'.format(a, b) for a, b in cmd.macros.items())
             return runcss_path, ['{} {}'.format(run_opi, macros)]
     else:  # Module has not been checked out
-        log.warning('No mirror path %s; xml not updated', mirror_path)
+        log.info('No mirror path %s; xml not updated', mirror_path)
+
+
+def summarise_updates(cmd_dict):
+    """Log all the entries in the cmd_dict.
+
+    This is useful to show which conversions have been picked up by the
+    launcher update.
+
+    Args:
+        cmd_dict: command object => (path, [args])
+    """
+    print('')
+    log.info('The following launcher items have been updated:')
+    for item in cmd_dict:
+        log.info('%s:%s', item.cmd, cmd_dict[item])
 
 
 def update_xml():
@@ -81,6 +96,7 @@ def update_xml():
         except (spoof.SpoofError, ValueError, TypeError) as e:
             log.info('Failed interpreting command {}: {}'.format(cmd.cmd, e))
     lxml.write_new(cmd_dict)
+    summarise_updates(cmd_dict)
     print('Wrote new launcher XML file to {}'.format(new_apps_xml))
 
 

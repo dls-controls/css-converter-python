@@ -85,8 +85,11 @@ def update_root(coord, root):
 def as_path(coord, include_version=True):
     """ Convert a module coordinate object to a file path
 
-    :param coord: Coordinate to interpret
-    :return: Full path to module
+    Args:
+        coord: Coordinate to interpret
+
+    Returns:
+        Full path to module
     """
     if coord.root is None:
         raise ValueError("Cannot find path of coord with no root", coord)
