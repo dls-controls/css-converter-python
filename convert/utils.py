@@ -133,6 +133,10 @@ def parse_version(version_string):
 def newer_version(v1, v2):
     """ Determine if v1 is newer than v2.
 
+    If the versions are equal, return False.
+    If v1 is None, return False.
+    If v1 is not None and v2 is None, return True.
+
     Args:
         v1: first version string to compare
         v2: second version string to compare
@@ -140,6 +144,10 @@ def newer_version(v1, v2):
     Returns:
         True if v1 is newer than v2
     """
+    if v1 is None:
+        return False
+    elif v2 is None:
+        return True
     for i, j in zip(parse_version(v1), parse_version(v2)):
         if i > j:
             return True
