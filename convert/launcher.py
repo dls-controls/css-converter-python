@@ -103,6 +103,7 @@ class LauncherCommand(object):
         self.path_to_run = None
         self.project = None
         self.edl_file = None
+        self.module_name = None
         self.version = None
         self.macros = {}
         self.all_dirs = []

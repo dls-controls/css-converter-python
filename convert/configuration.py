@@ -17,11 +17,16 @@ VCS_GIT = 'git'
 def parse_module_config(base_path):
     """ Parse the module configuration file
 
-    :param base_path: Path to module folder containing configure dir
-    :return: ConfigParser
-    :raises utils.ConfigError if module.ini file not found
+    Args:
+        base_path: Path to module folder containing configure dir
+
+    Returns:
+        ConfigParser
+
+    Raises:
+        utils.ConfigError if module.ini file not found
     """
-    log.info("Reading opiPath from %s", base_path)
+    log.debug("Reading opiPath from %s", base_path)
     module_ini_path = os.path.join(base_path, MODULE_INI)
     return parse_configuration(module_ini_path)
 
