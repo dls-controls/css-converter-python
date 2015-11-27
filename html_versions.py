@@ -12,6 +12,7 @@ import update_launcher
 import os
 from collections import namedtuple
 import string
+import subprocess
 import ConfigParser
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
@@ -22,6 +23,7 @@ SUPPORT = '/dls_sw/prod/R3.14.12.3/support'
 IOC = '/dls_sw/prod/R3.14.12.3/ioc'
 HTML_TEMPLATE = 'res/template.html'
 REPORT = 'deps.html'
+CFG_IOC_CMD = ["configure-ioc", "l"]
 
 # HTML templates
 DEPENDENCY_HEADERS = '<th class="dep-col">Dependency {}</th><th>Requested Version</th>'
@@ -109,18 +111,21 @@ def handle_one_module(module_cfg, module_name, launcher_version, area):
                       launcher_version, version_deps)
 
 
-def get_deps(module_cfg, cmd_dict):
+def get_deps(module_cfg, launcher_versions):
     """Locate all support modules and iocs and return their dependencies.
 
     Returns:
-        dict mapping module name (e.g. 'LI/TI') to dict of dependencies.
+        dict mapping module name (e.g. 'LI/TI') to ModDetails tuple
     """
     support_modules = find_support_modules()
+    cfg_ioc_versions = get_configure_ioc_versions(support_modules)
     iocs = find_iocs()
+    cfg_ioc_versions.update(get_configure_ioc_versions(iocs))
 
     module_details = {}
     for module in support_modules:
-        launcher_version = cmd_dict.get(module, None)
+        launcher_version = launcher_versions.get(module, None)
+        cfg_ioc_version = launcher_versions.get(module, None)
         print('Launcher version {}'.format(launcher_version))
         try:
             module_details[module] = handle_one_module(module_cfg, module, launcher_version, 'support')
@@ -129,7 +134,8 @@ def get_deps(module_cfg, cmd_dict):
             log.warn('Failed on {}: {}'.format(module, e))
 
     for module in iocs:
-        launcher_version = cmd_dict.get(module, None)
+        launcher_version = launcher_versions.get(module, None)
+        cfg_ioc_version = launcher_versions.get(module, None)
         try:
             module_details[module] = handle_one_module(module_cfg, module, launcher_version, 'ioc')
         except AssertionError as e:
@@ -217,6 +223,21 @@ def get_launcher_versions(gen_cfg, module_cfg):
     return launcher_versions
 
 
+def get_configure_ioc_versions(ioc_names):
+    cfg_ioc = subprocess.check_output(CFG_IOC_CMD).strip().split('\n')
+    print(cfg_ioc)
+    ioc_paths = [path for _, path in (line.split() for line in cfg_ioc)]
+    versions = {}
+    for ioc_name in ioc_names:
+        for ioc_path in ioc_paths:
+            if ioc_name in ioc_path:
+                index = ioc_path.index(ioc_name)
+                end = ioc_path[index+len(ioc_name)+1:]
+                version = end.split(os.path.sep)[0]
+                versions[ioc_name] = version
+    return versions
+
+
 def generate_table(module_details, max_deps):
     lines = []
     for module in sorted(module_details.keys()):
@@ -234,6 +255,7 @@ def start():
     headers = generate_headers(max_deps)
     table = generate_table(module_details, max_deps)
     render(headers, table)
+
 
 if __name__ == '__main__':
      start()
