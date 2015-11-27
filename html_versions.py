@@ -148,21 +148,16 @@ def get_module_details(module_cfg, launcher_versions):
     cfg_ioc_versions.update(get_configure_ioc_versions(iocs))
 
     module_details = {}
-    for module in support_modules:
-        launcher_version = launcher_versions.get(module, None)
-        cfg_ioc_version = cfg_ioc_versions.get(module, None)
-        try:
-            module_details[module] = handle_one_module(module_cfg, module, launcher_version, cfg_ioc_version, 'support')
-        except AssertionError as e:
-            log.warn('Failed on {}: {}'.format(module, e))
-
-    for module in iocs:
-        launcher_version = launcher_versions.get(module, None)
-        cfg_ioc_version = cfg_ioc_versions.get(module, None)
-        try:
-            module_details[module] = handle_one_module(module_cfg, module, launcher_version, cfg_ioc_version, 'ioc')
-        except AssertionError as e:
-            log.warn('Failed on {}: {}'.format(module, e))
+    for modules, area in ((support_modules, 'support'), (iocs, 'ioc')):
+        for module in modules:
+            launcher_version = launcher_versions.get(module, None)
+            cfg_ioc_version = cfg_ioc_versions.get(module, None)
+            try:
+                module_details[module] = handle_one_module(module_cfg, module,
+                                                           launcher_version,
+                                                           cfg_ioc_version, area)
+            except AssertionError as e:
+                log.warn('Failed on {}: {}'.format(module, e))
 
     return module_details
 
@@ -180,16 +175,6 @@ def render(max_deps, table):
 
 def get_max_deps(module_details):
     return max(len(val.deps) for mod, val in module_details.iteritems())
-
-
-def generate_headers(max_deps):
-    header = ''
-    for tag in ('thead', 'tfoot'):
-        header += '<{}><tr><th>Module</th><th>Latest Version</th><th>Launcher Version</th>'.format(tag)
-        for d in range(max_deps):
-            header += DEPENDENCY_HEADERS.format(d + 1)
-        header += '</tr></{}>'.format(tag)
-    return header
 
 
 def versions_from_cmd_dict(cmd_dict):
