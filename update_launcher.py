@@ -73,6 +73,27 @@ def summarise_updates(cmd_dict):
         log.info('%s:%s', item.cmd, cmd_dict[item])
 
 
+def get_updated_cmds(cmds, module_cfg, mirror_root):
+    """Update any commands that can be interpreted as launching edm.
+
+    Args:
+        cmds: list of LauncherCommand objects
+
+    Returns:
+        cmd_dict: command object => (path, [args])
+    """
+    cmd_dict = {}
+    for cmd in cmds:
+        try:
+            new_cmd = update_cmd(cmd, mirror_root, module_cfg)
+            if new_cmd is not None:
+                cmd_dict[cmd] = new_cmd
+        except (spoof.SpoofError, ValueError, TypeError) as e:
+            log.info('Failed interpreting command {}: {}'.format(cmd.cmd, e))
+
+    return cmd_dict
+
+
 def update_xml():
     """
     Parse configuration files, create a LauncherXml object and use its
@@ -87,14 +108,7 @@ def update_xml():
     new_apps_xml = gen_cfg.get('launcher', 'new_apps_xml')
     lxml = launcher.LauncherXml(apps_xml, new_apps_xml)
     cmds = lxml.get_cmds()
-    cmd_dict = {}
-    for cmd in cmds:
-        try:
-            new_cmd = update_cmd(cmd, mirror_root, module_cfg)
-            if new_cmd is not None:
-                cmd_dict[cmd] = new_cmd
-        except (spoof.SpoofError, ValueError, TypeError) as e:
-            log.info('Failed interpreting command {}: {}'.format(cmd.cmd, e))
+    cmd_dict = get_updated_cmds(cmds, module_cfg, mirror_root)
     lxml.write_new(cmd_dict)
     summarise_updates(cmd_dict)
     print('Wrote new launcher XML file to {}'.format(new_apps_xml))
