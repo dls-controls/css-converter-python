@@ -22,6 +22,8 @@ log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 SUPPORT = '/dls_sw/prod/R3.14.12.3/support'
 IOC = '/dls_sw/prod/R3.14.12.3/ioc'
+RESOURCES_DIR = 'res'
+HTML_TEMPLATE = 'template.html'
 REPORT = 'deps.html'
 CFG_IOC_CMD = ["configure-ioc", "l"]
 
@@ -174,8 +176,11 @@ def render(mod_details):
     max_deps = max(len(details.deps) for details in mod_details)
     # Sort by module name
     sorted_details = sorted(mod_details, key=lambda md: md.name)
-    env = jinja2.Environment(loader=jinja2.PackageLoader('html_versions', 'res'))
-    template = env.get_template('template.html')
+    # Script name as module i.e. no trailing .py
+    script_name = __file__.split('.')[0]
+    env = jinja2.Environment(loader=jinja2.PackageLoader(script_name,
+                                                         RESOURCES_DIR))
+    template = env.get_template(HTML_TEMPLATE)
     header_tags = ['thead', 'tfoot']
     full_html = template.render(header_tags=header_tags, nheaders=max_deps,
                                 mod_details=sorted_details)
