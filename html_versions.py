@@ -184,28 +184,28 @@ def render(mod_details):
     print('Created HTML report: {}'.format(REPORT))
 
 
-def versions_from_cmd_dict(cmd_dict):
-    versions = {}
-    for cmd in cmd_dict:
-        script, args = cmd_dict[cmd]
-        module = cmd.module_name
-        version = cmd.version
-        versions[module] = version
-    return versions
-
-
 def get_launcher_versions(gen_cfg, module_cfg):
+    """Determine where possible versions of modules used in the launcher.
+
+    Returns:
+        dict: module name => version string
+    """
     mirror_root = gen_cfg.get('general', 'mirror_root')
     apps_xml = gen_cfg.get('launcher', 'apps_xml')
     new_apps_xml = gen_cfg.get('launcher', 'new_apps_xml')
     lxml = launcher.LauncherXml(apps_xml, new_apps_xml)
     cmds = lxml.get_cmds()
     cmd_dict = update_launcher.get_updated_cmds(cmds, module_cfg, mirror_root)
-    launcher_versions = versions_from_cmd_dict(cmd_dict)
+    launcher_versions = {cmd.module_name: cmd.version for cmd in cmd_dict.keys()}
     return launcher_versions
 
 
 def get_configure_ioc_versions(ioc_names):
+    """Determine where possible versions of modules used in configure-ioc.
+
+    Returns:
+        dict: module name => version string or 'work'
+    """
     cfg_ioc = subprocess.check_output(CFG_IOC_CMD).strip().split('\n')
     ioc_paths = [path for _, path in (line.split() for line in cfg_ioc)]
     versions = {}
