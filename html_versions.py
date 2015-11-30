@@ -28,6 +28,7 @@ CFG_IOC_CMD = ["configure-ioc", "l"]
 
 
 class ModDetails(object):
+    # CSS classes
     OK = 'ok'
     OUT_OF_DATE = 'out-of-date'
     CONFIGURED = 'configured'
@@ -140,41 +141,47 @@ def get_module_details(module_cfg, launcher_versions):
     """Locate all support modules and iocs and return their dependencies.
 
     Returns:
-        dict mapping module name (e.g. 'LI/TI') to ModDetails tuple
+        List of ModDetails objects
     """
     support_modules = find_support_modules()
     cfg_ioc_versions = get_configure_ioc_versions(support_modules)
     iocs = find_iocs()
     cfg_ioc_versions.update(get_configure_ioc_versions(iocs))
 
-    module_details = {}
+    module_details = []
     for modules, area in ((support_modules, 'support'), (iocs, 'ioc')):
         for module in modules:
             launcher_version = launcher_versions.get(module, None)
             cfg_ioc_version = cfg_ioc_versions.get(module, None)
             try:
-                module_details[module] = handle_one_module(module_cfg, module,
-                                                           launcher_version,
-                                                           cfg_ioc_version, area)
+                module_details.append(handle_one_module(module_cfg, module,
+                                                        launcher_version,
+                                                        cfg_ioc_version, area))
             except AssertionError as e:
-                log.warn('Failed on {}: {}'.format(module, e))
+                log.warn('Failed to process module {}: {}'.format(module, e))
 
     return module_details
 
 
-def render(max_deps, table):
+def render(mod_details):
+    """Create and write HTML report for list of modules.
+
+    Args:
+        List of ModDetails objects
+    """
+    # The largest number of dependencies for any one module
+    max_deps = max(len(details.deps) for details in mod_details)
+    # Sort by module name
+    sorted_details = sorted(mod_details, key=lambda md: md.name)
     env = jinja2.Environment(loader=jinja2.PackageLoader('html_versions', 'res'))
     template = env.get_template('template.html')
     header_tags = ['thead', 'tfoot']
     full_html = template.render(header_tags=header_tags, nheaders=max_deps,
-                                mod_details=table)
+                                mod_details=sorted_details)
 
     with open(REPORT, 'w') as f:
         f.write(full_html)
-
-
-def get_max_deps(module_details):
-    return max(len(val.deps) for mod, val in module_details.iteritems())
+    print('Created HTML report: {}'.format(REPORT))
 
 
 def versions_from_cmd_dict(cmd_dict):
@@ -215,21 +222,11 @@ def get_configure_ioc_versions(ioc_names):
     return versions
 
 
-def sort_module_details(module_details):
-    lines = []
-    for module in sorted(module_details.keys()):
-        mod_details = module_details[module]
-        lines.append(mod_details)
-    return lines
-
-
 def start():
     gen_cfg, module_cfg = configuration.get_configs()
     launcher_versions = get_launcher_versions(gen_cfg, module_cfg)
     module_details = get_module_details(module_cfg, launcher_versions)
-    max_deps = get_max_deps(module_details)
-    table = sort_module_details(module_details)
-    render(max_deps, table)
+    render(module_details)
 
 
 if __name__ == '__main__':
