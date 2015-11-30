@@ -32,8 +32,10 @@ def find_modules(filepath):
             /dls_sw/prod/R3.14.12.3/support/zebra/2-0-1 => zebra
             /dls_sw/prod/R3.14.12.3/ioc/LI/TI/5-3 => LI/TI
 
-    :param filepath:
-    :return: list of module_names
+    Args:
+        filepath
+    Returns:
+        list of module_names
     """
     log.info('Finding all modules in: %s', filepath)
     all_paths = get_all_dirs(filepath)

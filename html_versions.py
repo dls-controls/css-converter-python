@@ -84,27 +84,7 @@ def get_versions(module_cfg, coords):
 
 def find_iocs():
     """Returns a list of IOC names e.g. 'LI/TI' """
-    iocs = set()
-    for (dirpath, dirnames, filenames) in os.walk(IOC_PATH):
-        parts = tuple(dirpath.split('/')[1:-1])
-        if parts in iocs:
-            dirnames[:] = []
-            continue
-        depth = len(parts)
-        if depth > 8:
-            dirnames[:] = []
-            continue
-        else:
-            if os.path.exists(os.path.join(dirpath, 'configure/RELEASE')):
-                dirnames[:] = []
-                iocs.add(parts)
-
-    ioc_names = []
-    for path_parts in iocs:
-        ioc_index = path_parts.index('ioc')
-        ioc_names.append(os.path.sep.join(path_parts[ioc_index + 1:]))
-
-    return ioc_names
+    return utils.find_modules(IOC_PATH)
 
 
 def find_support_modules():
