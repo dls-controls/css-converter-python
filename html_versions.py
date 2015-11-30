@@ -43,16 +43,20 @@ class ModDetails(object):
         self.requested = requested
         self.latest_release = latest_release
         self.config_version = config_version
-        self.launcher_version = None
-        self.cfg_ioc_version = None
+        self.launcher_version = launcher_version
+        self.cfg_ioc_version = cfg_ioc_version
         self.deps = {} if deps is None else deps
         self.version_class = ModDetails.OK
         self.launcher_version_class = ModDetails.OK
         self.cfg_ioc_version_class = ModDetails.OK
         self.requested_version_class = ModDetails.OK
-        self.assess_versions()
+        self._assess_versions()
 
-    def assess_versions(self):
+    def _assess_versions(self):
+        """ Set variables that describe the state of each assigned version.
+
+        These are used as CSS classes in the HTML.
+        """
         if self.config_version is not None:
             if utils.newer_version(self.latest_release, self.config_version):
                 self.version_class = ModDetails.OUT_OF_DATE
