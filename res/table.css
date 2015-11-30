@@ -19,6 +19,10 @@ td {
     background-color: #FBA799;
 }
 
+.no-release {
+    background-color: #F99D67;
+}
+
 .dep-col {
     border-left: 1px solid black;
 }

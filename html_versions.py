@@ -34,6 +34,7 @@ class ModDetails(object):
     OK = 'ok'
     OUT_OF_DATE = 'out-of-date'
     CONFIGURED = 'configured'
+    NO_RELEASE = 'no-release'
 
     def __init__(self, name, requested=None, latest_release=None,
                         config_version=None, launcher_version=None,
@@ -46,9 +47,9 @@ class ModDetails(object):
         self.cfg_ioc_version = None
         self.deps = {} if deps is None else deps
         self.version_class = ModDetails.OK
-        self.lversion_class = ModDetails.OK
-        self.cversion_class = ModDetails.OK
-        self.rversion_class = ModDetails.OK
+        self.launcher_version_class = ModDetails.OK
+        self.cfg_ioc_version_class = ModDetails.OK
+        self.requested_version_class = ModDetails.OK
         self.assess_versions()
 
     def assess_versions(self):
@@ -59,10 +60,15 @@ class ModDetails(object):
                 self.version_class = ModDetails.CONFIGURED
         if self.launcher_version is not None:
             if utils.newer_version(self.latest_release, self.launcher_version):
-                self.lversion_class = ModDetails.OUT_OF_DATE
+                self.launcher_version_class = ModDetails.OUT_OF_DATE
+        if self.cfg_ioc_version is not None:
+            if utils.newer_version(self.latest_release, self.cfg_ioc_version):
+                self.cfg_ioc_version_class = ModDetails.OUT_OF_DATE
         if self.requested is not None:
-            if utils.newer_version(self.latest_release, self.requested):
-                self.rversion_class = ModDetails.OUT_OF_DATE
+            if self.latest_release is None:
+                self.requested_version_class = ModDetails.NO_RELEASE
+            elif utils.newer_version(self.latest_release, self.requested):
+                self.requested_version_class = ModDetails.OUT_OF_DATE
 
 
 def get_config_item(cfg, section, option):
@@ -77,7 +83,7 @@ def get_versions(module_cfg, coords):
     try:
         latest_release = utils.get_latest_version(coordinates.as_path(coords, False))
     except ValueError:
-        latest_release = '99999'
+        latest_release = None
     config_version = get_config_item(module_cfg, coords.module, 'version')
     return latest_release, config_version
 

@@ -17,7 +17,7 @@
     </script>
     </head>
   <body>
-    <h1>Support modules and their dependencies</h1>
+    <h1>IOCs, support modules and their dependencies</h1>
     <h2>Hover for latest version</h2>
     <table id="ioc-table" class="display">
       {% for tag in header_tags %}
@@ -38,11 +38,11 @@
         <tr>
           <td>{{md.name}}</td>
           <td class="{{md.version_class}}">{{md.latest_release}}</td>
-          <td class="{{md.lversion_class}}">{{md.launcher_version}}</td>
-          <td class="{{md.cversion_class}}">{{md.cfg_ioc_version}}</td>
+          <td title="Latest release {{md.latest_release}}" class="{{md.launcher_version_class}}">{{md.launcher_version}}</td>
+          <td title="Latest release {{md.latest_release}}" class="{{md.cfg_ioc_version_class}}">{{md.cfg_ioc_version}}</td>
             {% for dep in md.deps %}
             <td class="dep-col">{{md.deps[dep].name}}</td>
-            <td title="Latest release {{md.deps[dep].latest_release}}" class="{{md.deps[dep].rversion_class}}">{{md.deps[dep].requested}}</td>
+            <td title="Latest release {{md.deps[dep].latest_release}}" class="{{md.deps[dep].requested_version_class}}">{{md.deps[dep].requested}}</td>
             {% endfor %}
             {% for n in range(nheaders - md.deps|length) %}
             <td class="dep-col"></td><td></td>
