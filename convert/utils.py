@@ -4,6 +4,7 @@ import stat
 import logging as log
 import string
 
+EPICS_ROOT = '/dls_sw/prod/R3.14.12.3'
 AREA_IOC = 'ioc'
 AREA_SUPPORT = 'support'
 
@@ -174,7 +175,7 @@ def get_all_dirs(filepath):
     return all_paths
 
 
-def find_module_from_path(filepath, top_dir='/dls_sw/prod/R3.14.12.3'):
+def find_module_from_path(filepath, top_dir=EPICS_ROOT):
     """ Crawl UP the file system to find the <module>/<version> folder containing
         the specified path.
 

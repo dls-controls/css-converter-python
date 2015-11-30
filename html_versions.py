@@ -20,8 +20,9 @@ LOG_FORMAT = '%(levelname)s:  %(message)s'
 LOG_LEVEL = log.WARNING
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
-SUPPORT = '/dls_sw/prod/R3.14.12.3/support'
-IOC = '/dls_sw/prod/R3.14.12.3/ioc'
+
+SUPPORT_PATH = os.path.join(utils.EPICS_ROOT, utils.AREA_SUPPORT)
+IOC_PATH = os.path.join(utils.EPICS_ROOT, utils.AREA_IOC)
 RESOURCES_DIR = 'res'
 HTML_TEMPLATE = 'template.html'
 REPORT = 'deps.html'
@@ -81,7 +82,7 @@ def get_versions(module_cfg, coords):
 def find_iocs():
     """Returns a list of IOC names e.g. 'LI/TI' """
     iocs = set()
-    for (dirpath, dirnames, filenames) in os.walk(IOC):
+    for (dirpath, dirnames, filenames) in os.walk(IOC_PATH):
         parts = tuple(dirpath.split('/')[1:-1])
         if parts in iocs:
             dirnames[:] = []
@@ -105,11 +106,11 @@ def find_iocs():
 
 def find_support_modules():
     """Returns a list of support module names e.g. 'diagOpi' """
-    return os.listdir(SUPPORT)
+    return os.listdir(SUPPORT_PATH)
 
 
 def handle_one_module(module_cfg, module_name, launcher_version, cfg_ioc_version, area):
-    coords = coordinates.ModCoord('/dls_sw/prod/R3.14.12.3/', area, module_name, None)
+    coords = coordinates.ModCoord(utils.EPICS_ROOT, area, module_name, None)
     latest_release, config_version = get_versions(module_cfg, coords)
     extra_deps = configuration.get_config_section(module_cfg, module_name)['extra_deps']
     if config_version is not None:
@@ -153,7 +154,8 @@ def get_module_details(gen_cfg, module_cfg):
     cfg_ioc_versions.update(get_configure_ioc_versions(iocs))
 
     module_details = []
-    for modules, area in ((support_modules, 'support'), (iocs, 'ioc')):
+    for modules, area in ((support_modules,  utils.AREA_SUPPORT),
+                          (iocs, utils.AREA_IOC)):
         for module in modules:
             launcher_version = launcher_versions.get(module, None)
             cfg_ioc_version = cfg_ioc_versions.get(module, None)
