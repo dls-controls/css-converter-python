@@ -35,18 +35,21 @@ class ModDetails(object):
     OUT_OF_DATE = 'out-of-date'
     CONFIGURED = 'configured'
 
-    def __init__(self, name, requested, latest_release, config_version):
+    def __init__(self, name, requested=None, latest_release=None,
+                        config_version=None, launcher_version=None,
+                        cfg_ioc_version=None, deps=None):
         self.name = name
         self.requested = requested
         self.latest_release = latest_release
         self.config_version = config_version
         self.launcher_version = None
         self.cfg_ioc_version = None
-        self.deps = {}
+        self.deps = {} if deps is None else deps
         self.version_class = ModDetails.OK
         self.lversion_class = ModDetails.OK
         self.cversion_class = ModDetails.OK
         self.rversion_class = ModDetails.OK
+        self.assess_versions()
 
     def assess_versions(self):
         if self.config_version is not None:
@@ -127,17 +130,17 @@ def handle_one_module(module_cfg, module_name, launcher_version, cfg_ioc_version
         # find versions here too.
         dep_latest, dep_cfg = get_versions(module_cfg, dep_coord)
         dep_requested = dep_coord.version
-        dmd = ModDetails(dep_coord.module, dep_requested, dep_latest, dep_cfg)
-        dmd.launcher_version = launcher_version
-        dmd.assess_versions()
+        dmd = ModDetails(dep_coord.module, requested=dep_requested,
+                         latest_release=dep_latest, config_version=dep_cfg)
         version_deps[dep_coord.module] = dmd
         log.debug('{}: {}, {}'.format(dep_coord.module, dep_latest, dep_cfg))
 
-    md = ModDetails(module_name, None, latest_release, config_version)
-    md.launcher_version = launcher_version
-    md.cfg_ioc_version = cfg_ioc_version
-    md.deps = version_deps
-    md.assess_versions()
+    md = ModDetails(module_name, requested=None,
+                    latest_release=latest_release,
+                    config_version=config_version,
+                    launcher_version=launcher_version,
+                    cfg_ioc_version=cfg_ioc_version,
+                    deps=version_deps)
     return md
 
 
