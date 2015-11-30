@@ -140,7 +140,7 @@ def handle_one_module(module_cfg, module_name, launcher_version, cfg_ioc_version
     return md
 
 
-def get_module_details(module_cfg, launcher_versions):
+def get_module_details(gen_cfg, module_cfg):
     """Locate all support modules and iocs and return their dependencies.
 
     Returns:
@@ -148,6 +148,7 @@ def get_module_details(module_cfg, launcher_versions):
     """
     support_modules = find_support_modules()
     cfg_ioc_versions = get_configure_ioc_versions(support_modules)
+    launcher_versions = get_launcher_versions(gen_cfg, module_cfg)
     iocs = find_iocs()
     cfg_ioc_versions.update(get_configure_ioc_versions(iocs))
 
@@ -230,8 +231,7 @@ def get_configure_ioc_versions(ioc_names):
 
 def start():
     gen_cfg, module_cfg = configuration.get_configs()
-    launcher_versions = get_launcher_versions(gen_cfg, module_cfg)
-    module_details = get_module_details(module_cfg, launcher_versions)
+    module_details = get_module_details(gen_cfg, module_cfg)
     render(module_details)
 
 
