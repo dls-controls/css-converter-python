@@ -11,7 +11,6 @@ from convert import coordinates
 from convert import dependency
 from convert import launcher
 from convert import utils
-import update_launcher
 
 import os
 import subprocess
@@ -78,6 +77,7 @@ def get_versions(module_cfg, coords):
 
 
 def find_iocs():
+    """Returns a list of IOC names e.g. 'LI/TI' """
     iocs = set()
     for (dirpath, dirnames, filenames) in os.walk(IOC):
         parts = tuple(dirpath.split('/')[1:-1])
@@ -102,6 +102,7 @@ def find_iocs():
 
 
 def find_support_modules():
+    """Returns a list of support module names e.g. 'diagOpi' """
     return os.listdir(SUPPORT)
 
 
@@ -195,7 +196,7 @@ def get_launcher_versions(gen_cfg, module_cfg):
     new_apps_xml = gen_cfg.get('launcher', 'new_apps_xml')
     lxml = launcher.LauncherXml(apps_xml, new_apps_xml)
     cmds = lxml.get_cmds()
-    cmd_dict = update_launcher.get_updated_cmds(cmds, module_cfg, mirror_root)
+    cmd_dict = launcher.get_updated_cmds(cmds, module_cfg, mirror_root)
     launcher_versions = {cmd.module_name: cmd.version for cmd in cmd_dict.keys()}
     return launcher_versions
 
