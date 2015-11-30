@@ -1,17 +1,79 @@
 import os
-import utils
 import logging as log
 import string
 import stat
 import xml.etree.ElementTree as et
 
-import spoof
+import configuration
 import paths
+import spoof
+import utils
+
 
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 SCRIPT_TEMPLATE = 'res/runcss.template'
 
 ESCAPE_CHARS = ['.', ':']
+
+
+def update_cmd(cmd, mirror_root, module_cfg):
+    """
+    Attempt to convert an EDM command into the appropriate command
+    to run the equivalent CSS screen.
+
+    Args:
+        cmd_dict: a convert.launcher.LauncherCommand object
+        mirror_root: path to root of mirror filesystem
+
+    Returns:
+        (path, [args]): where
+             - path is the path of the runcss.sh script
+             - args is one string: the opi to run followd by any macros
+    """
+    # Determine properties of command in launcher
+    cmd.interpret()
+    p, n, v, rp = utils.parse_module_name(cmd.path_to_run)
+    # Switch back to edl extension
+    edl_rp = rp[:-3] + 'edl'
+    nv = utils.increment_version(v)
+    updated_edl_path = os.path.join(p, n, nv, edl_rp)
+    # Remove leading slash from path to allow os.path.join() to work
+    path_to_module = os.path.join(mirror_root, p[1:], n, nv)
+    mirror_path = os.path.join(mirror_root, updated_edl_path[1:])
+    if os.path.exists(mirror_path):  # Module has been checked out
+        cfg = configuration.get_config_section(module_cfg, n)
+        edl_dir = os.path.normpath(os.path.join(path_to_module, cfg['edl_dir']))
+        opi_dir = os.path.normpath(os.path.join(path_to_module, cfg['opi_dir']))
+        # Filepath relative to EDMDATAFILES directory
+        rel_path = os.path.relpath(mirror_path, edl_dir)
+        runcss_path = os.path.join(opi_dir, 'runcss.sh')
+        if os.path.exists(opi_dir):
+            run_opi = rel_path[:-3] + 'opi'
+            macros = ','.join('{}={}'.format(a, b) for a, b in cmd.macros.items())
+            return runcss_path, ['{} {}'.format(run_opi, macros)]
+    else:  # Module has not been checked out
+        log.info('No mirror path %s; xml not updated', mirror_path)
+
+
+def get_updated_cmds(cmds, module_cfg, mirror_root):
+    """Update any commands that can be interpreted as launching edm.
+
+    Args:
+        cmds: list of LauncherCommand objects
+
+    Returns:
+        cmd_dict: command object => (path, [args])
+    """
+    cmd_dict = {}
+    for cmd in cmds:
+        try:
+            new_cmd = update_cmd(cmd, mirror_root, module_cfg)
+            if new_cmd is not None:
+                cmd_dict[cmd] = new_cmd
+        except (spoof.SpoofError, ValueError, TypeError) as e:
+            log.info('Failed interpreting command {}: {}'.format(cmd.cmd, e))
+
+    return cmd_dict
 
 
 def _get_macros(edm_args):
@@ -103,6 +165,7 @@ class LauncherCommand(object):
         self.path_to_run = None
         self.project = None
         self.edl_file = None
+        self.module_name = None
         self.version = None
         self.macros = {}
         self.all_dirs = []

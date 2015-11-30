@@ -4,6 +4,7 @@ import stat
 import logging as log
 import string
 
+EPICS_ROOT = '/dls_sw/prod/R3.14.12.3'
 AREA_IOC = 'ioc'
 AREA_SUPPORT = 'support'
 
@@ -31,8 +32,10 @@ def find_modules(filepath):
             /dls_sw/prod/R3.14.12.3/support/zebra/2-0-1 => zebra
             /dls_sw/prod/R3.14.12.3/ioc/LI/TI/5-3 => LI/TI
 
-    :param filepath:
-    :return: list of module_names
+    Args:
+        filepath
+    Returns:
+        list of module_names
     """
     log.info('Finding all modules in: %s', filepath)
     all_paths = get_all_dirs(filepath)
@@ -130,6 +133,30 @@ def parse_version(version_string):
     return [int(m) for m in matches]
 
 
+def newer_version(v1, v2):
+    """ Determine if v1 is newer than v2.
+
+    If the versions are equal, return False.
+    If v1 is None, return False.
+    If v1 is not None and v2 is None, return True.
+
+    Args:
+        v1: first version string to compare
+        v2: second version string to compare
+
+    Returns:
+        True if v1 is newer than v2
+    """
+    if v1 is None:
+        return False
+    elif v2 is None:
+        return True
+    for i, j in zip(parse_version(v1), parse_version(v2)):
+        if i > j:
+            return True
+    return False
+
+
 def get_all_dirs(filepath):
     """ Walk the file system from specified start point terminating at the iocBoot level
 
@@ -150,7 +177,7 @@ def get_all_dirs(filepath):
     return all_paths
 
 
-def find_module_from_path(filepath, top_dir='/dls_sw/prod/R3.14.12.3'):
+def find_module_from_path(filepath, top_dir=EPICS_ROOT):
     """ Crawl UP the file system to find the <module>/<version> folder containing
         the specified path.
 

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<!-- This page uses Jinja2 for rendering. -->
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="res/table.css">
+    <link rel="stylesheet" type="text/css" href="/dls/cs-www/reports/css/jquery.dataTables.css">
+    <script type="text/javascript" language="javascript" src="/dls/cs-www/reports/js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" language="javascript" src="/dls/cs-www/reports/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" language="javascript" src="/dls/cs-www/reports/js/shCore.js"></script>
+    <script type="text/javascript" language="javascript" src="/dls/cs-www/reports/js/demo.js"></script>
+    <script type="text/javascript" language="javascript" class="init">
+    $(document).ready(function() {
+      $('#ioc-table').DataTable({
+        "pageLength": 50
+      });
+    });
+    </script>
+    </head>
+  <body>
+    <h1>IOCs, support modules and their dependencies</h1>
+    <h2>Hover for latest version</h2>
+    <table id="ioc-table" class="display">
+      {% for tag in header_tags %}
+      <{{tag}}>
+        <tr>
+          <th>Module name</th>
+          <th>Latest Version</th>
+          <th>Launcher Version</th>
+          <th>Configure IOC Version</th>
+          {% for n in range(nheaders) %}
+          <th class="dep-col">Dependency {{n}}</th><th>Version</th>
+          {% endfor %}
+        </tr>
+      </{{tag}}>
+      {% endfor %}
+      <tbody>
+        {% for md in mod_details %}
+        <tr>
+          <td>{{md.name}}</td>
+          <td class="{{md.version_class}}">{{md.latest_release}}</td>
+          <td title="Latest release {{md.latest_release}}" class="{{md.launcher_version_class}}">{{md.launcher_version}}</td>
+          <td title="Latest release {{md.latest_release}}" class="{{md.cfg_ioc_version_class}}">{{md.cfg_ioc_version}}</td>
+            {% for dep in md.deps %}
+            <td class="dep-col">{{md.deps[dep].name}}</td>
+            <td title="Latest release {{md.deps[dep].latest_release}}" class="{{md.deps[dep].requested_version_class}}">{{md.deps[dep].requested}}</td>
+            {% endfor %}
+            {% for n in range(nheaders - md.deps|length) %}
+            <td class="dep-col"></td><td></td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

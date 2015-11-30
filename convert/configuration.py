@@ -5,6 +5,9 @@ import logging as log
 
 MODULE_INI = 'configure/module.ini'
 
+GEN_CONF = 'conf/converter.ini'
+MODULE_CONF = 'conf/modules.ini'
+
 SEC_GENERAL = 'general'
 OPI_DEPENDS = 'opi-depends'
 OPI_LOCATION = 'opi-location'
@@ -17,11 +20,16 @@ VCS_GIT = 'git'
 def parse_module_config(base_path):
     """ Parse the module configuration file
 
-    :param base_path: Path to module folder containing configure dir
-    :return: ConfigParser
-    :raises utils.ConfigError if module.ini file not found
+    Args:
+        base_path: Path to module folder containing configure dir
+
+    Returns:
+        ConfigParser
+
+    Raises:
+        utils.ConfigError if module.ini file not found
     """
-    log.info("Reading opiPath from %s", base_path)
+    log.debug("Reading opiPath from %s", base_path)
     module_ini_path = os.path.join(base_path, MODULE_INI)
     return parse_configuration(module_ini_path)
 
@@ -237,3 +245,9 @@ def create_module_ini_file(coord, mirror_root, opi_location, extra_depends, forc
         # Writing our configuration file to 'example.cfg'
         with open(mod_ini_file, 'wb') as configfile:
             config.write(configfile)
+
+
+def get_configs():
+    gen_cfg = parse_configuration(GEN_CONF)
+    module_cfg = parse_configuration(MODULE_CONF)
+    return gen_cfg, module_cfg
