@@ -37,7 +37,7 @@
         {% for md in mod_details %}
         <tr>
           <td>{{md.name}}</td>
-          <td class="{{md.version_class}}">{{md.latest_release}}</td>
+          <td title="{{md.version_message}}" class="{{md.version_class}}">{{md.latest_release}}</td>
           <td title="Latest release {{md.latest_release}}" class="{{md.launcher_version_class}}">{{md.launcher_version}}</td>
           <td title="Latest release {{md.latest_release}}" class="{{md.cfg_ioc_version_class}}">{{md.cfg_ioc_version}}</td>
             {% for dep in md.deps %}

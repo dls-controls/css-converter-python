@@ -35,6 +35,9 @@ class ModDetails(object):
     OUT_OF_DATE = 'out-of-date'
     CONFIGURED = 'configured'
     NO_RELEASE = 'no-release'
+    # Informational messages
+    CONFIGURED_MSG = 'The latest version is specified in modules.ini'
+    OUT_OF_DATE_MSG = 'Latest version {}; the older version is in modules.ini'
 
     def __init__(self, name, requested=None, latest_release=None,
                         config_version=None, launcher_version=None,
@@ -47,6 +50,7 @@ class ModDetails(object):
         self.cfg_ioc_version = cfg_ioc_version
         self.deps = {} if deps is None else deps
         self.version_class = ModDetails.OK
+        self.version_message = ""
         self.launcher_version_class = ModDetails.OK
         self.cfg_ioc_version_class = ModDetails.OK
         self.requested_version_class = ModDetails.OK
@@ -60,8 +64,11 @@ class ModDetails(object):
         if self.config_version is not None:
             if utils.newer_version(self.latest_release, self.config_version):
                 self.version_class = ModDetails.OUT_OF_DATE
+                msg = ModDetails.OUT_OF_DATE_MSG.format(self.latest_release)
+                self.version_message = msg
             else:
                 self.version_class = ModDetails.CONFIGURED
+                self.version_message = ModDetails.CONFIGURED_MSG
         if self.launcher_version is not None:
             if utils.newer_version(self.latest_release, self.launcher_version):
                 self.launcher_version_class = ModDetails.OUT_OF_DATE
