@@ -44,7 +44,8 @@ class Module(object):
         # file system INSIDE a containing dir /.../dls_sw/prod/R3...
         self.conversion_root = os.path.join(mirror_root, prod_path[1:],
                                             self.new_version)
-        if not os.path.exists(self.conversion_root):
+
+        if not os.path.exists(self.conversion_root) and cfg_dict['has_opi']:
             err_msg = 'Module to be converted does not exist: {}'
             raise ValueError(err_msg.format(self.conversion_root))
 
