@@ -10,6 +10,7 @@ from convert import configuration
 from convert import coordinates
 from convert import dependency
 from convert import launcher
+from convert import spoof
 from convert import utils
 
 import os
@@ -149,7 +150,7 @@ def get_module_details(gen_cfg, module_cfg):
     """
     support_modules = find_support_modules()
     cfg_ioc_versions = get_configure_ioc_versions(support_modules)
-    launcher_versions = get_launcher_versions(gen_cfg, module_cfg)
+    launcher_versions = get_launcher_versions(gen_cfg)
     iocs = find_iocs()
     cfg_ioc_versions.update(get_configure_ioc_versions(iocs))
 
@@ -193,19 +194,26 @@ def render(mod_details):
     print('Created HTML report: {}'.format(REPORT))
 
 
-def get_launcher_versions(gen_cfg, module_cfg):
+def get_launcher_versions(gen_cfg):
     """Determine where possible versions of modules used in the launcher.
 
     Returns:
         dict: module name => version string
     """
-    mirror_root = gen_cfg.get('general', 'mirror_root')
+    launcher_versions = {}
     apps_xml = gen_cfg.get('launcher', 'apps_xml')
     new_apps_xml = gen_cfg.get('launcher', 'new_apps_xml')
     lxml = launcher.LauncherXml(apps_xml, new_apps_xml)
     cmds = lxml.get_cmds()
-    cmd_dict = launcher.get_updated_cmds(cmds, module_cfg, mirror_root)
-    launcher_versions = {cmd.module_name: cmd.version for cmd in cmd_dict.keys()}
+    for cmd in cmds:
+        try:
+            cmd.interpret()
+            # Have to change this back, which is a bit awkward.
+            cmd.module_name = cmd.module_name.replace('_', '/')
+            launcher_versions[cmd.module_name] = cmd.version
+        except (spoof.SpoofError, ValueError):
+            log.debug('Failed to understand command {}'.format(cmd.cmd))
+
     return launcher_versions
 
 
