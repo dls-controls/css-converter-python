@@ -145,6 +145,7 @@ class LauncherXml(object):
             if cmd in cmd_dict:
                 new_cmd, new_args = cmd_dict[cmd]
                 node.set('command', new_cmd)
+                node.set('text', name + ' (CSS)')
                 node.set('args', ' '.join(new_args))
         else:
             for child in node:
