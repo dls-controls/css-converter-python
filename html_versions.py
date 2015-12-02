@@ -10,6 +10,7 @@ from convert import configuration
 from convert import coordinates
 from convert import dependency
 from convert import launcher
+from convert import spoof
 from convert import utils
 
 import os
@@ -35,10 +36,13 @@ class ModDetails(object):
     OUT_OF_DATE = 'out-of-date'
     CONFIGURED = 'configured'
     NO_RELEASE = 'no-release'
+    # Informational messages
+    CONFIGURED_MSG = 'The latest version is specified in modules.ini'
+    OUT_OF_DATE_MSG = 'Latest version {}; the older version is in modules.ini'
 
     def __init__(self, name, requested=None, latest_release=None,
-                        config_version=None, launcher_version=None,
-                        cfg_ioc_version=None, deps=None):
+                 config_version=None, launcher_version=None,
+                 cfg_ioc_version=None, deps=None):
         self.name = name
         self.requested = requested
         self.latest_release = latest_release
@@ -47,6 +51,7 @@ class ModDetails(object):
         self.cfg_ioc_version = cfg_ioc_version
         self.deps = {} if deps is None else deps
         self.version_class = ModDetails.OK
+        self.version_message = ""
         self.launcher_version_class = ModDetails.OK
         self.cfg_ioc_version_class = ModDetails.OK
         self.requested_version_class = ModDetails.OK
@@ -60,8 +65,11 @@ class ModDetails(object):
         if self.config_version is not None:
             if utils.newer_version(self.latest_release, self.config_version):
                 self.version_class = ModDetails.OUT_OF_DATE
+                msg = ModDetails.OUT_OF_DATE_MSG.format(self.latest_release)
+                self.version_message = msg
             else:
                 self.version_class = ModDetails.CONFIGURED
+                self.version_message = ModDetails.CONFIGURED_MSG
         if self.launcher_version is not None:
             if utils.newer_version(self.latest_release, self.launcher_version):
                 self.launcher_version_class = ModDetails.OUT_OF_DATE
@@ -85,7 +93,8 @@ def get_config_item(cfg, section, option):
 
 def get_versions(module_cfg, coords):
     try:
-        latest_release = utils.get_latest_version(coordinates.as_path(coords, False))
+        latest_release = utils.get_latest_version(coordinates.as_path(coords,
+                                                                      False))
     except ValueError:
         latest_release = None
     config_version = get_config_item(module_cfg, coords.module, 'version')
@@ -134,6 +143,51 @@ def handle_one_module(module_cfg, module_name, launcher_version, cfg_ioc_version
     return md
 
 
+def get_launcher_versions(gen_cfg):
+    """Determine where possible versions of modules used in the launcher.
+
+    Returns:
+        dict: module name => version string
+    """
+    launcher_versions = {}
+    apps_xml = gen_cfg.get('launcher', 'apps_xml')
+    new_apps_xml = gen_cfg.get('launcher', 'new_apps_xml')
+    lxml = launcher.LauncherXml(apps_xml, new_apps_xml)
+    cmds = lxml.get_cmds()
+    for cmd in cmds:
+        try:
+            cmd.interpret()
+            # Have to change this back, which is a bit awkward.
+            cmd.module_name = cmd.module_name.replace('_', '/')
+            launcher_versions[cmd.module_name] = cmd.version
+        except (spoof.SpoofError, ValueError):
+            log.debug('Failed to understand command {}'.format(cmd.cmd))
+
+    return launcher_versions
+
+
+def get_configure_ioc_versions(ioc_names):
+    """Determine where possible versions of modules used in configure-ioc.
+
+    Returns:
+        dict: module name => version string or 'work'
+    """
+    cfg_ioc = subprocess.check_output(CFG_IOC_CMD).strip().split('\n')
+    ioc_paths = [path for _, path in (line.split() for line in cfg_ioc)]
+    versions = {}
+    for ioc_name in ioc_names:
+        for ioc_path in ioc_paths:
+            if ioc_name in ioc_path:
+                if '/work/' in ioc_path:
+                    versions[ioc_name] = 'work'
+                else:
+                    index = ioc_path.index(ioc_name)
+                    end = ioc_path[index+len(ioc_name)+1:]
+                    version = end.split(os.path.sep)[0]
+                    versions[ioc_name] = version
+    return versions
+
+
 def get_module_details(gen_cfg, module_cfg):
     """Locate all support modules and iocs and return their dependencies.
 
@@ -142,7 +196,7 @@ def get_module_details(gen_cfg, module_cfg):
     """
     support_modules = find_support_modules()
     cfg_ioc_versions = get_configure_ioc_versions(support_modules)
-    launcher_versions = get_launcher_versions(gen_cfg, module_cfg)
+    launcher_versions = get_launcher_versions(gen_cfg)
     iocs = find_iocs()
     cfg_ioc_versions.update(get_configure_ioc_versions(iocs))
 
@@ -184,44 +238,6 @@ def render(mod_details):
     with open(REPORT, 'w') as f:
         f.write(full_html)
     print('Created HTML report: {}'.format(REPORT))
-
-
-def get_launcher_versions(gen_cfg, module_cfg):
-    """Determine where possible versions of modules used in the launcher.
-
-    Returns:
-        dict: module name => version string
-    """
-    mirror_root = gen_cfg.get('general', 'mirror_root')
-    apps_xml = gen_cfg.get('launcher', 'apps_xml')
-    new_apps_xml = gen_cfg.get('launcher', 'new_apps_xml')
-    lxml = launcher.LauncherXml(apps_xml, new_apps_xml)
-    cmds = lxml.get_cmds()
-    cmd_dict = launcher.get_updated_cmds(cmds, module_cfg, mirror_root)
-    launcher_versions = {cmd.module_name: cmd.version for cmd in cmd_dict.keys()}
-    return launcher_versions
-
-
-def get_configure_ioc_versions(ioc_names):
-    """Determine where possible versions of modules used in configure-ioc.
-
-    Returns:
-        dict: module name => version string or 'work'
-    """
-    cfg_ioc = subprocess.check_output(CFG_IOC_CMD).strip().split('\n')
-    ioc_paths = [path for _, path in (line.split() for line in cfg_ioc)]
-    versions = {}
-    for ioc_name in ioc_names:
-        for ioc_path in ioc_paths:
-            if ioc_name in ioc_path:
-                if '/work/' in ioc_path:
-                    versions[ioc_name] = 'work'
-                else:
-                    index = ioc_path.index(ioc_name)
-                    end = ioc_path[index+len(ioc_name)+1:]
-                    version = end.split(os.path.sep)[0]
-                    versions[ioc_name] = version
-    return versions
 
 
 def start():
