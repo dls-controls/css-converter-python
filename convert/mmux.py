@@ -144,16 +144,13 @@ def try_replace(text, symbols):
             updated = updated.replace(', ""', '')
             updated = updated.replace('"", ', '')
 
-    if not text == updated:
-        log.info("Converted %s to %s", text, updated)
-
-    # A concat() function does not need to be in quotes
-    # in the pv() function; a local PV does.
-    if updated.startswith("loc"):
-        updated = "'%s'" % updated
-
     if matched:
+        # A concat() function does not need to be in quotes
+        # in the pv() function; a local PV does.
+        if updated.startswith("loc"):
+            updated = "'%s'" % updated
         updated = '=pv(%s)' % updated
+        log.info("Converted %s to %s", text, updated)
     return updated
 
 
