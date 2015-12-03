@@ -118,6 +118,15 @@ class TryReplaceTest(unittest.TestCase):
 
         self.assertEqual(text, replaced)
 
+    def test_does_nothing_if_symbol_not_defined_and_loc_pv(self):
+
+        symbols = {"num": "val01"}
+        text = "loc://d(1)"
+
+        replaced = try_replace(text, symbols)
+
+        self.assertEqual(text, replaced)
+
     def test_try_replace_sets_loc_pv_if_straight_match(self):
         """ Map <attr>$(d)</attr> to <attr>loc://$(DID)d("initval")</attr>
         """
