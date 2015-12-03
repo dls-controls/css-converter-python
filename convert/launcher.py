@@ -28,7 +28,7 @@ def update_cmd(cmd, mirror_root, module_cfg):
     Returns:
         (path, [args]): where
              - path is the path of the runcss.sh script
-             - args is one string: the opi to run followd by any macros
+             - args is one string: the opi to run followed by any macros
     """
     # Determine properties of command in launcher
     cmd.interpret()
@@ -146,7 +146,8 @@ class LauncherXml(object):
                 new_cmd, new_args = cmd_dict[cmd]
                 node.set('command', new_cmd)
                 node.set('text', name + ' (CSS)')
-                node.set('args', ' '.join(new_args))
+                args_string = ' '.join(new_args)
+                node.set('args', '"{}"'.format(args_string))
         else:
             for child in node:
                 self._update_node(child, cmd_dict)
