@@ -28,7 +28,7 @@ def summarise_updates(cmd_dict):
     print('')
     log.info('The following launcher items have been updated:')
     for item in cmd_dict:
-        log.info('%s:%s', item.name, cmd_dict[item])
+        log.info('    %s:%s', item.name, cmd_dict[item])
 
 
 def update_xml():
