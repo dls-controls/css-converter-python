@@ -18,13 +18,15 @@ OPI_EXTENSION = 'opi'
 
 
 class Module(object):
+    """Object representing one IOC or support module."""
 
     def __init__(self, coords, cfg_dict, mirror_root, increment_version=True):
         """
 
-        :param coords: source module co-ord
-        :param cfg_dict: general config info -- extra deps, edl and opi dirs
-        :param mirror_root: root of target filesystem
+        Args:
+            coords: source module coordinates
+            cfg_dict: general config info -- extra deps, edl and opi dirs
+            mirror_root: root of target filesystem
         """
         self.coords = coords
         self.edl_dir = cfg_dict['edl_dir']
@@ -33,6 +35,9 @@ class Module(object):
         self.layers = cfg_dict['layers']
         self.groups = cfg_dict['groups']
         self.mirror_root = mirror_root
+        # Used for locating a file in module and dependencies given
+        # only its name.
+        self.file_dict = {}
 
         if increment_version:
             self.new_version = utils.increment_version(coords.version)
@@ -54,21 +59,24 @@ class Module(object):
 
     def get_dependencies(self):
         """
-        :return: dict {name: coords} for all module dependencies
+        Returns:
+            dict {name: coords} for all module dependencies
         """
         dp = dependency.DependencyParser(self.coords, self.extra_deps)
         return dp.find_dependencies()
 
     def get_opi_path(self):
         """
-        :return: Full path to converted OPI files directory
+        Returns:
+            Full path to converted OPI files directory
         """
         opi_path = os.path.join(self.conversion_root, self.opi_dir)
         return os.path.normpath(opi_path)
 
     def get_edl_path(self):
         """
-        :return: Full path to edl file directory
+        Returns:
+            Full path to edl file directory
         """
         edl_path = os.path.join(self.conversion_root, self.edl_dir)
         return os.path.normpath(edl_path)
@@ -76,8 +84,12 @@ class Module(object):
     def _build_files(self, part_paths):
         """ Build a list of all files referenced by the partial paths relative
             to an EDL path root
-        :param part_paths: Relative paths to generate
-        :return: List of file paths based on configuration EDL path
+
+        Args:
+            part_paths: Relative paths to generate
+
+        Returns:
+            List of file paths based on configuration EDL path
         """
         root = self.get_edl_path()
         file_list = []
@@ -88,12 +100,11 @@ class Module(object):
 
         return file_list
 
-    def convert(self, file_dict, force):
-        """
+    def convert(self, force):
+        """Convert entire module.
 
-        :param file_dict: filename -> (module,path-in-module)
-        :param force: Reconvert if destination exists
-        :return:
+        Args:
+            force: Reconvert if destination exists
         """
         origin = self.get_edl_path()
         destination = self.get_opi_path()
@@ -103,13 +114,13 @@ class Module(object):
             # directory already exists
             pass
 
-        self._convert_all(origin, destination, file_dict, force)
+        self._convert_all(origin, destination, force)
 
     def __str__(self):
         return 'Module at coordinates {}'.format(self.coords)
 
-    def _convert_one(self, source, target, depth, file_index, force):
-        """ Convert a single file
+    def _convert_one(self, source, target, depth, force):
+        """ Convert a single file.
 
             If this is not an EDL file it is copied to the target path,
             otherwise:
@@ -123,11 +134,11 @@ class Module(object):
 
             File metadata is preserved for non-EDL files
 
-        :param source: source file (relative path)
-        :param target: target file (relative path)
-        :param depth: file 'depth' relative to eclipse link base
-        :param file_index: dictionary of file paths
-        :param force: if True, force reconversion and copy
+        Args:
+            source: source file (relative path)
+            target: target file (relative path)
+            depth: file 'depth' relative to eclipse link base
+            force: if True, force reconversion and copy
         """
         log.debug('Handling file: %s to %s', source, target)
         edl_file = source.endswith(EDL_EXTENSION)
@@ -140,7 +151,7 @@ class Module(object):
         else:
             if edl_file:
                 if files.convert_edl(source, target):
-                    paths.update_opi_file(target, depth, file_index,
+                    paths.update_opi_file(target, depth, self.file_dict,
                                           self.coords.module, use_rel=False)
                     if self.is_layer_file(source):
                         layers.parse(target)
@@ -163,24 +174,29 @@ class Module(object):
                     log.warn('Error trying to copy {}: {}'.format(source, e))
 
     def is_layer_file(self, f):
-        """ Determine if file requires post-process 'layer' manipulation.
+        """Determine if file requires post-process 'layer' manipulation.
 
-        :param f: File path to check
-        :return: True if file appears in list of Layer files
+        Args:
+            f: File path to check
+
+        Returns:
+            True if file appears in list of Layer files
         """
         return f in self.layer_files
 
     def is_group_file(self, f):
         """ Determine if file requires post-process 'group' manipulation.
 
-        :param f: File path to check
-        :return: True if file appears in list of Group files
+        Args:
+            f: File path to check
+
+        Returns:
+            True if file appears in list of Group files
         """
         return f in self.group_files
 
-    def _convert_all(self, origin, destination, file_index, force):
-        """
-        Copy each file in origin to destination:
+    def _convert_all(self, origin, destination, force):
+        """Copy each file in origin to destination:
             * if .edl, convert it to .opi
             * ignore .svn directories
         """
@@ -216,7 +232,7 @@ class Module(object):
                 log.debug('The depth for %s in %s is %s', rel, self.coords.module, depth)
 
                 try:
-                    self._convert_one(source, target, depth, file_index, force)
+                    self._convert_one(source, target, depth, force)
                 except files.OldEdlError:
                     log.warn('Skipping old edl file %s', source)
                     old_edl_files.append(source)

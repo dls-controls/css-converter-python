@@ -73,9 +73,9 @@ def convert_one_module(mod, cfg, mirror_root):
             edl_dirs.append(dep_edl_path)
             extra_depends.append(dep_cfg.get('extra_deps', []))
 
-        file_dict = paths.index_paths(edl_dirs, True)
+        mod.file_dict = paths.index_paths(edl_dirs, True)
         try:
-            mod.convert(file_dict, args.force)
+            mod.convert(args.force)
 
             new_version = utils.increment_version(mod.coords.version)
             build_runcss.gen_run_script(mod.coords,
