@@ -1,5 +1,4 @@
 #!/usr/bin/env dls-python
-import pkg_resources
 import build_runcss
 
 import os
@@ -13,12 +12,17 @@ LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
-def get_modules(args, gen_cfg, area):
-    """
-    :param args: conversion arguments (uses .all and .module)
-    :param module_cfg: configuration containing area
-    :param gen_cfg: configuration containing general/prod_root and general/mirror_root
-    :return: list of Modules
+def get_modules(args, gen_cfg, cfg, area):
+    """Return either one or all modules for specified area.
+
+    Args:
+        args: conversion arguments (uses .all and .module)
+        module_cfg: configuration containing area
+        gen_cfg: configuration containing general/prod_root and general/mirror_root
+        area: 'ioc' or 'support'
+
+    Returns:
+        list of Module objects
     """
     modules = []
 
@@ -38,7 +42,6 @@ def get_modules(args, gen_cfg, area):
     for module_name in all_mods:
         module_cfg = configuration.get_config_section(cfg, module_name)
         version = utils.get_module_version(root, area, module_name, module_cfg.get('version'))
-
         coords = coordinates.create(root, area, module_name, version)
         modules.append(module.Module(coords, module_cfg, mirror))
 
@@ -46,10 +49,12 @@ def get_modules(args, gen_cfg, area):
 
 
 def convert_one_module(mod, cfg, mirror_root):
-    """
-    :param mod: module (object) to convert
-    :param cfg: parsed modules configuration
-    :param mirror_root: base bath for converted files
+    """Convert files in one module.
+
+    Args:
+        mod: module (object) to convert
+        cfg: parsed module configuration
+        mirror_root: base bath for converted files
     """
     log.info('Preparing conversion of module %s', mod)
     mod_config = configuration.get_config_section(cfg, mod.coords.module)
@@ -94,7 +99,7 @@ if __name__ == '__main__':
     mirror_root = gen_cfg.get('general', 'mirror_root')
 
     try:
-        modules = get_modules(args, gen_cfg, area)
+        modules = get_modules(args, gen_cfg, cfg, area)
     except ValueError as e:
         log.fatal('Failed to load modules: %s', e)
         sys.exit()
