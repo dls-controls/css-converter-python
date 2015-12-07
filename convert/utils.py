@@ -20,6 +20,11 @@ EXPECTED_DIR_IN_MODULE = ('bin', 'configure', 'data', 'db', 'etc')
 class ConfigError(Exception):
     pass
 
+VERSION_NUMBER_PATTERNS = [
+        re.compile(r"(dls)[0-9]+[_\-\.][0-9]+.*"),# dls4-21beta
+        re.compile(r"[0-9]+[_\-\.][0-9]+.*")     # 4-21beta
+    ]
+
 
 def find_modules(filepath):
     """ Find all modules in the given filepath.
@@ -202,6 +207,23 @@ def find_module_from_path(filepath, top_dir=EPICS_ROOT):
     return test_path
 
 
+def is_version_number(candidate):
+    """ Relatively crude pattern match of version numbers
+
+    :param candidate: string to test as a possible version number
+    :return: True if candidate is a version number
+    """
+    has_match = False
+    # These are patterns that return a name from a filename
+    for pattern in VERSION_NUMBER_PATTERNS:
+        match = pattern.match(candidate)
+        if match:
+            has_match = True
+            break
+
+    return has_match
+
+
 def parse_module_name(filepath):
     """
     Return (module_path, module_name, version, relative_path)
@@ -227,7 +249,7 @@ def parse_module_name(filepath):
         if p == '':
             continue
         # Test for whether string represents a version.
-        if p[0].isdigit() or p == 'Rx-y':
+        if is_version_number(p) or p == 'Rx-y':
             version = p
             v = i
     if v is None:
