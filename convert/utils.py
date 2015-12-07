@@ -22,7 +22,8 @@ class ConfigError(Exception):
 
 VERSION_NUMBER_PATTERNS = [
         re.compile(r"(dls)[0-9]+[_\-\.][0-9]+.*"),# dls4-21beta
-        re.compile(r"[0-9]+[_\-\.][0-9]+.*")     # 4-21beta
+        re.compile(r"[0-9]+[_\-\.][0-9]+.*"),    # 4-21beta
+        re.compile(r"[0-9]+[_\-\.](Run)[0-9]+.*") # 2015-Run2-4 (support/pgmNextGen_EPICS)
     ]
 
 
