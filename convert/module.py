@@ -31,6 +31,8 @@ class Module(object):
         self.coords = coords
         self.edl_dir = cfg_dict['edl_dir']
         self.opi_dir = cfg_dict['opi_dir']
+        # Relative paths within self.opi_dir
+        self.path_dirs = cfg_dict['path_dirs']
         self.extra_deps = cfg_dict['extra_deps']
         self.layers = cfg_dict['layers']
         self.groups = cfg_dict['groups']
@@ -38,6 +40,8 @@ class Module(object):
         # Used for locating a file in module and dependencies given
         # only its name.
         self.file_dict = {}
+        # Used for locating an executable given only its name.
+        self.path_dict = {}
 
         if increment_version:
             self.new_version = utils.increment_version(coords.version)
@@ -64,6 +68,13 @@ class Module(object):
         """
         dp = dependency.DependencyParser(self.coords, self.extra_deps)
         return dp.find_dependencies()
+
+    def get_path_dirs(self):
+        """
+        Returns:
+            List of paths relative to self.opi_dir
+        """
+        return self.path_dirs
 
     def get_opi_path(self):
         """
@@ -153,6 +164,8 @@ class Module(object):
                 if files.convert_edl(source, target):
                     paths.update_opi_file(target, depth, self.file_dict,
                                           self.coords.module, use_rel=False)
+                    paths.update_opi_file(target, depth, self.path_dict,
+                                          self.coords.module, use_rel=True)
                     if self.is_layer_file(source):
                         layers.parse(target)
                     if self.is_group_file(source):

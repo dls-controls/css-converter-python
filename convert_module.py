@@ -48,6 +48,30 @@ def get_modules(args, gen_cfg, cfg, area):
     return modules
 
 
+def file_dict_to_path_dict(file_dict, path_dirs):
+    """Create a dict for locating executables originally on EDM path.
+
+    Because the EDM path variable is treated differently to EDMDATAFILES,
+    this dict needs the filename as the key.
+
+    Args:
+        file_dict: used for indexing opi files
+        path_dirs: a list of dirs on EDM path relative to opi dir
+
+    Returns:
+        path_dict: filename: (module, path-relative-to-opi-dir)
+    """
+    path_dict = {}
+    for old_key, old_value in file_dict.items():
+        for path in path_dirs:
+            path = path.strip(os.path.sep)
+            if old_key.startswith(path):
+                module, _ = old_value
+                new_key = os.path.relpath(old_key, path)
+                path_dict[new_key] = (module, path)
+    return path_dict
+
+
 def convert_one_module(mod, cfg, mirror_root):
     """Convert files in one module.
 
@@ -63,6 +87,7 @@ def convert_one_module(mod, cfg, mirror_root):
     if configuration.has_opis(mod_config):
         dependencies = mod.get_dependencies()
         edl_dirs = [mod.get_edl_path()]
+        path_dirs = mod.get_path_dirs()
         for dep, dep_coords in dependencies.items():
             dep_cfg = configuration.get_config_section(cfg, dep)
             new_version = utils.increment_version(dep_coords.version)
@@ -71,9 +96,17 @@ def convert_one_module(mod, cfg, mirror_root):
                                     new_version,
                                     dep_cfg['edl_dir'])
             edl_dirs.append(dep_edl_path)
+            for p in dep_cfg['path_dirs']:
+                dep_path = os.path.join(mirror_root,
+                                        coordinates.as_path(dep_coords, False)[1:],
+                                        new_version,
+                                        p)
+                path_dirs.append(dep_path)
             extra_depends.append(dep_cfg.get('extra_deps', []))
 
         mod.file_dict = paths.index_paths(edl_dirs, True)
+        # path_dict is a reshaped subset of file_dict
+        mod.path_dict = file_dict_to_path_dict(mod.file_dict, path_dirs)
         try:
             mod.convert(args.force)
 
