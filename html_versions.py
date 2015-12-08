@@ -1,3 +1,4 @@
+#!/usr/bin/env dls-python
 """
 Inspired by Tom's /dls/cs-www/reports/scripts/list_ioc_support_modules.py
 """
