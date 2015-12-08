@@ -227,8 +227,8 @@ def render(mod_details):
     max_deps = max(len(details.deps) for details in mod_details)
     # Sort by module name
     sorted_details = sorted(mod_details, key=lambda md: md.name)
-    # Script name as module i.e. no trailing .py
-    script_name = __file__.split('.')[0]
+    # Use script name as module i.e. no trailing .py
+    script_name = os.path.split(__file__)[-1].split('.')[0]
     env = jinja2.Environment(loader=jinja2.PackageLoader(script_name,
                                                          RESOURCES_DIR))
     template = env.get_template(HTML_TEMPLATE)
