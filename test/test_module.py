@@ -22,9 +22,11 @@ class ModuleTest(unittest.TestCase):
         self.mirror_root = '/tmp/mirror'
         self.dummy_cfg = {'edl_dir': self.edl_path,
                           'opi_dir': self.opi_path,
+                          'path_dirs': [],
                           'extra_deps': [],
                           'groups': [],
-                          'layers': []}
+                          'layers': [],
+                          'has_opi': True}
 
         # Avoid checking that the directory exists
         with mock.patch('os.path.exists') as mp:
