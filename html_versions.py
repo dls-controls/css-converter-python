@@ -15,6 +15,7 @@ from convert import spoof
 from convert import utils
 
 import os
+import collections
 import subprocess
 import ConfigParser
 import logging as log
@@ -124,9 +125,11 @@ def handle_one_module(module_cfg, module_name, launcher_version, cfg_ioc_version
     log.debug('Dependencies of {} plus {}'.format(vcoords, extra_deps))
     dp = dependency.DependencyParser(vcoords, extra_deps)
     deps = dp.find_dependencies()
-    version_deps = {}
     log.debug('{}: {}, {}'.format(module_name, latest_release, config_version))
-    for dep_coord in deps.values():
+
+    # Sort dependencies by module name so that they render in order.
+    version_deps = collections.OrderedDict()
+    for dep_coord in sorted(deps.values(), key=lambda d: d.module):
         # find versions here too.
         dep_latest, dep_cfg = get_versions(module_cfg, dep_coord)
         dep_requested = dep_coord.version
