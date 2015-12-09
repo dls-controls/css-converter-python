@@ -179,6 +179,7 @@ def get_config_section(cfg, name):
     opi_dir = name.split(os.sep)[-1] + 'App/opi/opi'
     cfg_section = {'edl_dir': 'data',
                    'opi_dir': opi_dir,
+                   'path_dirs': [],
                    'area': utils.AREA_SUPPORT,
                    'layers': [],
                    'groups': [],
@@ -190,7 +191,7 @@ def get_config_section(cfg, name):
     try:
         items = cfg.items(name)
         for key, value in items:
-            if key in ('layers', 'groups', 'symbols'):
+            if key in ('layers', 'groups', 'symbols', 'path_dirs'):
                 cfg_section[key] = split_value_list(value)
             elif key == 'extra_deps':
                 dependencies = split_value_list(value)

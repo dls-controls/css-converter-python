@@ -1,5 +1,4 @@
 #!/usr/bin/env dls-python
-import pkg_resources
 import build_runcss
 
 import os
@@ -13,12 +12,17 @@ LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
-def get_modules(args, gen_cfg, area):
-    """
-    :param args: conversion arguments (uses .all and .module)
-    :param module_cfg: configuration containing area
-    :param gen_cfg: configuration containing general/prod_root and general/mirror_root
-    :return: list of Modules
+def get_modules(args, gen_cfg, cfg, area):
+    """Return either one or all modules for specified area.
+
+    Args:
+        args: conversion arguments (uses .all and .module)
+        module_cfg: configuration containing area
+        gen_cfg: configuration containing general/prod_root and general/mirror_root
+        area: 'ioc' or 'support'
+
+    Returns:
+        list of Module objects
     """
     modules = []
 
@@ -38,18 +42,43 @@ def get_modules(args, gen_cfg, area):
     for module_name in all_mods:
         module_cfg = configuration.get_config_section(cfg, module_name)
         version = utils.get_module_version(root, area, module_name, module_cfg.get('version'))
-
         coords = coordinates.create(root, area, module_name, version)
         modules.append(module.Module(coords, module_cfg, mirror))
 
     return modules
 
 
-def convert_one_module(mod, cfg, mirror_root):
+def file_dict_to_path_dict(file_dict, path_dirs):
+    """Create a dict for locating executables originally on EDM path.
+
+    Because the EDM path variable is treated differently to EDMDATAFILES,
+    this dict needs the filename as the key.
+
+    Args:
+        file_dict: used for indexing opi files
+        path_dirs: a list of dirs on EDM path relative to opi dir
+
+    Returns:
+        path_dict: filename: (module, path-relative-to-opi-dir)
     """
-    :param mod: module (object) to convert
-    :param cfg: parsed modules configuration
-    :param mirror_root: base bath for converted files
+    path_dict = {}
+    for old_key, old_value in file_dict.items():
+        for path in path_dirs:
+            path = path.strip(os.path.sep)
+            if old_key.startswith(path):
+                module, _ = old_value
+                new_key = os.path.relpath(old_key, path)
+                path_dict[new_key] = (module, path)
+    return path_dict
+
+
+def convert_one_module(mod, cfg, mirror_root):
+    """Convert files in one module.
+
+    Args:
+        mod: module (object) to convert
+        cfg: parsed module configuration
+        mirror_root: base bath for converted files
     """
     log.info('Preparing conversion of module %s', mod)
     mod_config = configuration.get_config_section(cfg, mod.coords.module)
@@ -58,6 +87,7 @@ def convert_one_module(mod, cfg, mirror_root):
     if configuration.has_opis(mod_config):
         dependencies = mod.get_dependencies()
         edl_dirs = [mod.get_edl_path()]
+        path_dirs = mod.get_path_dirs()
         for dep, dep_coords in dependencies.items():
             dep_cfg = configuration.get_config_section(cfg, dep)
             new_version = utils.increment_version(dep_coords.version)
@@ -66,11 +96,19 @@ def convert_one_module(mod, cfg, mirror_root):
                                     new_version,
                                     dep_cfg['edl_dir'])
             edl_dirs.append(dep_edl_path)
+            for p in dep_cfg['path_dirs']:
+                dep_path = os.path.join(mirror_root,
+                                        coordinates.as_path(dep_coords, False)[1:],
+                                        new_version,
+                                        p)
+                path_dirs.append(dep_path)
             extra_depends.append(dep_cfg.get('extra_deps', []))
 
-        file_dict = paths.index_paths(edl_dirs, True)
+        mod.file_dict = paths.index_paths(edl_dirs, True)
+        # path_dict is a reshaped subset of file_dict
+        mod.path_dict = file_dict_to_path_dict(mod.file_dict, path_dirs)
         try:
-            mod.convert(file_dict, args.force)
+            mod.convert(args.force)
 
             new_version = utils.increment_version(mod.coords.version)
             build_runcss.gen_run_script(mod.coords,
@@ -94,7 +132,7 @@ if __name__ == '__main__':
     mirror_root = gen_cfg.get('general', 'mirror_root')
 
     try:
-        modules = get_modules(args, gen_cfg, area)
+        modules = get_modules(args, gen_cfg, cfg, area)
     except ValueError as e:
         log.fatal('Failed to load modules: %s', e)
         sys.exit()
