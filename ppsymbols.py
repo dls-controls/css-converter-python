@@ -39,8 +39,9 @@ def get_edl_dirs(mod):
         dep_cfg = configuration.get_config_section(all_cfg, dep)
 
         log.info("Dependency: %s", coordinates.as_path(dep_coords))
-        dep_edl_path = os.path.join(coordinates.as_path(dep_coords, False)[1:],
-                                    dep_coords.version,
+        dep_edl_path = os.path.join(mod.mirror_root,
+                                    coordinates.as_path(dep_coords, False)[1:],
+                                    utils.increment_version(dep_coords.version),
                                     dep_cfg['edl_dir'])
         edl_dirs.append(dep_edl_path)
     return edl_dirs

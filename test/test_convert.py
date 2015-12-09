@@ -15,13 +15,6 @@ class DepthTest(unittest.TestCase):
         c = Converter([test_dir], [], '/tmp', {})
         self.assertEqual(c._get_depth(test_dir), 3)
 
-    def test_depths_ops(self):
-        test_dir = '/home/ops/scripts/ops_edl/ResidualKick'
-        from convert import paths
-        paths.index_paths = mock.MagicMock()
-        c = Converter([test_dir], [], '/tmp', {})
-        self.assertEqual(c._get_depth(test_dir), 0)
-
     def test_depths_tmbf(self):
         '''
         1 from TMBF, 2 from opi/tmbf.

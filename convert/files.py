@@ -77,14 +77,22 @@ def convert_symbol(symbol_file, destinations):
 
 
 def is_old_edl(filename):
-    """
-    Check version of .edl file.  Versions < 3 need updating.
+    """Check if .edl file is older than version 4 of EDM.
+
+    Older versions need updating by EDM.
+
+    If no version is found, assume that it is a new-style edl file because
+    there are very few old-style files.  Typically files without versions are
+    partial or generated files.
     """
     with open(filename) as edm_file:
         for line in edm_file.readlines():
             if line.isspace() or line.strip().startswith('#'):
                 continue
-            return int(line.split()[0]) < 4
+            try:
+                return int(line.split()[0]) < 4
+            except ValueError:  # no version found
+                return False
 
 
 def update_edl(filename, in_place=False):
