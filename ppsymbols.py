@@ -189,15 +189,13 @@ if __name__ == '__main__':
         module_cfg = configuration.get_config_section(all_cfg, mod_name)
         area = module_cfg.get('area')
 
-        # shadow_path = os.path.join(mirror_root, prod_root[1:])
         coords = coordinates.create(prod_root, area, mod_name, version)
-        depth = len(os.path.split(rel_path))
+        depth = len(os.path.split(rel_path)) - 1
         try:
             mod = module.Module(coords, module_cfg, mirror_root, increment_version=False)
             edl_dirs = get_edl_dirs(mod)
 
             file_dict = paths.index_paths(edl_dirs, True)
-            update_symbols(opi_path, depth, file_dict,
-                        all_cfg, prod_root, mirror_root)
+            update_symbols(opi_path, depth, file_dict, all_cfg, prod_root, mirror_root)
         except ValueError as e:
             log.warn('Error updating symbols in %s: %s', mod_name, e)
