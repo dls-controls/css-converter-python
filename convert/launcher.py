@@ -14,7 +14,7 @@ LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
 SCRIPT_TEMPLATE = 'res/runcss.template'
 
 ESCAPE_CHARS = ['.', ':']
-
+DLS_CSS_ICON = 'css-diamond-logo.svg'
 
 def update_cmd(cmd, mirror_root, module_cfg):
     """
@@ -145,7 +145,8 @@ class LauncherXml(object):
             if cmd in cmd_dict:
                 new_cmd, new_args = cmd_dict[cmd]
                 node.set('command', new_cmd)
-                node.set('text', name + ' (CSS)')
+                node.set('icon', DLS_CSS_ICON)
+                node.set('text', name)
                 args_string = ' '.join(new_args)
                 node.set('args', '"{}"'.format(args_string))
         else:
