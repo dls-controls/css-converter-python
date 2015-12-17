@@ -2,7 +2,7 @@
 
 # Generated run script for cs-studio.
 
-prefix=$${CONVERTER_ROOT:-}
+prefix=$${CONVERTER_ROOT:-/dls_sw/work/common/CSS/shadow/}
 
 if [ -z "$$1" ]; then
     echo "No OPI specified to launch!"
