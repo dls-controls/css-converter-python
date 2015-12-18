@@ -173,8 +173,11 @@ def gen_run_script(coord, new_version=None, prefix="/",
             f.write(updated_content)
 
     # Give owner and group execute permissions.
-    st = os.stat(script_path)
-    os.chmod(script_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP)
+    try:
+        st = os.stat(script_path)
+        os.chmod(script_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP)
+    except OSError as e:
+        log.error("Failed to update file permissions for %s", script_path)
     log.info('Run script written to %s', script_path)
     return script_path
 
