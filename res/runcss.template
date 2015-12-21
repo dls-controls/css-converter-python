@@ -9,7 +9,7 @@ if [ -z "$$1" ]; then
     exit 1
 fi
 
-CSSTUDIO=/dls_sw/prod/tools/RHEL6-x86_64/cs-studio/dls-4-2-beta1/prefix/bin/cs-studio
+CSSTUDIO=$$(configure-ioc s -p CSS-beta-gui)
 
 PROJECT=${project}
 MODULE=${module}
