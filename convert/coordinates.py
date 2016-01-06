@@ -100,8 +100,8 @@ def as_path(coord, include_version=True):
 
 
 def update_version_from_files(coords, root):
-    """ If any of the dependencies in the list do not have a specific version
-        get the latest version and update the dependency with that version.
+    """ If any of the coordinates in the list do not have a specific version
+        get the latest version and update the coord with that version.
 
     Args:
         deps: list of rootless coordinates, some of which may have None
