@@ -33,7 +33,14 @@ class Module(object):
         self.opi_dir = cfg_dict['opi_dir']
         # Relative paths within self.opi_dir
         self.path_dirs = cfg_dict['path_dirs']
-        self.extra_deps = cfg_dict['extra_deps']
+        self.extra_deps = []
+        for d in cfg_dict['extra_deps']:
+            if d.version is None:
+                latest_version = utils.get_latest_version(os.path.join(self.coords.root, d.area, d.module))
+                self.extra_deps.append(coordinates.ModCoord(self.coords.root, d.area, d.module, latest_version))
+            else:
+                self.extra_deps.append(d)
+        print('module.py: extra_deps {}'.format(self.extra_deps))
         self.layers = cfg_dict['layers']
         self.groups = cfg_dict['groups']
         self.mirror_root = mirror_root

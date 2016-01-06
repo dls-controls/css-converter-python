@@ -150,6 +150,7 @@ def gen_run_script(coord, new_version=None, prefix="/",
     if config is not None:
         cfg_section = configuration.get_config_section(config, coord.module)
         extra_depends = cfg_section.get('extra_deps', [])
+        extra_depends = utils.update_dependency_versions(extra_depends, coord.root)
     if extra_depends is None:
         extra_depends = []
 
