@@ -103,8 +103,9 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
             checkout_module(new_coords.module, new_version, new_path,
                             mirror_root, configuration.is_git(dep_cfg))
 
+            extra_deps = coordinates.update_version_from_files( dep_cfg.get('extra_deps'), coords.root)
             configuration.create_module_ini_file(new_coords, mirror_root,
-                    dep_cfg.get('opi_dir'), dep_cfg.get('extra_deps'), force)
+                    dep_cfg.get('opi_dir'), extra_deps, force)
 
         except ValueError:
             log.warn('Cannot handle coordinates %s', mcoords)
@@ -135,10 +136,11 @@ if __name__ == '__main__':
         version = utils.get_module_version(prod_root, area, mod, module_cfg.get('version'))
         coords = coordinates.create(prod_root, area, mod, version)
 
+        versioned_deps = coordinates.update_version_from_files(module_cfg.get('extra_deps', []),
+                                                               prod_root)
+
         mod_path = coordinates.as_path(coords)
         if os.path.exists(mod_path):
-            checkout_coords(coords, mirror_root, get_depends,
-                            module_cfg.get('extra_deps', []),
-                            args.force)
+            checkout_coords(coords, mirror_root, get_depends, versioned_deps, args.force)
         else:
             log.error("Module doesn't exist: {}".format(mod_path))

@@ -97,3 +97,24 @@ def as_path(coord, include_version=True):
         path = os.path.join(coord.root, coord.area, coord.module, coord.version)
 
     return path
+
+
+def update_version_from_files(coords, root):
+    """ If any of the coordinates in the list do not have a specific version
+        get the latest version and update the coord with that version.
+
+    Args:
+        deps: list of rootless coordinates, some of which may have None
+              as a version
+        root: filesystem root in which to look for versions
+    """
+    updated_coords = []
+    for coord in coords:
+        if coord.version is None:
+            latest_version = utils.get_latest_version(os.path.join(root, coord.area, coord.module))
+            updated_dep = update_version(coord, latest_version)
+            updated_coords.append(updated_dep)
+        else:
+            updated_coords.append(coord)
+
+    return updated_coords
