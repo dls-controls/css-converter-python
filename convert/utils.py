@@ -105,8 +105,12 @@ def get_latest_version(filepath):
             5-4-2 > 5-2-8
             5-4dls2 > 5-4dls1
 
-    :param filepath: Module path to search
-    :return: Largest version number
+    Args:
+        filepath: Module path to search
+    Returns:
+        Largest version number
+    Raises:
+        ValueError if no versions are found in filepath
     """
     all_parts = []
     for root, dirs, _ in os.walk(filepath):

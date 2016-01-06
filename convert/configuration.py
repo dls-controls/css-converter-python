@@ -119,8 +119,11 @@ def parse_configuration(filepath):
 def split_value_list(value):
     """ Split a list of ';' separated strings into a list.
         Empty elements are removed.
-    :param value: Formatted string list of values
-    :return: List of string values
+
+    Args:
+        value: Formatted string list of values
+    Returns:
+        List of string values
     """
     return filter(None, [val.strip() for val in value.split(';')])
 
@@ -163,8 +166,10 @@ def parse_dependency_list(dependencies, cfg):
 def is_git(cfg):
     """ Is the source in Git or SVN?
 
-    :param cfg: Configuration dictionary to examine
-    :return: True if VCS is specified as Git
+    Args:
+        cfg: Configuration dictionary to examine
+    Returns:
+        True if VCS is specified as Git
     """
     return cfg.get('vcs', VCS_SVN).lower() == VCS_GIT
 
@@ -172,8 +177,11 @@ def is_git(cfg):
 def has_opis(cfg):
     """ Does the module have OPIs
         If not, the version number should not be updated, runcss dropped etc..
-    :param cfg: Configuration dictionary to examine
-    :return: True if module contains OPIs
+
+    Args:
+        cfg: Configuration dictionary to examine
+    Returns:
+        True if module contains OPIs
     """
     return cfg.get('has_opi')
 
