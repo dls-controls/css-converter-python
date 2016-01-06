@@ -131,10 +131,12 @@ if __name__ == '__main__':
 
     for mod in all_mods:
         module_cfg = configuration.get_config_section(cfg, mod)
-        versioned_deps = utils.update_dependency_versions(module_cfg.get('extra_deps', []), prod_root)
 
         version = utils.get_module_version(prod_root, area, mod, module_cfg.get('version'))
         coords = coordinates.create(prod_root, area, mod, version)
+
+        versioned_deps = coordinates.update_version_from_files(module_cfg.get('extra_deps', []),
+                                                               prod_root)
 
         mod_path = coordinates.as_path(coords)
         if os.path.exists(mod_path):

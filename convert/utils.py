@@ -4,9 +4,6 @@ import stat
 import logging as log
 import string
 
-import coordinates
-
-
 EPICS_ROOT = '/dls_sw/prod/R3.14.12.3'
 AREA_IOC = 'ioc'
 AREA_SUPPORT = 'support'
@@ -125,29 +122,6 @@ def get_latest_version(filepath):
         raise ValueError('No version found in %s' % filepath)
 
     return version_string
-
-
-def update_dependency_versions(deps, root):
-    """ If any of the dependencies in the list do not have a specific version
-        get the latest version and update the dependency with that version.
-
-    Args:
-        deps: list of rootless coordinates, some of which may have None
-              as a version
-        root: filesystem root in which to look for versions
-    """
-    updated_deps = []
-    for dep in deps:
-        if dep.version is None:
-            print('To update: {}'.format(dep))
-            latest_version = get_latest_version(os.path.join(root, dep.area, dep.module))
-            updated_dep = coordinates.ModCoord(dep.root, dep.area,
-                                               dep.module, latest_version)
-            updated_deps.append(updated_dep)
-        else:
-            updated_deps.append(dep)
-
-    return updated_deps
 
 
 def parse_version(version_string):
