@@ -111,7 +111,6 @@ def update_version_from_files(coords, root):
     updated_coords = []
     for coord in coords:
         if coord.version is None:
-            print('To update: {}'.format(coord))
             latest_version = utils.get_latest_version(os.path.join(root, coord.area, coord.module))
             updated_dep = update_version(coord, latest_version)
             updated_coords.append(updated_dep)
