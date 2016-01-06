@@ -133,17 +133,22 @@ def parse_dependency_list(dependencies, cfg):
         include root path information.
 
         Area is set to 'support' if no information can be found in the config
-        file for dependency module, of config argument is None.
+        file for dependency module, or config argument is None.
 
-    :param dependencies: List of dependency strings (module/version)
-    :param cfg: Converter modules config data (may be None)
-    :return: List of root-less coordinates (area,module,version)
+    Args:
+        dependencies: List of dependency strings (module or module:version)
+        cfg: Converter modules config data (may be None)
+        List of root-less coordinates (area,module,version)
     """
     deps = []
     for dep in dependencies:
-        module, version = os.path.split(dep)
-        area = utils.AREA_SUPPORT
+        if ':' in dep:
+            module, version = dep.split(':')
+        else:
+            module = dep
+            version = None
 
+        area = utils.AREA_SUPPORT
         if cfg is not None:
             try:
                 area = cfg.get(module, 'area')
