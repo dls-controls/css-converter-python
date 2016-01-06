@@ -140,7 +140,6 @@ if __name__ == '__main__':
 
         mod_path = coordinates.as_path(coords)
         if os.path.exists(mod_path):
-            checkout_coords(coords, mirror_root, get_depends,
-                            versioned_deps, args.force)
+            checkout_coords(coords, mirror_root, get_depends, versioned_deps, args.force)
         else:
             log.error("Module doesn't exist: {}".format(mod_path))
