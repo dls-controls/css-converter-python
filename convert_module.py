@@ -103,7 +103,7 @@ def convert_one_module(mod, cfg, mirror_root):
                                         p)
                 path_dirs.append(dep_path)
             mod_deps = dep_cfg.get('extra_deps', [])
-            updated_mod_deps = utils.update_dependency_versions(mod_deps, mod.coords.root)
+            updated_mod_deps = coordinates.update_version_from_files(mod_deps, mod.coords.root)
             extra_depends.append(updated_mod_deps)
 
         mod.file_dict = paths.index_paths(edl_dirs, True)
