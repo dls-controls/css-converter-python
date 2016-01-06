@@ -103,8 +103,9 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
             checkout_module(new_coords.module, new_version, new_path,
                             mirror_root, configuration.is_git(dep_cfg))
 
+            extra_deps = coordinates.update_version_from_files( dep_cfg.get('extra_deps'), coords.root)
             configuration.create_module_ini_file(new_coords, mirror_root,
-                    dep_cfg.get('opi_dir'), dep_cfg.get('extra_deps'), force)
+                    dep_cfg.get('opi_dir'), extra_deps, force)
 
         except ValueError:
             log.warn('Cannot handle coordinates %s', mcoords)
