@@ -65,7 +65,8 @@ class DependencyParser(object):
                 for acoord in self._additional:
                     log.info("Additional dependency %s/%s", acoord.module, acoord.version)
                     dependencies[acoord.module] = coordinates.update_root(acoord, self._root)
-        except (dls_epicsparser.releaseparser.ParseException, KeyError) as ex:
+
+        except (dls_epicsparser.releaseparser.ParseException, KeyError, AssertionError) as ex:
             log.error("Failed to parse RELEASE for %s: %s", cr_path, ex.message)
 
             if cr_path not in KNOWN_PARSE_ISSUES:
