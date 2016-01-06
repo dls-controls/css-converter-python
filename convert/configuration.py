@@ -138,6 +138,7 @@ def parse_dependency_list(dependencies, cfg):
     Args:
         dependencies: List of dependency strings (module or module:version)
         cfg: Converter modules config data (may be None)
+    Returns:
         List of root-less coordinates (area,module,version)
     """
     deps = []
