@@ -17,9 +17,13 @@ KNOWN_PARSE_ISSUES = [
     "/dls_sw/prod/R3.14.12.3/ioc/BL24I/BL/3-1/configure/RELEASE",
     "/dls_sw/prod/R3.14.12.3/support/ADBinaries/2-2dls2/configure/RELEASE", #EPICS_HOST_ARCH
     "/dls_sw/prod/R3.14.12.3/support/adUtil/2-0/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/adUtil/2-4/configure/RELEASE",
     "/dls_sw/prod/R3.14.12.3/support/aravisGigE/2-0/configure/RELEASE",
     "/dls_sw/prod/R3.14.12.3/support/ffmpegServer/3-0dls0-1/configure/RELEASE",
-    "/dls_sw/prod/R3.14.12.3/support/ADCore/2-2dls3/configure/RELEASE"]
+    "/dls_sw/prod/R3.14.12.3/support/ADPilatus/2-1dls5/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/ADCore/2-2dls3/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/ADCore/2-3dls4/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/dxp/3-5dls2/configure/RELEASE"]
 
 
 class DependencyParser(object):
