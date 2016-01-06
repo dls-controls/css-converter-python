@@ -17,9 +17,13 @@ KNOWN_PARSE_ISSUES = [
     "/dls_sw/prod/R3.14.12.3/ioc/BL24I/BL/3-1/configure/RELEASE",
     "/dls_sw/prod/R3.14.12.3/support/ADBinaries/2-2dls2/configure/RELEASE", #EPICS_HOST_ARCH
     "/dls_sw/prod/R3.14.12.3/support/adUtil/2-0/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/adUtil/2-4/configure/RELEASE",
     "/dls_sw/prod/R3.14.12.3/support/aravisGigE/2-0/configure/RELEASE",
     "/dls_sw/prod/R3.14.12.3/support/ffmpegServer/3-0dls0-1/configure/RELEASE",
-    "/dls_sw/prod/R3.14.12.3/support/ADCore/2-2dls3/configure/RELEASE"]
+    "/dls_sw/prod/R3.14.12.3/support/ADPilatus/2-1dls5/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/ADCore/2-2dls3/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/ADCore/2-3dls4/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/dxp/3-5dls2/configure/RELEASE"]
 
 
 class DependencyParser(object):
@@ -65,7 +69,8 @@ class DependencyParser(object):
                 for acoord in self._additional:
                     log.info("Additional dependency %s/%s", acoord.module, acoord.version)
                     dependencies[acoord.module] = coordinates.update_root(acoord, self._root)
-        except (dls_epicsparser.releaseparser.ParseException, KeyError) as ex:
+
+        except (dls_epicsparser.releaseparser.ParseException, KeyError, AssertionError) as ex:
             log.error("Failed to parse RELEASE for %s: %s", cr_path, ex.message)
 
             if cr_path not in KNOWN_PARSE_ISSUES:
