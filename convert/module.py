@@ -20,7 +20,7 @@ OPI_EXTENSION = 'opi'
 class Module(object):
     """Object representing one IOC or support module."""
 
-    def __init__(self, coords, cfg_dict, mirror_root, increment_version=True):
+    def __init__(self, coords, module_cfg, mirror_root, increment_version=True):
         """
 
         Args:
@@ -29,13 +29,13 @@ class Module(object):
             mirror_root: root of target filesystem
         """
         self.coords = coords
-        self.edl_dir = cfg_dict['edl_dir']
-        self.opi_dir = cfg_dict['opi_dir']
+        self.edl_dir = module_cfg.edl_dir
+        self.opi_dir = module_cfg.opi_dir
         # Relative paths within self.opi_dir
-        self.path_dirs = cfg_dict['path_dirs']
-        self.extra_deps = coordinates.update_version_from_files(cfg_dict['extra_deps'], self.coords.root)
-        self.layers = cfg_dict['layers']
-        self.groups = cfg_dict['groups']
+        self.path_dirs = module_cfg.path_dirs
+        self.extra_deps = coordinates.update_version_from_files(module_cfg.extra_deps, self.coords.root)
+        self.layers = module_cfg.layers
+        self.groups = module_cfg.groups
         self.mirror_root = mirror_root
         # Used for locating a file in module and dependencies given
         # only its name.
@@ -54,7 +54,7 @@ class Module(object):
         self.conversion_root = os.path.join(mirror_root, prod_path[1:],
                                             self.new_version)
 
-        if not os.path.exists(self.conversion_root) and cfg_dict['has_opi']:
+        if not os.path.exists(self.conversion_root) and module_cfg.has_opi:
             err_msg = 'Module to be converted does not exist: {}'
             raise ValueError(err_msg.format(self.conversion_root))
 

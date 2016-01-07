@@ -12,7 +12,7 @@ LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
-def get_modules(args, gen_cfg, cfg, area):
+def get_modules(args, gen_cfg, area):
     """Return either one or all modules for specified area.
 
     Args:
@@ -26,8 +26,8 @@ def get_modules(args, gen_cfg, cfg, area):
     """
     modules = []
 
-    root = gen_cfg.get('general', 'prod_root')
-    mirror = gen_cfg.get('general', 'mirror_root')
+    root = gen_cfg.prod_root
+    mirror = gen_cfg.mirror_root
 
     if args.all:
         mirror_root_dir = os.path.join(mirror, root[1:])
@@ -40,8 +40,8 @@ def get_modules(args, gen_cfg, cfg, area):
         all_mods = [args.module]
 
     for module_name in all_mods:
-        module_cfg = configuration.get_config_section(cfg, module_name)
-        version = utils.get_module_version(root, area, module_name, module_cfg.get('version'))
+        module_cfg = gen_cfg.get_mod_cfg(module_name)
+        version = utils.get_module_version(root, area, module_name, module_cfg.version)
         coords = coordinates.create(root, area, module_name, version)
         modules.append(module.Module(coords, module_cfg, mirror))
 
@@ -72,37 +72,36 @@ def file_dict_to_path_dict(file_dict, path_dirs):
     return path_dict
 
 
-def convert_one_module(mod, cfg, mirror_root):
+def convert_one_module(mod, gen_cfg):
     """Convert files in one module.
 
     Args:
         mod: module (object) to convert
         cfg: parsed module configuration
-        mirror_root: base bath for converted files
     """
     log.info('Preparing conversion of module %s', mod)
-    mod_config = configuration.get_config_section(cfg, mod.coords.module)
+    mod_cfg = gen_cfg.get_mod_cfg(mod.coords.module)
     extra_depends = []
 
-    if configuration.has_opis(mod_config):
+    if mod_cfg.has_opi:
         dependencies = mod.get_dependencies()
         edl_dirs = [mod.get_edl_path()]
         path_dirs = mod.get_path_dirs()
         for dep, dep_coords in dependencies.items():
-            dep_cfg = configuration.get_config_section(cfg, dep)
+            dep_cfg = gen_cfg.get_mod_cfg(dep)
             new_version = utils.increment_version(dep_coords.version)
-            dep_edl_path = os.path.join(mirror_root,
+            dep_edl_path = os.path.join(gen_cfg.mirror_root,
                                     coordinates.as_path(dep_coords, False)[1:],
                                     new_version,
-                                    dep_cfg['edl_dir'])
+                                    dep_cfg.edl_dir)
             edl_dirs.append(dep_edl_path)
-            for p in dep_cfg['path_dirs']:
-                dep_path = os.path.join(mirror_root,
+            for p in dep_cfg.path_dirs:
+                dep_path = os.path.join(gen_cfg.mirror_root,
                                         coordinates.as_path(dep_coords, False)[1:],
                                         new_version,
                                         p)
                 path_dirs.append(dep_path)
-            mod_deps = dep_cfg.get('extra_deps', [])
+            mod_deps = dep_cfg.extra_deps
             updated_mod_deps = coordinates.update_version_from_files(mod_deps, mod.coords.root)
             extra_depends.append(updated_mod_deps)
 
@@ -112,8 +111,8 @@ def convert_one_module(mod, cfg, mirror_root):
         try:
             mod.convert(args.force)
             new_version = utils.increment_version(mod.coords.version)
-            run_script.generate(mod.coords, new_version, prefix=mirror_root,
-                                opi_dir=mod.get_opi_path(), config=cfg,
+            run_script.generate(mod.coords, new_version, prefix=gen_cfg.mirror_root,
+                                opi_dir=mod.get_opi_path(), config=gen_cfg,
                                 extra_depends=extra_depends)
         except ValueError as e:
             log.warn('Conversion of %s failed:', mod)
@@ -124,20 +123,19 @@ def convert_one_module(mod, cfg, mirror_root):
 
 if __name__ == '__main__':
     args = arguments.parse_arguments()
-    gen_cfg = configuration.parse_configuration(args.general_config)
-    cfg = configuration.parse_configuration(args.module_config)
+    gen_cfg = configuration.GeneralConfig(args.general_config, args.module_config)
     area = utils.AREA_IOC if args.ioc else utils.AREA_SUPPORT
-    mirror_root = gen_cfg.get('general', 'mirror_root')
+    mirror_root = gen_cfg.mirror_root
 
     try:
-        modules = get_modules(args, gen_cfg, cfg, area)
+        modules = get_modules(args, gen_cfg, area)
     except ValueError as e:
         log.fatal('Failed to load modules: %s', e)
         sys.exit()
 
     try:
         for mod in modules:
-            convert_one_module(mod, cfg, mirror_root)
+            convert_one_module(mod, gen_cfg)
     except utils.ConfigError as e:
         log.fatal('Incorrect configuration: %s', e)
         log.fatal('System will exit.')

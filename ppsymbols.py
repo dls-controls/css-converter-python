@@ -26,23 +26,26 @@ import xml.etree.ElementTree as et
 SYMBOL_ID = 'org.csstudio.opibuilder.widgets.edm.symbolwidget'
 
 
-def get_edl_dirs(mod):
-    """ Find list of edl data files in all dependencies for the passed module
+def get_edl_dirs(mod, gen_cfg):
+    """ Find list of edl directories in all dependencies for the passed module
 
-    :param mod: Module to search
-    :return:
+    Args:
+        mod: Module to search
+        gen_cfg: GeneralConfig object
+    Returns:
+        list of all directories containing edl files.
     """
     log.info("Fetching dependencies for %s", coordinates.as_path(mod.coords))
     dependencies = mod.get_dependencies()
     edl_dirs = [mod.get_edl_path()]
     for dep, dep_coords in dependencies.items():
-        dep_cfg = configuration.get_config_section(all_cfg, dep)
+        dep_cfg = gen_cfg.get_mod_cfg(dep)
 
         log.info("Dependency: %s", coordinates.as_path(dep_coords))
         dep_edl_path = os.path.join(mod.mirror_root,
                                     coordinates.as_path(dep_coords, False)[1:],
                                     utils.increment_version(dep_coords.version),
-                                    dep_cfg['edl_dir'])
+                                    dep_cfg.edl_dir)
         edl_dirs.append(dep_edl_path)
     return edl_dirs
 
@@ -84,8 +87,7 @@ def edit_symbol_node(node, filename):
     node.remove(node.find('opi_file'))
 
 
-def update_symbols(filename, depth, file_dict, all_cfg, prod_root, mirror_root):
-
+def update_symbols(filename, depth, file_dict, gen_cfg):
     symbol_files = {}
     log.info('Updating symbols in %s depth %s', filename, depth)
     tree = et.parse(filename)
@@ -100,8 +102,9 @@ def update_symbols(filename, depth, file_dict, all_cfg, prod_root, mirror_root):
         if (symbol_file, smodule) in symbol_files:
             png_file = symbol_files[(symbol_file, smodule)]
         else:
-            png_file = process_symbol(symbol_file, smodule, all_cfg,
-                                      prod_root, mirror_root)
+            mod_cfg = gen_cfg.get_mod_cfg(smodule)
+            png_file = process_symbol(symbol_file, smodule, mod_cfg,
+                                      gen_cfg.mirror_root, gen_cfg.prod_root)
             symbol_files[(symbol_file, smodule)] = png_file
             file_dict[png_file] = (smodule, '')
 
@@ -135,7 +138,7 @@ def build_filelist(basepath):
     return symbol_files
 
 
-def process_symbol(name, mod, all_cfg, prod_root, mirror_root):
+def process_symbol(name, mod, mod_cfg, mirror_root, prod_root):
     """
     :param name:
     :param mod:
@@ -144,16 +147,15 @@ def process_symbol(name, mod, all_cfg, prod_root, mirror_root):
     :param mirror_root:
     :return: PNG filename if successful, None if any error occurred
     """
-    mod_cfg = configuration.get_config_section(all_cfg, mod)
 
-    area = mod_cfg['area']
+    area = mod_cfg.area
     working_path = os.path.join(mirror_root, prod_root[1:])
-    mod_version = utils.get_module_version(working_path, area, mod, mod_cfg.get('version'))
+    mod_version = utils.get_module_version(working_path, area, mod, mod_cfg.version)
     # version = utils.increment_version(version)
     log.debug("%s", working_path)
     log.warning("FOUND VERSION %s", mod_version)
-    edl_path = mod_cfg['edl_dir']
-    opi_path = mod_cfg['opi_dir']
+    edl_path = mod_cfg.edl_dir
+    opi_path = mod_cfg.opi_dir
 
     coords = coordinates.create(prod_root, area, mod, mod_version)
     mirror_path = os.path.join(mirror_root, coordinates.as_path(coords)[1:])
@@ -178,24 +180,21 @@ def process_symbol(name, mod, all_cfg, prod_root, mirror_root):
 
 
 if __name__ == '__main__':
-    all_cfg = configuration.parse_configuration('conf/modules.ini')
-    gen_cfg = configuration.parse_configuration('conf/converter.ini')
-    mirror_root = gen_cfg.get('general', 'mirror_root')
-    prod_root = gen_cfg.get('general', 'prod_root')
-    symbol_opis = build_filelist(mirror_root)
+    cfg = configuration.GeneralConfig()
+    symbol_opis = build_filelist(cfg.mirror_root)
 
     for opi_path in symbol_opis:
         _, mod_name, version, rel_path = utils.parse_module_name(opi_path)
-        module_cfg = configuration.get_config_section(all_cfg, mod_name)
-        area = module_cfg.get('area')
+        module_cfg = cfg.get_mod_cfg(mod_name)
+        area = module_cfg.area
 
-        coords = coordinates.create(prod_root, area, mod_name, version)
+        coords = coordinates.create(cfg.prod_root, area, mod_name, version)
         depth = len(os.path.split(rel_path)) - 1
         try:
-            mod = module.Module(coords, module_cfg, mirror_root, increment_version=False)
-            edl_dirs = get_edl_dirs(mod)
+            mod = module.Module(coords, module_cfg, cfg.mirror_root, increment_version=False)
+            edl_dirs = get_edl_dirs(mod, cfg)
 
             file_dict = paths.index_paths(edl_dirs, True)
-            update_symbols(opi_path, depth, file_dict, all_cfg, prod_root, mirror_root)
+            update_symbols(opi_path, depth, file_dict, cfg)
         except ValueError as e:
             log.warn('Error updating symbols in %s: %s', mod_name, e)
