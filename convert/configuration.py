@@ -17,6 +17,38 @@ MODULE_NAME = 'name'
 VCS_SVN = 'svn'
 VCS_GIT = 'git'
 
+
+class Struct(object):
+    def __init__(self, entries):
+        self.__dict__.update(entries)
+
+
+class GeneralConfig(object):
+
+    def __init__(self, gen_cfg_file=GEN_CONF, mod_cfg_file=MODULE_CONF):
+        self._gen_cfg_file = gen_cfg_file
+        self._mod_cfg_file = mod_cfg_file
+        self._module_cfgs = {}
+
+        # Add all items in the general configuration as attributes of this
+        # object.
+        gen_cfg_parser = parse_configuration(gen_cfg_file)
+        for section in gen_cfg_parser.sections():
+            cfg_dict = dict(gen_cfg_parser.items(section))
+            self.__dict__.update(cfg_dict)
+
+        # Each section of the module configuration becomes a struct in the
+        # self._module_cfgs dict.
+        mod_cfg_parser = parse_configuration(mod_cfg_file)
+        for section in mod_cfg_parser.sections():
+            mod_cfg_items = dict(mod_cfg_parser.items(section))
+            mod_cfg = Struct(mod_cfg_items)
+            self._module_cfgs[section] = mod_cfg
+
+    def get_mod_cfg(self, name):
+        return self._module_cfgs[name]
+
+
 def parse_module_config(base_path):
     """ Parse the module configuration file
 
