@@ -237,62 +237,6 @@ def parse_dependency_list(dependencies, cfg):
     return deps
 
 
-def is_git(cfg):
-    """ Is the source in Git or SVN?
-
-    Args:
-        cfg: Configuration dictionary to examine
-    Returns:
-        True if VCS is specified as Git
-    """
-    return cfg.get('vcs', VCS_SVN).lower() == VCS_GIT
-
-
-def has_opis(cfg):
-    """ Does the module have OPIs
-        If not, the version number should not be updated, runcss dropped etc..
-
-    Args:
-        cfg: Configuration dictionary to examine
-    Returns:
-        True if module contains OPIs
-    """
-    return cfg.get('has_opi')
-
-
-def get_config_section(cfg, name):
-    # In some cases, the new opi dir will be at moduleNameApp/opi/opi.
-    # In some of those cases, the IOC name may be prefix/moduleName
-    # e.g. CS/CS-RF-IOC-01 but the leading CS needs removing
-    opi_dir = name.split(os.sep)[-1] + 'App/opi/opi'
-    cfg_section = {'edl_dir': 'data',
-                   'opi_dir': opi_dir,
-                   'path_dirs': [],
-                   'area': utils.AREA_SUPPORT,
-                   'layers': [],
-                   'groups': [],
-                   'symbols': [],
-                   'extra_deps': [],
-                   'vcs': VCS_SVN,
-                   'has_opi': True,
-                   'version': None}
-    try:
-        items = cfg.items(name)
-        for key, value in items:
-            if key in ('layers', 'groups', 'symbols', 'path_dirs'):
-                cfg_section[key] = split_value_list(value)
-            elif key == 'extra_deps':
-                dependencies = split_value_list(value)
-                cfg_section[key] = parse_dependency_list(dependencies, cfg)
-            elif key == 'has_opi':
-                cfg_section[key] = cfg.getboolean(name, key)
-            else:
-                cfg_section[key] = value
-    except ConfigParser.NoSectionError:
-        pass
-    return cfg_section
-
-
 def dependency_list_to_string(coord_list):
     """ Convert a list of dependency coords (area, module, version) to
         a semicolon separated list of 'module/version' strings suitable for
@@ -334,9 +278,3 @@ def create_module_ini_file(coord, mirror_root, opi_location, extra_depends, forc
         # Writing our configuration file to 'example.cfg'
         with open(mod_ini_file, 'wb') as configfile:
             config.write(configfile)
-
-
-def get_configs():
-    gen_cfg = parse_configuration(GEN_CONF)
-    module_cfg = parse_configuration(MODULE_CONF)
-    return gen_cfg, module_cfg
