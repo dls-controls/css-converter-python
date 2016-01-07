@@ -55,6 +55,9 @@ class ModuleConfig(object):
             log.debug('Failed to find configuration for {}'.format(name))
         self.__dict__.update(cfg_section)
 
+    def is_git(self):
+        return self.vcs == VCS_GIT
+
 
 class GeneralConfig(object):
 

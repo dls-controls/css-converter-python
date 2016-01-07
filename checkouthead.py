@@ -100,7 +100,7 @@ def checkout_coords(coords, cfg, include_deps=True, extra_deps=None, force=False
                 shutil.rmtree(checkout_path)
 
             checkout_module(new_coords.module, new_version, new_path,
-                            cfg.mirror_root, dep_cfg.vcs == configuration.VCS_GIT)
+                            cfg.mirror_root, dep_cfg.is_git())
 
             extra_deps = coordinates.update_version_from_files(dep_cfg.extra_deps, coords.root)
             configuration.create_module_ini_file(new_coords, cfg.mirror_root,
