@@ -42,10 +42,10 @@ class ModuleConfig(object):
             items = config_parser.items(name)
             for key, value in items:
                 if key in ('layers', 'groups', 'symbols', 'path_dirs'):
-                    cfg_section[key] = split_value_list(value)
+                    cfg_section[key] = _split_value_list(value)
                 elif key == 'extra_deps':
-                    dependencies = split_value_list(value)
-                    cfg_section[key] = parse_dependency_list(dependencies,
+                    dependencies = _split_value_list(value)
+                    cfg_section[key] = _parse_dependency_list(dependencies,
                                                              config_parser)
                 elif key == 'has_opi':
                     cfg_section[key] = config_parser.getboolean(name, key)
@@ -82,7 +82,6 @@ class GeneralConfig(object):
         self._mod_cfg_parser = parse_configuration(mod_cfg_file)
         for section in self._mod_cfg_parser.sections():
             self._module_cfgs[section] = ModuleConfig(self._mod_cfg_parser, section)
-
 
     def get_mod_cfg(self, name):
         try:
@@ -160,9 +159,9 @@ def opi_depends(parser):
     depends = []
     try:
         depends_string = parser.get('general', 'opi-depends')
-        depends_list = split_value_list(depends_string)
+        depends_list = _split_value_list(depends_string)
         # assume all depends are 'support' not 'ioc'
-        depends = parse_dependency_list(depends_list, None)
+        depends = _parse_dependency_list(depends_list, None)
     except ConfigParser.NoSectionError:
         log.info("No opi-depends in module.ini file")
 
@@ -190,7 +189,7 @@ def parse_configuration(filepath):
     return config
 
 
-def split_value_list(value):
+def _split_value_list(value):
     """ Split a list of ';' separated strings into a list.
         Empty elements are removed.
 
@@ -202,7 +201,7 @@ def split_value_list(value):
     return filter(None, [val.strip() for val in value.split(';')])
 
 
-def parse_dependency_list(dependencies, cfg):
+def _parse_dependency_list(dependencies, cfg):
     """ Parse a list of dependencies, converting into list of
         'dependency tuples'.
 
@@ -237,7 +236,7 @@ def parse_dependency_list(dependencies, cfg):
     return deps
 
 
-def dependency_list_to_string(coord_list):
+def _dependency_list_to_string(coord_list):
     """ Convert a list of dependency coords (area, module, version) to
         a semicolon separated list of 'module/version' strings suitable for
         insertion into a module.ini file
@@ -266,7 +265,7 @@ def create_module_ini_file(coord, mirror_root, opi_location, extra_depends, forc
 
         dependencies = " ; Unable to lookup dependencies in configuration"
         if extra_depends is not None:
-            dependencies = dependency_list_to_string(extra_depends)
+            dependencies = _dependency_list_to_string(extra_depends)
 
         config = ConfigParser.ConfigParser()
         config.add_section(SEC_GENERAL)
