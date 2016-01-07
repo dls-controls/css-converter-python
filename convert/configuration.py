@@ -17,6 +17,66 @@ MODULE_NAME = 'name'
 VCS_SVN = 'svn'
 VCS_GIT = 'git'
 
+def _split_value_list(value):
+    """ Split a list of ';' separated strings into a list.
+        Empty elements are removed.
+
+    Args:
+        value: Formatted string list of values
+    Returns:
+        List of string values
+    """
+    return filter(None, [val.strip() for val in value.split(';')])
+
+
+def _parse_dependency_list(dependencies, cfg):
+    """ Parse a list of dependencies, converting into list of
+        'dependency tuples'.
+
+        Note: these are NOT coordinates as they do not
+        include root path information.
+
+        Area is set to 'support' if no information can be found in the config
+        file for dependency module, or config argument is None.
+
+    Args:
+        dependencies: List of dependency strings (module or module:version)
+        cfg: Converter modules config data (may be None)
+    Returns:
+        List of root-less coordinates (area,module,version)
+    """
+    deps = []
+    for dep in dependencies:
+        if ':' in dep:
+            module, version = dep.split(':')
+        else:
+            module = dep
+            version = None
+
+        area = utils.AREA_SUPPORT
+        if cfg is not None:
+            try:
+                area = cfg.get(module, 'area')
+            except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+                pass
+
+        deps.append(coordinates.create_rootless(area, module, version))
+    return deps
+
+
+def _dependency_list_to_string(coord_list):
+    """ Convert a list of dependency coords (area, module, version) to
+        a semicolon separated list of 'module/version' strings suitable for
+        insertion into a module.ini file
+
+        Note: list is NOT terminated by a ';'
+
+    :param coord_list: List to convert
+    :return: formatted string list
+    """
+    return ';'.join(
+        [os.sep.join((coord.module, coord.version)) for coord in coord_list])
+
 
 class ModuleConfig(object):
 
@@ -187,67 +247,6 @@ def parse_configuration(filepath):
     config = ConfigParser.ConfigParser()
     config.read(filepath)
     return config
-
-
-def _split_value_list(value):
-    """ Split a list of ';' separated strings into a list.
-        Empty elements are removed.
-
-    Args:
-        value: Formatted string list of values
-    Returns:
-        List of string values
-    """
-    return filter(None, [val.strip() for val in value.split(';')])
-
-
-def _parse_dependency_list(dependencies, cfg):
-    """ Parse a list of dependencies, converting into list of
-        'dependency tuples'.
-
-        Note: these are NOT coordinates as they do not
-        include root path information.
-
-        Area is set to 'support' if no information can be found in the config
-        file for dependency module, or config argument is None.
-
-    Args:
-        dependencies: List of dependency strings (module or module:version)
-        cfg: Converter modules config data (may be None)
-    Returns:
-        List of root-less coordinates (area,module,version)
-    """
-    deps = []
-    for dep in dependencies:
-        if ':' in dep:
-            module, version = dep.split(':')
-        else:
-            module = dep
-            version = None
-
-        area = utils.AREA_SUPPORT
-        if cfg is not None:
-            try:
-                area = cfg.get(module, 'area')
-            except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-                pass
-
-        deps.append(coordinates.create_rootless(area, module, version))
-    return deps
-
-
-def _dependency_list_to_string(coord_list):
-    """ Convert a list of dependency coords (area, module, version) to
-        a semicolon separated list of 'module/version' strings suitable for
-        insertion into a module.ini file
-
-        Note: list is NOT terminated by a ';'
-
-    :param coord_list: List to convert
-    :return: formatted string list
-    """
-    return ';'.join(
-        [os.sep.join((coord.module, coord.version)) for coord in coord_list])
 
 
 def create_module_ini_file(coord, mirror_root, opi_location, extra_depends, force):
