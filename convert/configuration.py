@@ -17,6 +17,28 @@ MODULE_NAME = 'name'
 VCS_SVN = 'svn'
 VCS_GIT = 'git'
 
+
+def _parse_configuration(filepath):
+    """ Open and parse a configuration file (*.ini)
+
+    Args:
+        filepath: File to open
+
+    Returns:
+        ConfigParser object
+
+    Raises:
+        ConfigError: when specified file does not exist
+    """
+
+    if not os.path.exists(filepath):
+        raise utils.ConfigError('Cannot find {}'.format(filepath))
+
+    config = ConfigParser.ConfigParser()
+    config.read(filepath)
+    return config
+
+
 def _split_value_list(value):
     """ Split a list of ';' separated strings into a list.
         Empty elements are removed.
@@ -128,7 +150,7 @@ class GeneralConfig(object):
 
         # Add all items in the general configuration as attributes of this
         # object.
-        gen_cfg_parser = parse_configuration(gen_cfg_file)
+        gen_cfg_parser = _parse_configuration(gen_cfg_file)
         for section in gen_cfg_parser.sections():
             cfg_dict = dict(gen_cfg_parser.items(section))
             self.__dict__.update(cfg_dict)
@@ -139,7 +161,7 @@ class GeneralConfig(object):
 
         # Each section of the module configuration becomes a struct in the
         # self._module_cfgs dict.
-        self._mod_cfg_parser = parse_configuration(mod_cfg_file)
+        self._mod_cfg_parser = _parse_configuration(mod_cfg_file)
         for section in self._mod_cfg_parser.sections():
             self._module_cfgs[section] = ModuleConfig(self._mod_cfg_parser, section)
 
@@ -164,7 +186,7 @@ def parse_module_config(base_path):
     """
     log.debug("Reading opiPath from %s", base_path)
     module_ini_path = os.path.join(base_path, MODULE_INI)
-    return parse_configuration(module_ini_path)
+    return _parse_configuration(module_ini_path)
 
 
 def module_name(parser):
@@ -227,26 +249,6 @@ def opi_depends(parser):
 
     return depends
 
-
-def parse_configuration(filepath):
-    """ Open and parse a configuration file (*.ini)
-
-    Args:
-        filepath: File to open
-
-    Returns:
-        ConfigParser object
-
-    Raises:
-        ConfigError: when specified file does not exist
-    """
-
-    if not os.path.exists(filepath):
-        raise utils.ConfigError('Cannot find {}'.format(filepath))
-
-    config = ConfigParser.ConfigParser()
-    config.read(filepath)
-    return config
 
 
 def create_module_ini_file(coord, mirror_root, opi_location, extra_depends, force):
