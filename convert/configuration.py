@@ -172,6 +172,11 @@ class GeneralConfig(object):
             return ModuleConfig(self._mod_cfg_parser, name)
 
 
+################################################################################
+# Functions below are for creating and reading module.ini for each module.
+################################################################################
+
+
 def parse_module_config(base_path):
     """ Parse the module configuration file
 
@@ -248,7 +253,6 @@ def opi_depends(parser):
         log.info("No opi-depends in module.ini file")
 
     return depends
-
 
 
 def create_module_ini_file(coord, mirror_root, opi_location, extra_depends, force):
