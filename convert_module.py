@@ -1,10 +1,10 @@
 #!/usr/bin/env dls-python
-import build_runcss
 
 import os
 import sys
 
-from convert import module, utils, coordinates, paths, arguments, configuration
+from convert import arguments, coordinates, configuration, module
+from convert import paths, run_script, utils
 
 import logging as log
 LOG_FORMAT = '%(levelname)s:%(pathname)s: %(message)s'
@@ -111,14 +111,10 @@ def convert_one_module(mod, cfg, mirror_root):
         mod.path_dict = file_dict_to_path_dict(mod.file_dict, path_dirs)
         try:
             mod.convert(args.force)
-
             new_version = utils.increment_version(mod.coords.version)
-            build_runcss.gen_run_script(mod.coords,
-                                        new_version,
-                                        prefix=mirror_root,
-                                        opi_dir=mod.get_opi_path(),
-                                        config=cfg,
-                                        extra_depends=extra_depends)
+            run_script.generate(mod.coords, new_version, prefix=mirror_root,
+                                opi_dir=mod.get_opi_path(), config=cfg,
+                                extra_depends=extra_depends)
         except ValueError as e:
             log.warn('Conversion of %s failed:', mod)
             log.warn('%s', e)
