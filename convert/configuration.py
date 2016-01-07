@@ -70,6 +70,10 @@ class GeneralConfig(object):
             cfg_dict = dict(gen_cfg_parser.items(section))
             self.__dict__.update(cfg_dict)
 
+        # Honour relative or absolute paths for converter output.
+        if not os.path.isabs(self.mirror_root):
+            self.mirror_root = os.path.join(os.getcwd(), self.mirror_root)
+
         # Each section of the module configuration becomes a struct in the
         # self._module_cfgs dict.
         self._mod_cfg_parser = parse_configuration(mod_cfg_file)
