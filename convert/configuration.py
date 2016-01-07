@@ -18,14 +18,9 @@ VCS_SVN = 'svn'
 VCS_GIT = 'git'
 
 
-class Struct(object):
-    def __init__(self, entries):
-        self.__dict__.update(entries)
+class ModuleConfig(object):
 
-
-class GeneralConfig(object):
-
-    DEFAULT_MOD_CFG = {'edl_dir': 'data',
+    DEFAULT_CFG = {'edl_dir': 'data',
                        'path_dirs': [],
                        'area': utils.AREA_SUPPORT,
                        'layers': [],
@@ -35,6 +30,33 @@ class GeneralConfig(object):
                        'vcs': VCS_SVN,
                        'has_opi': True,
                        'version': None}
+
+    def __init__(self, config_parser, name):
+        # In some cases, the new opi dir will be at moduleNameApp/opi/opi.
+        # In some of those cases, the IOC name may be prefix/moduleName
+        # e.g. CS/CS-RF-IOC-01 but the leading CS needs removing
+        opi_dir = name.split(os.sep)[-1] + 'App/opi/opi'
+        cfg_section = dict(ModuleConfig.DEFAULT_CFG)
+        cfg_section['opi_dir'] = opi_dir
+        try:
+            items = config_parser.items(name)
+            for key, value in items:
+                if key in ('layers', 'groups', 'symbols', 'path_dirs'):
+                    cfg_section[key] = split_value_list(value)
+                elif key == 'extra_deps':
+                    dependencies = split_value_list(value)
+                    cfg_section[key] = parse_dependency_list(dependencies,
+                                                             config_parser)
+                elif key == 'has_opi':
+                    cfg_section[key] = config_parser.getboolean(name, key)
+                else:
+                    cfg_section[key] = value
+        except ConfigParser.NoSectionError:
+            log.debug('Failed to find configuration for {}'.format(name))
+        self.__dict__.update(cfg_section)
+
+
+class GeneralConfig(object):
 
     def __init__(self, gen_cfg_file=GEN_CONF, mod_cfg_file=MODULE_CONF):
         self._gen_cfg_file = gen_cfg_file
@@ -52,39 +74,14 @@ class GeneralConfig(object):
         # self._module_cfgs dict.
         self._mod_cfg_parser = parse_configuration(mod_cfg_file)
         for section in self._mod_cfg_parser.sections():
-            mod_cfg_items = self._get_config_section(section)
-            mod_cfg = Struct(mod_cfg_items)
-            self._module_cfgs[section] = mod_cfg
+            self._module_cfgs[section] = ModuleConfig(self._mod_cfg_parser, section)
 
-    def _get_config_section(self, name):
-        # In some cases, the new opi dir will be at moduleNameApp/opi/opi.
-        # In some of those cases, the IOC name may be prefix/moduleName
-        # e.g. CS/CS-RF-IOC-01 but the leading CS needs removing
-        opi_dir = name.split(os.sep)[-1] + 'App/opi/opi'
-        cfg_section = dict(GeneralConfig.DEFAULT_MOD_CFG)
-        cfg_section['opi_dir'] = opi_dir
-        try:
-            items = self._mod_cfg_parser.items(name)
-            for key, value in items:
-                if key in ('layers', 'groups', 'symbols', 'path_dirs'):
-                    cfg_section[key] = split_value_list(value)
-                elif key == 'extra_deps':
-                    dependencies = split_value_list(value)
-                    cfg_section[key] = parse_dependency_list(dependencies,
-                                                             self._mod_cfg_parser)
-                elif key == 'has_opi':
-                    cfg_section[key] = self._mod_cfg_parser.getboolean(name, key)
-                else:
-                    cfg_section[key] = value
-        except ConfigParser.NoSectionError:
-            log.debug('Failed to find configuration for {}'.format(name))
-        return cfg_section
 
     def get_mod_cfg(self, name):
         try:
             return self._module_cfgs[name]
         except KeyError:
-            return Struct(self._get_config_section(name))
+            return ModuleConfig(self._mod_cfg_parser, name)
 
 
 def parse_module_config(base_path):
