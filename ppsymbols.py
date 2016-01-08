@@ -138,33 +138,32 @@ def build_filelist(basepath):
     return symbol_files
 
 
-def process_symbol(name, mod, mod_cfg, mirror_root, prod_root):
-    """
-    :param name:
-    :param mod:
-    :param all_cfg:
-    :param prod_root:
-    :param mirror_root:
-    :return: PNG filename if successful, None if any error occurred
-    """
+def process_symbol(filename, mod, mod_cfg, mirror_root, prod_root):
+    """ Process one symbol file and convert to PNG.
 
-    area = mod_cfg.area
+    Args:
+        filename: symbol filename
+        mod: module name of containing module
+        mod_cfg: configuration.ModuleConfig object for module
+        mirror_root: root of mirror filesystem
+        prod_root: root of prod filesystem
+    Returns:
+        PNG filename if successful, None if any error occurred
+    """
     working_path = os.path.join(mirror_root, prod_root[1:])
-    mod_version = utils.get_module_version(working_path, area, mod, mod_cfg.version)
+    mod_version = utils.get_module_version(working_path, mod_cfg.area, mod, mod_cfg.version)
     # version = utils.increment_version(version)
     log.debug("%s", working_path)
     log.warning("FOUND VERSION %s", mod_version)
-    edl_path = mod_cfg.edl_dir
-    opi_path = mod_cfg.opi_dir
 
-    coords = coordinates.create(prod_root, area, mod, mod_version)
+    coords = coordinates.create(prod_root, mod_cfg.area, mod, mod_version)
     mirror_path = os.path.join(mirror_root, coordinates.as_path(coords)[1:])
-    full_path = os.path.join(mirror_path, edl_path, name[:-3] + 'edl')
-    destination = os.path.dirname(os.path.join(mirror_path, opi_path, name))
+    full_path = os.path.join(mirror_path, mod_cfg.edl_dir, filename[:-3] + 'edl')
+    destination = os.path.dirname(os.path.join(mirror_path, mod_cfg.opi_dir, filename))
     log.info('Destination directory is {}'.format(destination))
     if os.path.exists(destination):
         for f in os.listdir(destination):
-            n = os.path.split(name)[1]
+            n = os.path.split(filename)[1]
             n = '.'.join(n.split('.')[:-1])
             if f.startswith(n) and f.endswith('png'):
                 log.info('Symbol png already exists: %s', f)
@@ -191,7 +190,8 @@ if __name__ == '__main__':
         coords = coordinates.create(cfg.prod_root, area, mod_name, version)
         depth = len(os.path.split(rel_path)) - 1
         try:
-            mod = module.Module(coords, module_cfg, cfg.mirror_root, increment_version=False)
+            mod = module.Module(coords, module_cfg, cfg.mirror_root,
+                                increment_version=False)
             edl_dirs = get_edl_dirs(mod, cfg)
 
             file_dict = paths.index_paths(edl_dirs, True)
