@@ -17,7 +17,6 @@ from convert import utils
 import os
 import collections
 import subprocess
-import ConfigParser
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
 LOG_LEVEL = log.WARNING
@@ -85,21 +84,13 @@ class ModDetails(object):
                 self.requested_version_class = ModDetails.OUT_OF_DATE
 
 
-def get_config_item(cfg, section, option):
-    try:
-        value = cfg.get(section, option)
-    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-        value = None
-    return value
-
-
 def get_versions(module_cfg, coords):
     try:
         latest_release = utils.get_latest_version(coordinates.as_path(coords,
                                                                       False))
     except ValueError:
         latest_release = None
-    config_version = get_config_item(module_cfg, coords.module, 'version')
+    config_version = module_cfg.version
     return latest_release, config_version
 
 
@@ -113,17 +104,16 @@ def find_support_modules():
     return os.listdir(SUPPORT_PATH)
 
 
-def handle_one_module(module_cfg, module_name, launcher_version, cfg_ioc_version, area):
+def handle_one_module(module_name, module_cfg, launcher_version, cfg_ioc_version, area):
     coords = coordinates.ModCoord(utils.EPICS_ROOT, area, module_name, None)
     latest_release, config_version = get_versions(module_cfg, coords)
-    extra_deps = configuration.get_config_section(module_cfg, module_name)['extra_deps']
     if config_version is not None:
         vcoords = coordinates.update_version(coords, config_version)
     else:
         vcoords = coordinates.update_version(coords, latest_release)
 
-    log.debug('Dependencies of {} plus {}'.format(vcoords, extra_deps))
-    dp = dependency.DependencyParser(vcoords, extra_deps)
+    log.debug('Dependencies of {} plus {}'.format(vcoords, module_cfg.extra_deps))
+    dp = dependency.DependencyParser(vcoords, module_cfg.extra_deps)
     deps = dp.find_dependencies()
     log.debug('{}: {}, {}'.format(module_name, latest_release, config_version))
 
@@ -154,8 +144,8 @@ def get_launcher_versions(gen_cfg):
         dict: module name => version string
     """
     launcher_versions = {}
-    apps_xml = gen_cfg.get('launcher', 'apps_xml')
-    new_apps_xml = gen_cfg.get('launcher', 'new_apps_xml')
+    apps_xml = gen_cfg.apps_xml
+    new_apps_xml = gen_cfg.new_apps_xml
     lxml = launcher.LauncherXml(apps_xml, new_apps_xml)
     cmds = lxml.get_cmds()
     for cmd in cmds:
@@ -192,7 +182,7 @@ def get_configure_ioc_versions(ioc_names):
     return versions
 
 
-def get_module_details(gen_cfg, module_cfg):
+def get_module_details(gen_cfg):
     """Locate all support modules and iocs and return their dependencies.
 
     Returns:
@@ -210,8 +200,9 @@ def get_module_details(gen_cfg, module_cfg):
         for module in modules:
             launcher_version = launcher_versions.get(module, None)
             cfg_ioc_version = cfg_ioc_versions.get(module, None)
+            module_cfg = gen_cfg.get_mod_cfg(module)
             try:
-                module_details.append(handle_one_module(module_cfg, module,
+                module_details.append(handle_one_module(module, module_cfg,
                                                         launcher_version,
                                                         cfg_ioc_version, area))
             except AssertionError as e:
@@ -245,8 +236,8 @@ def render(mod_details):
 
 
 def start():
-    gen_cfg, module_cfg = configuration.get_configs()
-    module_details = get_module_details(gen_cfg, module_cfg)
+    gen_cfg = configuration.GeneralConfig()
+    module_details = get_module_details(gen_cfg)
     render(module_details)
 
 

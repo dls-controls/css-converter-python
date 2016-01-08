@@ -38,16 +38,13 @@ def update_xml():
 
     Write the new commands back to a new XML file.
     """
-    gen_cfg, module_cfg = configuration.get_configs()
-    mirror_root = gen_cfg.get('general', 'mirror_root')
-    apps_xml = gen_cfg.get('launcher', 'apps_xml')
-    new_apps_xml = gen_cfg.get('launcher', 'new_apps_xml')
-    lxml = launcher.LauncherXml(apps_xml, new_apps_xml)
+    cfg = configuration.GeneralConfig()
+    lxml = launcher.LauncherXml(cfg.apps_xml, cfg.new_apps_xml)
     cmds = lxml.get_cmds()
-    cmd_dict = launcher.get_updated_cmds(cmds, module_cfg, mirror_root)
+    cmd_dict = launcher.get_updated_cmds(cmds, cfg)
     lxml.write_new(cmd_dict)
     summarise_updates(cmd_dict)
-    print('Wrote new launcher XML file to {}'.format(new_apps_xml))
+    print('Wrote new launcher XML file to {}'.format(cfg.new_apps_xml))
 
 
 if __name__ == '__main__':

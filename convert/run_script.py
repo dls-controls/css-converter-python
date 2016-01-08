@@ -31,13 +31,13 @@ def get_link_opi_path(config, dep, dep_coord):
     :return: None or relative path from module root to the opi files directory
     :raises ValueError: when <coord> does not include version information
     """
-    config_section = configuration.get_config_section(config, dep)
+    dep_cfg = config.get_mod_cfg(dep)
     try:
-        opi_path = config_section['opi_dir']
+        opi_path = dep_cfg.opi_dir
     except (KeyError, AttributeError):
         opi_path = get_opi_path(dep_coord)
 
-    if configuration.has_opis(config_section):
+    if dep_cfg.has_opi:
         log.info("Adding link to :%s:%s:", dep_coord.area, dep_coord.module)
         new_version = utils.increment_version(dep_coord.version)
         mod_path = coordinates.as_path(
@@ -137,8 +137,8 @@ def generate(coord, new_version=None, prefix="/",
     script_path = os.path.join(script_dir, SCRIPT_FILE)
 
     if config is not None:
-        cfg_section = configuration.get_config_section(config, coord.module)
-        extra_depends = coordinates.update_version_from_files(cfg_section.get('extra_deps', []),
+        mod_config = config.get_mod_cfg(coord.module)
+        extra_depends = coordinates.update_version_from_files(mod_config.extra_deps,
                                                               coord.root)
     if extra_depends is None:
         extra_depends = []

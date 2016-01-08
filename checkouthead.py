@@ -67,8 +67,7 @@ def checkout_module(name, version, path, mirror_root, git):
             os.chdir(current_dir)
 
 
-def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
-                    force=False):
+def checkout_coords(coords, cfg, include_deps=True, extra_deps=None, force=False):
     log.info('Checking out module at: %s', coords)
     log.info('Extra dependencies: %s', extra_deps)
     if include_deps:
@@ -83,9 +82,9 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
     for module, mcoords in to_checkout.items():
         try:
 
-            dep_cfg = configuration.get_config_section(cfg, mcoords.module)
+            dep_cfg = cfg.get_mod_cfg(mcoords.module)
 
-            if not configuration.has_opis(dep_cfg):
+            if not dep_cfg.has_opi:
                 log.info('Skipping checkout of module with no OPIs: %s/%s (%s)',
                             mcoords.area, mcoords.module, mcoords.version)
                 continue
@@ -95,35 +94,31 @@ def checkout_coords(coords, mirror_root, include_deps=True, extra_deps=None,
             new_coords = coordinates.update_version(mcoords, new_version)
 
             new_path = coordinates.as_path(new_coords)
-            checkout_path = os.path.join(mirror_root, new_path[1:])
+            checkout_path = os.path.join(cfg.mirror_root, new_path[1:])
             if force and os.path.exists(checkout_path):
                 log.info('Removing %s before checking out', new_path)
                 shutil.rmtree(checkout_path)
 
             checkout_module(new_coords.module, new_version, new_path,
-                            mirror_root, configuration.is_git(dep_cfg))
+                            cfg.mirror_root, dep_cfg.is_git())
 
-            extra_deps = coordinates.update_version_from_files( dep_cfg.get('extra_deps'), coords.root)
-            configuration.create_module_ini_file(new_coords, mirror_root,
-                    dep_cfg.get('opi_dir'), extra_deps, force)
+            extra_deps = coordinates.update_version_from_files(dep_cfg.extra_deps, coords.root)
+            configuration.create_module_ini_file(new_coords, cfg.mirror_root,
+                    dep_cfg.opi_dir, extra_deps, force)
 
         except ValueError:
             log.warn('Cannot handle coordinates %s', mcoords)
     log.info('Finished checking out all modules.')
 
+
 if __name__ == '__main__':
     args = arguments.parse_arguments()
-
-    gen_cfg = configuration.parse_configuration(args.general_config)
-    cfg = configuration.parse_configuration(args.module_config)
+    cfg = configuration.GeneralConfig(args.general_config, args.module_config)
     area = utils.AREA_IOC if args.ioc else utils.AREA_SUPPORT
-
-    prod_root = gen_cfg.get('general', 'prod_root')
-    mirror_root = gen_cfg.get('general', 'mirror_root')
 
     if args.all:
         log.info("Searching for all '%s' modules for checkout.", area)
-        all_mods = utils.find_modules(os.path.join(prod_root, area))
+        all_mods = utils.find_modules(os.path.join(cfg.prod_root, area))
         log.info('Dependency checkout suppressed')
         get_depends = False
     else:
@@ -131,16 +126,14 @@ if __name__ == '__main__':
         get_depends = True
 
     for mod in all_mods:
-        module_cfg = configuration.get_config_section(cfg, mod)
-
-        version = utils.get_module_version(prod_root, area, mod, module_cfg.get('version'))
-        coords = coordinates.create(prod_root, area, mod, version)
-
-        versioned_deps = coordinates.update_version_from_files(module_cfg.get('extra_deps', []),
-                                                               prod_root)
+        module_cfg = cfg.get_mod_cfg(mod)
+        version = utils.get_module_version(cfg.prod_root, area, mod, module_cfg.version)
+        coords = coordinates.create(cfg.prod_root, area, mod, version)
+        versioned_deps = coordinates.update_version_from_files(module_cfg.extra_deps,
+                                                               cfg.prod_root)
 
         mod_path = coordinates.as_path(coords)
         if os.path.exists(mod_path):
-            checkout_coords(coords, mirror_root, get_depends, versioned_deps, args.force)
+            checkout_coords(coords, cfg, get_depends, versioned_deps, args.force)
         else:
             log.error("Module doesn't exist: {}".format(mod_path))
