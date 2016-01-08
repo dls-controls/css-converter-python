@@ -103,15 +103,15 @@ def _dependency_list_to_string(coord_list):
 class ModuleConfig(object):
 
     DEFAULT_CFG = {'edl_dir': 'data',
-                       'path_dirs': [],
-                       'area': utils.AREA_SUPPORT,
-                       'layers': [],
-                       'groups': [],
-                       'symbols': [],
-                       'extra_deps': [],
-                       'vcs': VCS_SVN,
-                       'has_opi': True,
-                       'version': None}
+                   'path_dirs': [],
+                   'area': utils.AREA_SUPPORT,
+                   'layers': [],
+                   'groups': [],
+                   'symbols': [],
+                   'extra_deps': [],
+                   'vcs': VCS_SVN,
+                   'has_opi': True,
+                   'version': None}
 
     def __init__(self, config_parser, name):
         # In some cases, the new opi dir will be at moduleNameApp/opi/opi.
@@ -135,7 +135,10 @@ class ModuleConfig(object):
                     cfg_section[key] = value
         except ConfigParser.NoSectionError:
             log.debug('Failed to find configuration for {}'.format(name))
-        self.__dict__.update(cfg_section)
+
+        # Set items in dict as attributes of the object
+        for key, value in cfg_section.iteritems():
+            setattr(self, key, value)
 
     def is_git(self):
         return self.vcs == VCS_GIT
@@ -152,8 +155,8 @@ class GeneralConfig(object):
         # object.
         gen_cfg_parser = _parse_configuration(gen_cfg_file)
         for section in gen_cfg_parser.sections():
-            cfg_dict = dict(gen_cfg_parser.items(section))
-            self.__dict__.update(cfg_dict)
+            for key, value in gen_cfg_parser.items(section):
+                setattr(self, key, value)
 
         # Honour relative or absolute paths for converter output.
         if not os.path.isabs(self.mirror_root):
