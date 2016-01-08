@@ -40,10 +40,11 @@ def get_modules(args, gen_cfg, area):
         all_mods = [args.module]
 
     for module_name in all_mods:
-        module_cfg = gen_cfg.get_mod_cfg(module_name)
-        version = utils.get_module_version(root, area, module_name, module_cfg.version)
-        coords = coordinates.create(root, area, module_name, version)
-        modules.append(module.Module(coords, module_cfg, mirror))
+        if "-BUILDER" not in module_name and not module_name.startswith("BL"):
+            module_cfg = gen_cfg.get_mod_cfg(module_name)
+            version = utils.get_module_version(root, area, module_name, module_cfg.version)
+            coords = coordinates.create(root, area, module_name, version)
+            modules.append(module.Module(coords, module_cfg, mirror))
 
     return modules
 
