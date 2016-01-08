@@ -130,10 +130,11 @@ def build_filelist(basepath):
     """
     log.info("Building list of files containing EDM symbols in %s", basepath)
     symbol_files = []
-    for dir_path, _, file_names in os.walk(basepath):
-        for filename in file_names:
-            if filename.endswith(".opi") and utils.grep(os.path.join(dir_path, filename), "EDM Symbol"):
-                symbol_files.append(os.path.join(dir_path, filename))
+    for dir_path, _, filenames in os.walk(basepath):
+        for filename in filenames:
+            filepath = os.path.join(dir_path, filename)
+            if filename.endswith(".opi") and utils.grep(filepath, "EDM Symbol"):
+                symbol_files.append(filepath)
 
     return symbol_files
 
