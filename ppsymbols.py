@@ -87,10 +87,10 @@ def edit_symbol_node(node, filename):
     node.remove(node.find('opi_file'))
 
 
-def update_symbols(filename, depth, file_dict, gen_cfg):
+def update_symbols(filepath, depth, file_dict, gen_cfg):
     symbol_files = {}
-    log.info('Updating symbols in %s depth %s', filename, depth)
-    tree = et.parse(filename)
+    log.info('Updating symbols in %s depth %s', filepath, depth)
+    tree = et.parse(filepath)
     root = tree.getroot()
     for widget in root.findall(".//widget[name='EDM Symbol']"):
         symbol_file = widget.find('opi_file').text
@@ -114,7 +114,7 @@ def update_symbols(filename, depth, file_dict, gen_cfg):
             new_path = os.sep.join(os.path.split(new_path)[:-1] + (png_file,))
             edit_symbol_node(widget, new_path)
 
-    tree.write(filename, encoding='utf-8', xml_declaration=True)
+    tree.write(filepath, encoding='utf-8', xml_declaration=True)
 
 
 def build_filelist(basepath):
