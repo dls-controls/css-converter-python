@@ -179,7 +179,7 @@ def process_symbol(filename, mod, mod_cfg, mirror_root, prod_root):
         log.warn('Symbol %s does not exist', full_path)
 
 
-if __name__ == '__main__':
+def start():
     cfg = configuration.GeneralConfig()
     symbol_opis = build_filelist(cfg.mirror_root)
 
@@ -199,3 +199,7 @@ if __name__ == '__main__':
             update_symbols(opi_path, depth, file_dict, cfg)
         except ValueError as e:
             log.warn('Error updating symbols in %s: %s', mod_name, e)
+
+
+if __name__ == '__main__':
+    start()
