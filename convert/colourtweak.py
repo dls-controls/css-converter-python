@@ -135,8 +135,13 @@ def change_colours(widget):
     typeId = widget.get("typeId")
     # Parent lookup for colours
     colour_prop = {c:p.tag for p in widget.iter() for c in p}
-    # Look for colour elements
-    for colour in widget.findall(".//color"):
+    # Look for colour elements two elements below.
+    # <foreground_color>
+    #   <color blue="32" green="64" name="Related Display: FG" red="128" />
+    # </foreground_color>
+    # Other colour elements may be inside child widgets (e.g. within grouping
+    # containers) and need to be handled in those widgets.
+    for colour in widget.findall("./*/color"):
         # Map colours
         name = colour.get("name")
         if name is None:
