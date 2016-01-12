@@ -25,6 +25,7 @@ import utils
 MENU_MUX_ID = 'org.csstudio.opibuilder.widgets.edm.menumux'
 MISSING = 'missing'
 LOC_PREFIX = 'loc://$(DID)'
+VSTRING_TYPE = '<VString>'
 
 # OPI XML tags to subsitute a plain 'concat( )' not 'pv(concat( ))'
 NON_PV_TAGS = ['text']
@@ -78,20 +79,22 @@ def find_mm_symbols(node):
 
 
 def create_loc_pv(pv_name, initial_value=None):
-    """
+    """Create a local PV for use in a menu mux.
 
-        Arguments:
-        - pv_name: name of edl macro, e.g. iot
-        - initial_value: optional initial value
-        Returns:
-            loc://$(DID)pv_name if initial value is None
-            loc://$(DID)pv_name(\"initial_value\") otherwise
+    Args:
+    - pv_name: name of edl macro, e.g. iot
+    - initial_value: optional initial value
+    Returns:
+        loc://$(DID)pv_name<VString> if initial value is None
+        loc://$(DID)pv_name<VString>(\"initial_value\") otherwise
     """
     if initial_value is None:
-        pv = "%s%s" % (LOC_PREFIX, pv_name)
+        initial_value_string = ''
     else:
-        pv = "%s%s(\"%s\")" % (LOC_PREFIX, pv_name, initial_value)
+        initial_value_string = '({})'.format(initial_value)
 
+    pv = '{}{}{}{}'.format(LOC_PREFIX, pv_name, VSTRING_TYPE,
+                           initial_value_string)
     return pv
 
 
