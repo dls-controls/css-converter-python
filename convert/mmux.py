@@ -88,13 +88,11 @@ def create_loc_pv(pv_name, initial_value=None):
         loc://$(DID)pv_name<VString> if initial value is None
         loc://$(DID)pv_name<VString>(\"initial_value\") otherwise
     """
-    if initial_value is None:
-        initial_value_string = ''
-    else:
-        initial_value_string = '({})'.format(initial_value)
+    pv = '{}{}{}'.format(LOC_PREFIX, pv_name, VSTRING_TYPE)
 
-    pv = '{}{}{}{}'.format(LOC_PREFIX, pv_name, VSTRING_TYPE,
-                           initial_value_string)
+    if initial_value is not None:
+        pv += '({})'.format(initial_value)
+
     return pv
 
 
