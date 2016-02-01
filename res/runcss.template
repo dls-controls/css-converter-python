@@ -3,22 +3,21 @@
 # Generated run script for cs-studio.
 prefix=$${CONVERTER_ROOT:-/dls_sw/work/common/CSS/shadow/}
 
-if [ -z "$$1" ]; then
+if [[ -z $$1 ]]; then
     echo "No OPI specified to launch!"
     exit 1
 fi
 
-if [ -n $$2 ]; then
-    MACROS="-m $$2"
-fi
-
+# pop the opifile off the head of the argument list
+opifile="$$1"
+shift
 
 CSS_RUN_SCRIPT=$$(configure-ioc s -p CSS-beta-gui)
 
-PROJECT=${project}
-MODULE=${module}
-LAUNCH_OPI=/$$PROJECT/$$MODULE/$$1
+project=${project}
+module=${module}
+launch_opi=/$$project/$$module/$$opifile
 
-LINKS="${links}"
+links="${links}"
 
-$$CSS_RUN_SCRIPT -o $${LAUNCH_OPI} -s -l "$$LINKS" $$MACROS
+$$CSS_RUN_SCRIPT -o $${launch_opi} -s -l "$$links" "$$@"

@@ -53,6 +53,7 @@ def update_cmd(cmd, cfg):
             return runcss_path, ['{} {}'.format(run_opi, macros)]
     else:  # Module has not been checked out
         log.info('No mirror path %s; xml not updated', mirror_path)
+        return None
 
 
 def get_updated_cmds(cmds, cfg):
