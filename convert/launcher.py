@@ -247,19 +247,6 @@ class LauncherCommand(object):
         self.version = version
         self.edl_file = edl_file
 
-    def get_run_cmd(self):
-        # Add OPI shell macro to those already there
-        self.macros['Position'] = 'NEW_SHELL'
-        macros_strings = []
-        for key, value in self.macros.iteritems():
-            macros_strings.append('%s=%s' % (key, value))
-        macros_string = ','.join(macros_strings)
-        for c in ESCAPE_CHARS:
-            macros_string = macros_string.replace(c, '[\%d]' % ord(c))
-
-        run_cmd = '"%s %s"' % (self.launch_opi, macros_string)
-        return run_cmd
-
     def gen_run_script(self, root_dir):
         """
         Generate a wrapper script which updates the appropriate
