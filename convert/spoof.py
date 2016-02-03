@@ -85,6 +85,12 @@ def spoof_edm(script_file, args=[]):
     from any script used to run edm.
 
     Assume that the last four lines of output are those produced by this script.
+
+    Returns:
+        edmdatafiles:
+        path:
+        pwd:
+        args: List of additional arguments (may include $PORT or a number).
     """
     # Special cases: launcher scripts from_configure_ioc.sh and
     # script_from_dir.sh
