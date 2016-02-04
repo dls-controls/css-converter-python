@@ -51,13 +51,18 @@ def update_cmd(cmd, cfg):
         runcss_path = os.path.join(opi_dir, 'runcss.sh')
         if os.path.exists(opi_dir):
             run_opi = rel_path[:-3] + 'opi'
-            macros = ','.join('{}={}'.format(a, b) for a, b in cmd.macros.items())
+            if cmd.macros:
+                macros_list = ','.join('{}={}'.format(a, b) for a, b in cmd.macros.items())
+                macros = ' -m {}'.format(macros_list)
+            else:
+                macros = ''
+
             if cmd.port is not None:
                 port = ' -p {}'.format(cmd.port)
             else:
                 port = ''
 
-            return runcss_path, ['{} {}{}'.format(run_opi, macros, port)]
+            return runcss_path, ['{}{}{}'.format(run_opi, macros, port)]
     else:  # Module has not been checked out
         log.info('No mirror path %s; xml not updated', mirror_path)
         return None
