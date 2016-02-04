@@ -11,7 +11,6 @@ import logging as log
 
 SCRIPT_FILE = 'runcss.sh'
 DEFAULT_OPI_PATH = "%sApp/opi/opi"
-ESCAPE_CHARS = ['.', ':']
 PATH_PREFIX = '${prefix}'
 SCRIPT_TEMPLATE = 'res/runcss.template'
 
@@ -79,9 +78,6 @@ def build_links(dependencies, project_name, prefix, config=None):
                 log.warn('Creating link for non-existent path %s%s', prefix, opi_dir)
 
     links = ',\\\n'.join(links_strings)
-
-    for c in ESCAPE_CHARS:
-        links = links.replace(c, '[\%d]' % ord(c))
 
     return links
 

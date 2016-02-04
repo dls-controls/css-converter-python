@@ -1,36 +1,23 @@
 #!/bin/bash
 
 # Generated run script for cs-studio.
-
 prefix=$${CONVERTER_ROOT:-/dls_sw/work/common/CSS/shadow/}
 
-if [ -z "$$1" ]; then
+if [[ -z $$1 ]]; then
     echo "No OPI specified to launch!"
     exit 1
 fi
 
-CSSTUDIO=$$(configure-ioc s -p CSS-beta-gui)
+# pop the opifile off the head of the argument list
+opifile="$$1"
+shift
 
-PROJECT=${project}
-MODULE=${module}
-# Escape all periods except the one in the filename.
-escaped=$$(echo $$1 | perl -ne "s|\.(?!opi)|[\\\46]|g; print;")
-LAUNCH_OPI=/$$PROJECT/$$MODULE/$$escaped
+CSS_RUN_SCRIPT=$$(configure-ioc s -p CSS-nightly-gui)
 
-function tokens() {
-    echo $$#
-}
+project=${project}
+module=${module}
+launch_opi=/$$project/$$module/$$opifile
 
-# Only if macros are passed in (separated by a space from the filename)
-# do we need a comma to separate the Position=NEW_SHELL macro from the
-# others.  Otherwise, it's separated by a space.
-toks=$$(tokens $$LAUNCH_OPI)
-if [ $$toks == 1 ]; then
-    delimiter=" "
-else
-    delimiter=","
-fi
+links="${links}"
 
-LINKS="${links}"
-
-$$CSSTUDIO --launcher.openFile "$${LAUNCH_OPI}$${delimiter}Position=NEW_SHELL -share_link $$LINKS"
+$$CSS_RUN_SCRIPT -o $${launch_opi} -s -l "$$links" "$$@"

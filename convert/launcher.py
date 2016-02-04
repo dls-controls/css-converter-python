@@ -15,6 +15,8 @@ SCRIPT_TEMPLATE = 'res/runcss.template'
 ESCAPE_CHARS = ['.', ':']
 DLS_CSS_ICON = 'css-diamond-logo.svg'
 
+PORT_MACRO = '$PORT'
+
 
 def update_cmd(cmd, cfg):
     """
@@ -50,9 +52,15 @@ def update_cmd(cmd, cfg):
         if os.path.exists(opi_dir):
             run_opi = rel_path[:-3] + 'opi'
             macros = ','.join('{}={}'.format(a, b) for a, b in cmd.macros.items())
-            return runcss_path, ['{} {}'.format(run_opi, macros)]
+            if cmd.port is not None:
+                port = ' -p {}'.format(cmd.port)
+            else:
+                port = ''
+
+            return runcss_path, ['{} {}{}'.format(run_opi, macros, port)]
     else:  # Module has not been checked out
         log.info('No mirror path %s; xml not updated', mirror_path)
+        return None
 
 
 def get_updated_cmds(cmds, cfg):
@@ -75,6 +83,33 @@ def get_updated_cmds(cmds, cfg):
             log.info('Failed interpreting command {}: {}'.format(cmd.cmd, e))
 
     return cmd_dict
+
+
+def _get_port(edm_args):
+    """ Attempt to parse the PORT from the EDM command arguments.
+        Two cases are handled:
+            '$PORT' - the launcher PORT macro
+            'xxxx' - a string that can be cast as an integer
+    Args:
+        edm_args:
+
+    Returns:
+
+    """
+    port = None
+
+    for arg in edm_args:
+        if arg == PORT_MACRO:
+            port = PORT_MACRO
+            break
+        else:
+            try:
+                port = str(int(arg))
+                break
+            except ValueError:
+                pass
+    log.info("Found PORT {}".format(port))
+    return port
 
 
 def _get_macros(edm_args):
@@ -171,6 +206,7 @@ class LauncherCommand(object):
         self.edl_file = None
         self.module_name = None
         self.version = None
+        self.port = None
         self.macros = {}
         self.all_dirs = []
 
@@ -209,6 +245,8 @@ class LauncherCommand(object):
         self.launch_opi = launch_opi
         self.project = project
         self.path_to_run = path_to_run
+        self.port = _get_port(self.args)
+
 
     def _spoof_command(self, cmd, args, directory):
         log.debug('Launcher command: %s', cmd)
@@ -218,12 +256,12 @@ class LauncherCommand(object):
         # Spoof EDM to find EDMDATAFILES and PATH
         # Index these directories to find which modules
         # relative paths may be in.
-        edmdatafiles, path_dirs, working_dir, args = spoof.spoof_edm(cmd, args)
+        edmdatafiles, path_dirs, working_dir, spoofed_args = spoof.spoof_edm(cmd, args)
 
-        self.macros = _get_macros(args)
+        self.macros = _get_macros(spoofed_args)
 
-        edl_files = [a for a in args if a.endswith('edl')]
-        edl_file = edl_files[0] if len(edl_files) > 0 else args[-1]
+        edl_files = [a for a in spoofed_args if a.endswith('edl')]
+        edl_file = edl_files[0] if len(edl_files) > 0 else spoofed_args[-1]
         try:
             _, module_name, version, _ = utils.parse_module_name(working_dir)
         except ValueError:
@@ -245,19 +283,6 @@ class LauncherCommand(object):
         self.module_name = module_name
         self.version = version
         self.edl_file = edl_file
-
-    def get_run_cmd(self):
-        # Add OPI shell macro to those already there
-        self.macros['Position'] = 'NEW_SHELL'
-        macros_strings = []
-        for key, value in self.macros.iteritems():
-            macros_strings.append('%s=%s' % (key, value))
-        macros_string = ','.join(macros_strings)
-        for c in ESCAPE_CHARS:
-            macros_string = macros_string.replace(c, '[\%d]' % ord(c))
-
-        run_cmd = '"%s %s"' % (self.launch_opi, macros_string)
-        return run_cmd
 
     def gen_run_script(self, root_dir):
         """
