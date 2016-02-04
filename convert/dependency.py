@@ -23,7 +23,10 @@ KNOWN_PARSE_ISSUES = [
     "/dls_sw/prod/R3.14.12.3/support/ADPilatus/2-1dls5/configure/RELEASE",
     "/dls_sw/prod/R3.14.12.3/support/ADCore/2-2dls3/configure/RELEASE",
     "/dls_sw/prod/R3.14.12.3/support/ADCore/2-3dls4/configure/RELEASE",
-    "/dls_sw/prod/R3.14.12.3/support/dxp/3-5dls2/configure/RELEASE"]
+    "/dls_sw/prod/R3.14.12.3/support/ADCore/2-3dls5/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/dxp/3-5dls2/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/dxp/3-5dls4/configure/RELEASE",
+    "/dls_sw/prod/R3.14.12.3/support/dtacq_adc/2-0/configure/RELEASE"]
 
 
 class DependencyParser(object):
