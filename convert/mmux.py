@@ -91,7 +91,7 @@ def create_loc_pv(pv_name, initial_value=None):
     pv = '{}{}{}'.format(LOC_PREFIX, pv_name, VSTRING_TYPE)
 
     if initial_value is not None:
-        pv += '({})'.format(initial_value)
+        pv += '(\"{}\")'.format(initial_value)
 
     return pv
 
