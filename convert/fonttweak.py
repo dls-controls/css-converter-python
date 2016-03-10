@@ -16,8 +16,6 @@ FONT_MAP = {"arial": "liberation sans",
 
 def change_font(font_element):
     name = font_element.get("fontName")
-    if name is None:
-        return
     if name in FONT_MAP:
         font_element.set("fontName", FONT_MAP[name])
 
