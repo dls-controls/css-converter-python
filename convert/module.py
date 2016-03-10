@@ -1,5 +1,6 @@
 import colourtweak
 import files
+import fonttweak
 import groups
 import layers
 import mmux
@@ -171,6 +172,7 @@ class Module(object):
                     if self.is_group_file(source):
                         groups.parse(target)
                     colourtweak.parse(target)
+                    fonttweak.parse(target)
                     if utils.grep(target, mmux.MENU_MUX_ID):
                         mmux.parse(target)
             else:
