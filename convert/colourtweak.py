@@ -182,7 +182,7 @@ def change_colours(widget):
             set_colour(colour, "Controller: FG")
         elif name == "Shell/reldsp-alt" and typeId in [ACTIONBUTTON] and prop == "foreground_color":
             set_colour(colour, "Text: FG")
-        elif name == "Related display" and typeId in [ACTIONBUTTON] and prop == "foreground_color":
+        elif name == "Related display" and typeId in [ACTIONBUTTON, MENUBUTTON] and prop == "foreground_color":
             set_colour(colour, "Related Display: FG")
         elif name == "Exit/Quit/Kill" and typeId in [ACTIONBUTTON] and prop == "foreground_color":
             set_colour(colour, "Exit: FG")
