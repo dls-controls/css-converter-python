@@ -60,8 +60,10 @@ colour_map = {
     "grey-13": "Grey 25%",
     "Black": "Black",
     "Green LED: On": "Green",
-    "Monitor: NORMAL": "Green",
+    # Originally Tom set this to green, but it was considered too bright.
+    "Monitor: NORMAL": "Mid Green",
     "Open/On": "Mid Green",
+    # Should this be dark green?
     "Monitor: alt": "Mid Green",
     "Green LED: Off": "Dark Green",
     "Red LED: On": "Red",
