@@ -12,7 +12,7 @@ fi
 opifile="$$1"
 shift
 
-CSS_RUN_SCRIPT=$$(configure-ioc s -p CSS-nightly-gui)
+CSS_RUN_SCRIPT=$$(configure-ioc s -p CSS-release-gui)
 
 project=${project}
 module=${module}
