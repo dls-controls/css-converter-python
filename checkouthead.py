@@ -102,9 +102,10 @@ def checkout_coords(coords, cfg, include_deps=True, extra_deps=None, force=False
             checkout_module(new_coords.module, new_version, new_path,
                             cfg.mirror_root, dep_cfg.is_git())
 
-            extra_deps = coordinates.update_version_from_files(dep_cfg.extra_deps, coords.root)
-            configuration.create_module_ini_file(new_coords, cfg.mirror_root,
-                    dep_cfg.opi_dir, extra_deps, force)
+            extra_deps = coordinates.update_version_from_files(
+                dep_cfg.extra_deps, coords.root)
+            configuration.create_module_ini_file(
+                new_coords, cfg.mirror_root, dep_cfg.opi_dir, extra_deps, force)
 
         except ValueError:
             log.warn('Cannot handle coordinates %s', mcoords)
@@ -127,10 +128,11 @@ if __name__ == '__main__':
 
     for mod in all_mods:
         module_cfg = cfg.get_mod_cfg(mod)
-        version = utils.get_module_version(cfg.prod_root, area, mod, module_cfg.version)
+        version = utils.get_module_version(
+            cfg.prod_root, area, mod, module_cfg.version)
         coords = coordinates.create(cfg.prod_root, area, mod, version)
-        versioned_deps = coordinates.update_version_from_files(module_cfg.extra_deps,
-                                                               cfg.prod_root)
+        versioned_deps = coordinates.update_version_from_files(
+            module_cfg.extra_deps, cfg.prod_root)
 
         mod_path = coordinates.as_path(coords)
         if os.path.exists(mod_path):

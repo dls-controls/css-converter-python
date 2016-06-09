@@ -109,10 +109,10 @@ class DependencyParser(object):
         Returns:
             True if valid dependency
         """
-        valid = dependency.path is not None
-        valid = valid and dependency.name is not None
-        valid = valid and not dependency.path.startswith(EPICS_BASE)
-        valid = valid and not dependency.path.startswith(EPICS_11_BASE)
-        valid = valid and not dependency.path == self._module_path
+        valid = (dependency.path is not None
+                 and dependency.name is not None
+                 and not dependency.path.startswith(EPICS_BASE)
+                 and not dependency.path.startswith(EPICS_11_BASE)
+                 and not dependency.path == self._module_path)
 
         return valid
