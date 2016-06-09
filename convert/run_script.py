@@ -55,8 +55,6 @@ def build_links(dependencies, project_name, prefix, config=None):
         This is comma separated list of
         <full-path-to-versioned-dependency/opi/opi>=<module_name>_<module_version>
 
-        Set of characters, e.g. '.' are replaced with the ascii representations
-
         Links are NOT added for any module marked as containing no OPIs
         e.g. support/utilities
 
