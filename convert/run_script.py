@@ -123,9 +123,11 @@ def generate(coord, new_version=None, prefix="/",
     if new_version is None:
         new_version = coord.version
 
+    # creating working module coord with updated version
+    shadow_coord = coordinates.update_version(coord, new_version)
+
     script_dir = os.path.join(prefix,
-                              coordinates.as_path(coord, False)[1:],
-                              new_version,
+                              coordinates.as_path(shadow_coord, True)[1:],
                               opi_dir)
 
     if not os.path.exists(script_dir):
@@ -133,20 +135,22 @@ def generate(coord, new_version=None, prefix="/",
     script_path = os.path.join(script_dir, SCRIPT_FILE)
 
     if config is not None:
-        mod_config = config.get_mod_cfg(coord.module)
+        mod_config = config.get_mod_cfg(shadow_coord.module)
         extra_depends = coordinates.update_version_from_files(mod_config.extra_deps,
-                                                              coord.root)
+                                                              shadow_coord.root)
     if extra_depends is None:
         extra_depends = []
 
-    dependencies = dependency.DependencyParser(coord, extra_depends)
+    dependencies = dependency.DependencyParser(
+        shadow_coord, mirror_root=prefix, additional_depends=extra_depends)
 
-    project_name = "%s_%s" % (coord.module.replace(os.path.sep, '_'), new_version)
+    project_name = "%s_%s" % (shadow_coord.module.replace(os.path.sep, '_'), shadow_coord.version)
 
-    # a reference to THIS module needed in the links string is required for
-    # correct navigation to add to the dict of
     deps = dependencies.find_dependencies()
-    deps[coord.module] = coord
+    # a reference to THIS module needed in the links string is required for
+    # correct navigation to add to the dict.
+    # Pass the *un-incremented version* as build_links will do an increment
+    deps[shadow_coord.module] = coord
     links_string = build_links(deps, project_name, prefix, config)
 
     with open(script_path, 'w') as f:
@@ -155,7 +159,7 @@ def generate(coord, new_version=None, prefix="/",
             s = string.Template(content)
             updated_content = s.substitute(links=links_string,
                                            project=project_name,
-                                           module=coord.module)
+                                           module=shadow_coord.module)
             f.write(updated_content)
 
     # Give owner and group execute permissions.

@@ -67,7 +67,10 @@ class Module(object):
         Returns:
             dict {name: coords} for all module dependencies
         """
-        dp = dependency.DependencyParser(self.coords, self.extra_deps)
+        new_version = utils.increment_version(self.coords.version)
+        shadow_coord = coordinates.update_version(self.coords, new_version)
+        dp = dependency.DependencyParser(
+            shadow_coord, mirror_root=self.mirror_root, additional_depends=self.extra_deps)
         return dp.find_dependencies()
 
     def get_path_dirs(self):

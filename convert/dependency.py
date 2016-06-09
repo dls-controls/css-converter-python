@@ -31,7 +31,7 @@ KNOWN_PARSE_ISSUES = [
 
 class DependencyParser(object):
 
-    def __init__(self, module_coord, additional_depends=None):
+    def __init__(self, module_coord, mirror_root="", additional_depends=None):
         """ Parse dependencies for IOC
 
         Args:
@@ -42,8 +42,24 @@ class DependencyParser(object):
             "Cannot find dependencies of module (%s) with no version" % module_coord.module
         self._additional = additional_depends
         self._module_path = coordinates.as_path(module_coord)
+        self._mirror = mirror_root
         self._root = module_coord.root
 
+        log.info('Preparing conversion of module %s', module_coord)
+        if mirror_root:
+            log.info("Prefix set for %s to %s" % (module_coord.module, mirror_root))
+
+        if self._mirror and not self._module_path.startswith(self._mirror):
+            # Create a working coordinate pointing at the new release, i.e.
+            # shadow version. This allows the dependency parser to pull the
+            # correct dependencies
+            # shadow_coord = coordinates.update_version(
+            #     module_coord, utils.increment_version(module_coord.version))
+            # log.info("Updating version %s" % shadow_coord.version)
+
+            log.info("Prefixing shadow %s" % self._mirror)
+            self._module_path = os.path.join(
+                self._mirror, coordinates.as_path(module_coord)[1:])
     def find_dependencies(self):
         """ Generate a dictionary of dependencies for this module
 

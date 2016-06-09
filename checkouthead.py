@@ -71,7 +71,7 @@ def checkout_coords(coords, cfg, include_deps=True, extra_deps=None, force=False
     log.info('Checking out module at: %s', coords)
     log.info('Extra dependencies: %s', extra_deps)
     if include_deps:
-        dp = dependency.DependencyParser(coords, extra_deps)
+        dp = dependency.DependencyParser(coords, additional_depends=extra_deps)
         log.info('Finding dependencies of %s', coords)
         to_checkout = dp.find_dependencies()
     else:
