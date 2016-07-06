@@ -164,7 +164,7 @@ class Converter(object):
 
     def _convert_one_file(self, full_path, outdir, force, depth):
         """
-        Apppropriately convert one edl file, including updating
+        Appropriately convert one edl file, including updating
         any relative paths using the file_index dict.
         """
         # change extension
