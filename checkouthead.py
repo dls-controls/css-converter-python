@@ -102,6 +102,9 @@ def checkout_coords(coords, cfg, include_deps=True, extra_deps=None, force=False
             checkout_module(new_coords.module, new_version, new_path,
                             cfg.mirror_root, dep_cfg.is_git())
 
+            if not opi_dir_is_empty(checkout_path, dep_cfg):
+                log.warning("Files may be overwritten in conversion - module OPI directory exists (%s).", checkout_path)
+
             extra_deps = coordinates.update_version_from_files(
                 dep_cfg.extra_deps, coords.root)
             configuration.create_module_ini_file(
@@ -110,6 +113,29 @@ def checkout_coords(coords, cfg, include_deps=True, extra_deps=None, force=False
         except ValueError:
             log.warn('Cannot handle coordinates %s', mcoords)
     log.info('Finished checking out all modules.')
+
+
+def opi_dir_is_empty(checkout_path, dep_cfg):
+    """ Determine if the opi directory used in the conversion exists and is
+        non-empty
+
+    Args:
+        checkout_path: Full path to module (in shadow file system)
+        dep_cfg: Module configuration, including opi_dir
+
+    Returns:
+        False if directory exists and is not empty
+    """
+    mirror_location = os.path.join(checkout_path, dep_cfg.opi_dir)
+    files = []
+    try:
+        files = os.listdir(mirror_location)
+    except OSError:
+        # thrown if path doesn't exist
+        pass
+
+    # not <empty> is True, not <non-empty> is False
+    return not files
 
 
 if __name__ == '__main__':
