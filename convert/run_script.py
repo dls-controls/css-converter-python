@@ -13,6 +13,8 @@ SCRIPT_FILE = 'runcss.sh'
 DEFAULT_OPI_PATH = "%sApp/opi/opi"
 PATH_PREFIX = '${prefix}'
 SCRIPT_TEMPLATE = 'res/runcss.template'
+SCRIPT_PERMISSIONS = stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | \
+    stat.S_IROTH | stat.S_IXOTH  # 0o755
 
 
 def get_link_opi_path(config, dep, dep_coord):
@@ -160,10 +162,10 @@ def generate(coord, new_version=None, prefix="/",
                                            module=shadow_coord.module)
             f.write(updated_content)
 
-    # Give owner and group execute permissions.
+    # Give everyone read/execute permissions on top of any defaults
     try:
         st = os.stat(script_path)
-        os.chmod(script_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP)
+        os.chmod(script_path, st.st_mode | SCRIPT_PERMISSIONS)
     except OSError:
         log.error("Failed to update file permissions for %s", script_path)
     log.info('Run script written to %s', script_path)
