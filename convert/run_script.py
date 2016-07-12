@@ -162,10 +162,9 @@ def generate(coord, new_version=None, prefix="/",
                                            module=shadow_coord.module)
             f.write(updated_content)
 
-    # Give everyone read/execute permissions on top of any defaults
+    # Give everyone read/execute permissions
     try:
-        st = os.stat(script_path)
-        os.chmod(script_path, st.st_mode | SCRIPT_PERMISSIONS)
+        os.chmod(script_path, SCRIPT_PERMISSIONS)
     except OSError:
         log.error("Failed to update file permissions for %s", script_path)
     log.info('Run script written to %s', script_path)
