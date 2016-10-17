@@ -106,26 +106,30 @@ def spoof_edm(script_file, args=[]):
     old_dir = os.getcwd()
     script_dir = os.path.dirname(script_file)
     # Change to directory of spoofed script.
-    os.chdir(script_dir)
+    try:
+        os.chdir(script_dir)
 
-    this_dir = os.path.dirname(__file__)
-    spoof_edm_dir = os.path.join(this_dir, '..', 'res')
-    # Put spoof edm first on the path.
-    env['PATH'] = '%s:%s:%s' % (spoof_edm_dir, script_dir, env['PATH'])
-    old_path = env['PATH'].split(':')
+        this_dir = os.path.dirname(__file__)
+        spoof_edm_dir = os.path.join(this_dir, '..', 'res')
+        # Put spoof edm first on the path.
+        env['PATH'] = '%s:%s:%s' % (spoof_edm_dir, script_dir, env['PATH'])
+        old_path = env['PATH'].split(':')
 
-    edmdatafiles = None
-    path = None
+        edmdatafiles = None
+        path = None
 
-    args_string = " ".join(a for a in args)
-    args_string = args_string.replace('$PORT', '5064')
-    command_string = '%s %s' % (script_file, args_string)
-    log.debug('Spoofing script: %s', command_string)
+        args_string = " ".join(a for a in args)
+        args_string = args_string.replace('$PORT', '5064')
+        command_string = '%s %s' % (script_file, args_string)
+        log.debug('Spoofing script: %s', command_string)
 
-    out = subprocess.check_output([command_string], shell=True, env=env)
+        out = subprocess.check_output([command_string], shell=True, env=env)
 
-    # Change back to original directory.
-    os.chdir(old_dir)
+    except subprocess.CalledProcessError as e:
+        raise SpoofError('Error spoofing script: {}'.format(e))
+    finally:
+        # Change back to original directory.
+        os.chdir(old_dir)
     log.debug('Spoof EDM output:\n\n%s', out)
     lines = out.splitlines()
     if len(lines) == 0 or lines[-1] != 'Spoof EDM complete.':
