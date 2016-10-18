@@ -75,6 +75,58 @@ class SpoofError(Exception):
     pass
 
 
+def capture_spoof_output(env, script_dir, script_file, args):
+    """
+    Execute script with any arguments after replacing 'edm' on the path
+    with the spoof version.  Capture and return the output.
+    """
+    os.chdir(script_dir)
+    this_dir = os.path.dirname(__file__)
+    spoof_edm_dir = os.path.join(this_dir, '..', 'res')
+    # Put spoof edm first on the path.
+    env['PATH'] = '%s:%s:%s' % (spoof_edm_dir, script_dir, env['PATH'])
+
+    args_string = " ".join(a for a in args)
+    args_string = args_string.replace('$PORT', '5064')
+    command_string = '%s %s' % (script_file, args_string)
+    log.debug('Spoofing script: %s', command_string)
+
+    out = subprocess.check_output([command_string], shell=True, env=env)
+    return out
+
+
+def process_output(output, old_path):
+    """
+    Convert lines of output from spoof edm script into:
+        * edmdatafiles directories
+        * path directories
+        * working directory
+        * script arguments
+    Return as a tuple.
+    """
+    lines = output.splitlines()
+    if len(lines) == 0 or lines[-1] != 'Spoof EDM complete.':
+        log.warn('EDM spoof failed.')
+        return [], [], "", []
+
+    if len(lines) > 1:
+        path = lines[-2]
+        path = path.strip().split(':')
+        path = [p for p in path if p not in old_path]
+    if len(lines) > 2:
+        edmdatafiles = lines[-3]
+        edmdatafiles = edmdatafiles.strip().split(':')
+        edmdatafiles = [e for e in edmdatafiles if e != '']
+    if len(lines) > 3:
+        pwd = lines[-4].strip()
+    if len(lines) > 4:
+        args = lines[-5].strip().split()
+    log.debug('EDMDATAFILES: %s', edmdatafiles)
+    log.debug('PATH: %s', path)
+    log.debug('Script arguments: %s', args)
+    return edmdatafiles, path, pwd, args
+
+
 def spoof_edm(script_file, args=[]):
     """
     Use a dummy script called 'edm' to extract:
@@ -103,48 +155,16 @@ def spoof_edm(script_file, args=[]):
     if not _is_edm_script(script_file):
         raise SpoofError('Script file %s does not use EDM.' % script_file)
     env = os.environ.copy()
+    old_path = env['PATH'].split(':')
     old_dir = os.getcwd()
     script_dir = os.path.dirname(script_file)
-    # Change to directory of spoofed script.
-    os.chdir(script_dir)
-
-    this_dir = os.path.dirname(__file__)
-    spoof_edm_dir = os.path.join(this_dir, '..', 'res')
-    # Put spoof edm first on the path.
-    env['PATH'] = '%s:%s:%s' % (spoof_edm_dir, script_dir, env['PATH'])
-    old_path = env['PATH'].split(':')
-
-    edmdatafiles = None
-    path = None
-
-    args_string = " ".join(a for a in args)
-    args_string = args_string.replace('$PORT', '5064')
-    command_string = '%s %s' % (script_file, args_string)
-    log.debug('Spoofing script: %s', command_string)
-
-    out = subprocess.check_output([command_string], shell=True, env=env)
-
-    # Change back to original directory.
-    os.chdir(old_dir)
-    log.debug('Spoof EDM output:\n\n%s', out)
-    lines = out.splitlines()
-    if len(lines) == 0 or lines[-1] != 'Spoof EDM complete.':
-        log.warn('EDM spoof failed.')
-        return [], [], "", []
-
-    if len(lines) > 1:
-        path = lines[-2]
-        path = path.strip().split(':')
-        path = [p for p in path if p not in old_path]
-    if len(lines) > 2:
-        edmdatafiles = lines[-3]
-        edmdatafiles = edmdatafiles.strip().split(':')
-        edmdatafiles = [e for e in edmdatafiles if e != '']
-    if len(lines) > 3:
-        pwd = lines[-4].strip()
-    if len(lines) > 4:
-        args = lines[-5].strip().split()
-    log.debug('EDMDATAFILES: %s', edmdatafiles)
-    log.debug('PATH: %s', path)
-    log.debug('Script arguments: %s', args)
+    try:
+        output = capture_spoof_output(env, script_dir, script_file, args)
+    except (subprocess.CalledProcessError, ValueError) as exc:
+        raise SpoofError('Error spoofing script: {}'.format(exc))
+    finally:
+        # Change back to original directory.
+        os.chdir(old_dir)
+    log.debug('Spoof EDM output:\n\n%s', output)
+    edmdatafiles, path, pwd, args = process_output(output, old_path)
     return edmdatafiles, path, pwd, args
