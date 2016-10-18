@@ -160,7 +160,7 @@ def spoof_edm(script_file, args=[]):
     script_dir = os.path.dirname(script_file)
     try:
         output = capture_spoof_output(env, script_dir, script_file, args)
-    except subprocess.CalledProcessError as exc:
+    except (subprocess.CalledProcessError, ValueError) as exc:
         raise SpoofError('Error spoofing script: {}'.format(exc))
     finally:
         # Change back to original directory.
