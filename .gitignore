@@ -6,6 +6,8 @@
 res/converter.jar
 # compiled python
 *.pyc
+# pytest cache
+.cache
 # vim ctags file
 tags
 # datafile directories
