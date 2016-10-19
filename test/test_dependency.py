@@ -8,7 +8,7 @@ from convert.dependency import DependencyParser
 class TestDependencies(unittest.TestCase):
 
     def test_returns_empty_list_if_no_depends(self):
-        coord = coordinates.create('/dls_sw/prod/R3.14.12.3',  'support', 'topup', '5-3')
+        coord = coordinates.create('/dls_sw/prod/R3.14.12.3',  'support', 'devIocStats', '3-1-5dls5')
         d = DependencyParser(coord)
         depends = d.find_dependencies()
         self.assertDictEqual({}, depends)
@@ -46,7 +46,7 @@ class TestDependencies(unittest.TestCase):
 
         additional = [coordinates.create_rootless('support', 'calc', '3-1')]
         coord = coordinates.create('/dls_sw/prod/R3.14.12.3', 'dummy', 'LI/TI', '5-3')
-        d = DependencyParser(coord, additional)
+        d = DependencyParser(coord, additional_depends=additional)
 
         depends = d.find_dependencies()
         expected = {'calc':coordinates.create('/dls_sw/prod/R3.14.12.3', 'support', 'calc', '3-1')}
@@ -56,7 +56,7 @@ class TestDependencies(unittest.TestCase):
 
         additional = [coordinates.create_rootless('support', 'test', '3-1dls4')]
         coord = coordinates.create('/dls_sw/prod/R3.14.12.3', 'support', 'dlsPLC', '1-30')
-        d = DependencyParser(coord, additional)
+        d = DependencyParser(coord, additional_depends=additional)
 
         depends = d.find_dependencies()
         expected = {'test':coordinates.create('/dls_sw/prod/R3.14.12.3', 'support', 'test', '3-1dls4')}
@@ -68,7 +68,7 @@ class TestDependencies(unittest.TestCase):
         additional = [coordinates.create_rootless('support', 'test', '3-1dls4'),
                       coordinates.create_rootless('support', 'test2', '5-2')]
         coord = coordinates.create('/dls_sw/prod/R3.14.12.3', 'support', 'dummy', '1-30')
-        d = DependencyParser(coord, additional)
+        d = DependencyParser(coord, additional_depends=additional)
 
         depends = d.find_dependencies()
         expected = {'test':coordinates.create('/dls_sw/prod/R3.14.12.3', 'support', 'test', '3-1dls4'),
