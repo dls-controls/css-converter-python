@@ -107,6 +107,25 @@ def convert_module(mod, gen_cfg, force):
     except ValueError as e:
         log.warn('Conversion of %s failed:', mod)
         log.warn('%s', e)
+
+
+def already_converted(mod):
+    """ If the module has a module.ini file that contains an opi-location key,
+    assume that the module has already been converted.
+
+    Returns:
+        True if opi-location key is found.
+    """
+    converted = False
+    try:
+        module_config = configuration.parse_module_config(coordinates.as_path(mod.coords))
+        if configuration.opi_path(module_config) is not None:
+            converted = True
+    except utils.ConfigError:
+        pass # file not found
+    return converted
+
+
 def prepare_conversion(mod, gen_cfg, force):
     """Convert files in one module.
 
@@ -118,7 +137,9 @@ def prepare_conversion(mod, gen_cfg, force):
     log.info('Preparing conversion of module %s', mod)
     mod_cfg = gen_cfg.get_mod_cfg(mod.coords.module)
 
-    if mod_cfg.has_opi:
+    if already_converted(mod):
+        log.info('Skipping conversion, module %s already converted.', mod)
+    elif mod_cfg.has_opi:
         convert_module(mod, gen_cfg, force)
     else:
         log.info('Skipping conversion, no OPIs in module %s', mod)
