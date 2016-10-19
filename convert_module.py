@@ -126,7 +126,6 @@ def start_conversion():
     args = arguments.parse_arguments()
     gen_cfg = configuration.GeneralConfig(args.general_config, args.module_config)
     area = utils.AREA_IOC if args.ioc else utils.AREA_SUPPORT
-    mirror_root = gen_cfg.mirror_root
 
     try:
         modules = get_modules(args, gen_cfg, area)
