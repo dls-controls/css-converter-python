@@ -72,7 +72,42 @@ def file_dict_to_path_dict(file_dict, path_dirs):
     return path_dict
 
 
-def convert_one_module(mod, gen_cfg, force):
+def convert_module(mod, gen_cfg, force):
+    extra_depends = []
+    dependencies = mod.get_dependencies()
+    edl_dirs = [mod.get_edl_path()]
+    path_dirs = mod.get_path_dirs()
+    for dep, dep_coords in dependencies.items():
+        dep_cfg = gen_cfg.get_mod_cfg(dep)
+        new_version = utils.increment_version(dep_coords.version)
+        dep_edl_path = os.path.join(gen_cfg.mirror_root,
+                                coordinates.as_path(dep_coords, False)[1:],
+                                new_version,
+                                dep_cfg.edl_dir)
+        edl_dirs.append(dep_edl_path)
+        for p in dep_cfg.path_dirs:
+            dep_path = os.path.join(gen_cfg.mirror_root,
+                                    coordinates.as_path(dep_coords, False)[1:],
+                                    new_version,
+                                    p)
+            path_dirs.append(dep_path)
+        mod_deps = dep_cfg.extra_deps
+        updated_mod_deps = coordinates.update_version_from_files(mod_deps, mod.coords.root)
+        extra_depends.append(updated_mod_deps)
+
+    mod.file_dict = paths.index_paths(edl_dirs, True)
+    # path_dict is a reshaped subset of file_dict
+    mod.path_dict = file_dict_to_path_dict(mod.file_dict, path_dirs)
+    try:
+        mod.convert(force)
+        new_version = utils.increment_version(mod.coords.version)
+        run_script.generate(mod.coords, new_version, prefix=gen_cfg.mirror_root,
+                            opi_dir=mod.get_opi_path(), config=gen_cfg,
+                            extra_depends=extra_depends)
+    except ValueError as e:
+        log.warn('Conversion of %s failed:', mod)
+        log.warn('%s', e)
+def prepare_conversion(mod, gen_cfg, force):
     """Convert files in one module.
 
     Args:
@@ -82,42 +117,9 @@ def convert_one_module(mod, gen_cfg, force):
     """
     log.info('Preparing conversion of module %s', mod)
     mod_cfg = gen_cfg.get_mod_cfg(mod.coords.module)
-    extra_depends = []
 
     if mod_cfg.has_opi:
-        dependencies = mod.get_dependencies()
-        edl_dirs = [mod.get_edl_path()]
-        path_dirs = mod.get_path_dirs()
-        for dep, dep_coords in dependencies.items():
-            dep_cfg = gen_cfg.get_mod_cfg(dep)
-            new_version = utils.increment_version(dep_coords.version)
-            dep_edl_path = os.path.join(gen_cfg.mirror_root,
-                                    coordinates.as_path(dep_coords, False)[1:],
-                                    new_version,
-                                    dep_cfg.edl_dir)
-            edl_dirs.append(dep_edl_path)
-            for p in dep_cfg.path_dirs:
-                dep_path = os.path.join(gen_cfg.mirror_root,
-                                        coordinates.as_path(dep_coords, False)[1:],
-                                        new_version,
-                                        p)
-                path_dirs.append(dep_path)
-            mod_deps = dep_cfg.extra_deps
-            updated_mod_deps = coordinates.update_version_from_files(mod_deps, mod.coords.root)
-            extra_depends.append(updated_mod_deps)
-
-        mod.file_dict = paths.index_paths(edl_dirs, True)
-        # path_dict is a reshaped subset of file_dict
-        mod.path_dict = file_dict_to_path_dict(mod.file_dict, path_dirs)
-        try:
-            mod.convert(force)
-            new_version = utils.increment_version(mod.coords.version)
-            run_script.generate(mod.coords, new_version, prefix=gen_cfg.mirror_root,
-                                opi_dir=mod.get_opi_path(), config=gen_cfg,
-                                extra_depends=extra_depends)
-        except ValueError as e:
-            log.warn('Conversion of %s failed:', mod)
-            log.warn('%s', e)
+        convert_module(mod, gen_cfg, force)
     else:
         log.info('Skipping conversion, no OPIs in module %s', mod)
 
@@ -135,7 +137,7 @@ def start_conversion():
 
     try:
         for mod in modules:
-            convert_one_module(mod, gen_cfg, args.force)
+            prepare_conversion(mod, gen_cfg, args.force)
     except utils.ConfigError as e:
         log.fatal('Incorrect configuration: %s', e)
         log.fatal('System will exit.')
