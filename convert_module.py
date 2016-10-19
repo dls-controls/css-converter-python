@@ -72,12 +72,13 @@ def file_dict_to_path_dict(file_dict, path_dirs):
     return path_dict
 
 
-def convert_one_module(mod, gen_cfg):
+def convert_one_module(mod, gen_cfg, force):
     """Convert files in one module.
 
     Args:
         mod: module (object) to convert
         cfg: parsed module configuration
+        force: force conversion
     """
     log.info('Preparing conversion of module %s', mod)
     mod_cfg = gen_cfg.get_mod_cfg(mod.coords.module)
@@ -109,7 +110,7 @@ def convert_one_module(mod, gen_cfg):
         # path_dict is a reshaped subset of file_dict
         mod.path_dict = file_dict_to_path_dict(mod.file_dict, path_dirs)
         try:
-            mod.convert(args.force)
+            mod.convert(force)
             new_version = utils.increment_version(mod.coords.version)
             run_script.generate(mod.coords, new_version, prefix=gen_cfg.mirror_root,
                                 opi_dir=mod.get_opi_path(), config=gen_cfg,
@@ -121,7 +122,7 @@ def convert_one_module(mod, gen_cfg):
         log.info('Skipping conversion, no OPIs in module %s', mod)
 
 
-if __name__ == '__main__':
+def start_conversion():
     args = arguments.parse_arguments()
     gen_cfg = configuration.GeneralConfig(args.general_config, args.module_config)
     area = utils.AREA_IOC if args.ioc else utils.AREA_SUPPORT
@@ -135,7 +136,10 @@ if __name__ == '__main__':
 
     try:
         for mod in modules:
-            convert_one_module(mod, gen_cfg)
+            convert_one_module(mod, gen_cfg, args.force)
     except utils.ConfigError as e:
         log.fatal('Incorrect configuration: %s', e)
         log.fatal('System will exit.')
+
+if __name__ == '__main__':
+    start_conversion()
