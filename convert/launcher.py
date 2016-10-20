@@ -35,6 +35,8 @@ def update_cmd(cmd, cfg):
     # Determine properties of command in launcher
     cmd.interpret()
     p, n, v, rp = utils.parse_module_name(cmd.path_to_run)
+    if v is None:
+        raise ValueError('Version string not parsed from path {}'.format(cmd.path_to_run))
     # Switch back to edl extension
     edl_rp = rp[:-3] + 'edl'
     nv = utils.increment_version(v)
@@ -84,7 +86,7 @@ def get_updated_cmds(cmds, cfg):
             new_cmd = update_cmd(cmd, cfg)
             if new_cmd is not None:
                 cmd_dict[cmd] = new_cmd
-        except (spoof.SpoofError, ValueError, TypeError) as e:
+        except (spoof.SpoofError, ValueError) as e:
             log.info('Failed interpreting command {}: {}'.format(cmd.cmd, e))
 
     return cmd_dict
@@ -113,7 +115,7 @@ def _get_port(edm_args):
                 break
             except ValueError:
                 pass
-    log.info("Found PORT {}".format(port))
+    log.debug("Found PORT {}".format(port))
     return port
 
 

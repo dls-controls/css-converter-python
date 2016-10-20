@@ -7,9 +7,11 @@ commands to run a CSS screen.
 Updates are only made if the converted CSS screen is located in the
 mirror filesystem.
 """
+from __future__ import print_function
 from convert import configuration
 from convert import launcher
 
+import sys
 import logging as log
 LOG_FORMAT = '%(levelname)s:  %(message)s'
 LOG_LEVEL = log.INFO
@@ -25,10 +27,14 @@ def summarise_updates(cmd_dict):
     Args:
         cmd_dict: command object => (path, [args])
     """
-    print('')
-    log.info('The following launcher items have been updated:')
-    for item in cmd_dict:
-        log.info('    %s:%s', item.name, cmd_dict[item])
+    print('', file=sys.stderr)
+    if cmd_dict:
+        log.info('The following launcher items have been updated:\n')
+        for item in cmd_dict:
+            log.info('    %s:%s', item.name, cmd_dict[item])
+    else:
+        log.info('No launcher items have been updated.')
+    print('', file=sys.stderr)
 
 
 def update_xml():
@@ -44,7 +50,7 @@ def update_xml():
     cmd_dict = launcher.get_updated_cmds(cmds, cfg)
     lxml.write_new(cmd_dict)
     summarise_updates(cmd_dict)
-    print('Wrote new launcher XML file to {}'.format(cfg.new_apps_xml))
+    print('Wrote new launcher XML file to {}\n'.format(cfg.new_apps_xml), file=sys.stderr)
 
 
 if __name__ == '__main__':
