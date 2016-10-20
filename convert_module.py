@@ -137,7 +137,7 @@ def prepare_conversion(mod, gen_cfg, force):
     log.info('Preparing conversion of module %s', mod)
     mod_cfg = gen_cfg.get_mod_cfg(mod.coords.module)
 
-    if already_converted(mod):
+    if not force and already_converted(mod):
         log.info('Skipping conversion, module %s already converted.', mod)
     elif mod_cfg.has_opi:
         convert_module(mod, gen_cfg, force)
