@@ -128,12 +128,12 @@ class TryReplaceTest(unittest.TestCase):
         self.assertEqual(text, replaced)
 
     def test_try_replace_sets_loc_pv_if_straight_match(self):
-        """ Map <attr>$(d)</attr> to <attr>loc://$(DID)d("initval")</attr>
+        """ Map <attr>$(d)</attr> to <attr>loc://$(DID)d<VString>("initval")</attr>
         """
 
         symbols = {"d": "val01"}
         text = "$(d)"
-        expected = "=pv('loc://$(DID)%s(\"%s\")')" % ("d", symbols["d"])
+        expected = "=pv('loc://$(DID)%s<VString>(\"%s\")')" % ("d", symbols["d"])
 
         replaced = try_replace(text, symbols)
 
@@ -143,7 +143,7 @@ class TryReplaceTest(unittest.TestCase):
 
         symbols = {"d": "val01"}
         text = "$(d)MYPVNAME"
-        expected = "=pv(concat(toString('loc://$(DID)%s(\"%s\")\'), \"MYPVNAME\"))" % ("d", symbols["d"])
+        expected = "=pv(concat(toString('loc://$(DID)%s<VString>(\"%s\")\'), \"MYPVNAME\"))" % ("d", symbols["d"])
 
         replaced = try_replace(text, symbols)
 
@@ -153,7 +153,7 @@ class TryReplaceTest(unittest.TestCase):
 
         symbols = {"d": "val01"}
         text = "MYPVNAME$(d)"
-        expected = "=pv(concat(\"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\')))" % ("d", symbols["d"])
+        expected = "=pv(concat(\"MYPVNAME\", toString('loc://$(DID)%s<VString>(\"%s\")\')))" % ("d", symbols["d"])
 
         replaced = try_replace(text, symbols)
 
@@ -163,7 +163,7 @@ class TryReplaceTest(unittest.TestCase):
 
         symbols = {"d": "val01"}
         text = "MYPVNAME$(d)SUFFIX"
-        expected = "=pv(concat(\"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\'), \"SUFFIX\"))" % ("d", symbols["d"])
+        expected = "=pv(concat(\"MYPVNAME\", toString('loc://$(DID)%s<VString>(\"%s\")\'), \"SUFFIX\"))" % ("d", symbols["d"])
 
         replaced = try_replace(text, symbols)
 
@@ -173,7 +173,7 @@ class TryReplaceTest(unittest.TestCase):
 
         symbols = {"d": "val01", "e": "val2"}
         text = "$(d)$(e)"
-        expected = "=pv(concat(toString('loc://$(DID)%s(\"%s\")\'), toString('loc://$(DID)%s(\"%s\")\')))"  % ("d", symbols["d"], "e", symbols["e"])
+        expected = "=pv(concat(toString('loc://$(DID)%s<VString>(\"%s\")\'), toString('loc://$(DID)%s<VString>(\"%s\")\')))"  % ("d", symbols["d"], "e", symbols["e"])
 
         replaced = try_replace(text, symbols)
 
@@ -182,7 +182,7 @@ class TryReplaceTest(unittest.TestCase):
     def test_try_replace_sets_concat_loc_pv_if_inserting_two_matches_at_end_in_order(self):
         symbols = {"d": "val01", "e": "val2"}
         text = "MYPVNAME$(d)$(e)"
-        expected = "=pv(concat(\"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\'), toString('loc://$(DID)%s(\"%s\")\')))" % ("d", symbols["d"], "e", symbols["e"])
+        expected = "=pv(concat(\"MYPVNAME\", toString('loc://$(DID)%s<VString>(\"%s\")\'), toString('loc://$(DID)%s<VString>(\"%s\")\')))" % ("d", symbols["d"], "e", symbols["e"])
 
         replaced = try_replace(text, symbols)
 
@@ -192,7 +192,7 @@ class TryReplaceTest(unittest.TestCase):
 
         symbols = {"d": "val01", "e": "val2"}
         text = "MYPVNAME$(e)$(d)"
-        expected = "=pv(concat(\"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\'), toString('loc://$(DID)%s(\"%s\")\')))" % ("e", symbols["e"], "d", symbols["d"])
+        expected = "=pv(concat(\"MYPVNAME\", toString('loc://$(DID)%s<VString>(\"%s\")\'), toString('loc://$(DID)%s<VString>(\"%s\")\')))" % ("e", symbols["e"], "d", symbols["d"])
 
         replaced = try_replace(text, symbols)
 
@@ -202,7 +202,7 @@ class TryReplaceTest(unittest.TestCase):
 
         symbols = {"d": "val01", "e": "val2"}
         text = "$(d)MYPVNAME$(e)"
-        expected = "=pv(concat(toString('loc://$(DID)%s(\"%s\")\'), \"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\')))" % ("d", symbols["d"], "e", symbols["e"])
+        expected = "=pv(concat(toString('loc://$(DID)%s<VString>(\"%s\")\'), \"MYPVNAME\", toString('loc://$(DID)%s<VString>(\"%s\")\')))" % ("d", symbols["d"], "e", symbols["e"])
 
         replaced = try_replace(text, symbols)
 
@@ -212,7 +212,7 @@ class TryReplaceTest(unittest.TestCase):
 
         symbols = {"d": "val01", "e": "val2"}
         text = "$(e)MYPVNAME$(d)"
-        expected = "=pv(concat(toString('loc://$(DID)%s(\"%s\")\'), \"MYPVNAME\", toString('loc://$(DID)%s(\"%s\")\')))" % ("e", symbols["e"], "d", symbols["d"])
+        expected = "=pv(concat(toString('loc://$(DID)%s<VString>(\"%s\")\'), \"MYPVNAME\", toString('loc://$(DID)%s<VString>(\"%s\")\')))" % ("e", symbols["e"], "d", symbols["d"])
 
         replaced = try_replace(text, symbols)
 
