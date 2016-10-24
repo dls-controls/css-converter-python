@@ -152,10 +152,9 @@ def process_symbol(filename, mod, mod_cfg, mirror_root, prod_root):
         PNG filename if successful, None if any error occurred
     """
     working_path = os.path.join(mirror_root, prod_root[1:])
+    log.debug("Finding version from %s", working_path)
     mod_version = utils.get_module_version(working_path, mod_cfg.area, mod, mod_cfg.version)
-    # version = utils.increment_version(version)
-    log.debug("%s", working_path)
-    log.warning("FOUND VERSION %s", mod_version)
+    log.info("Found version %s", mod_version)
 
     coords = coordinates.create(prod_root, mod_cfg.area, mod, mod_version)
     mirror_path = os.path.join(mirror_root, coordinates.as_path(coords)[1:])
@@ -182,6 +181,7 @@ def process_symbol(filename, mod, mod_cfg, mirror_root, prod_root):
 def start():
     cfg = configuration.GeneralConfig()
     symbol_opis = build_filelist(cfg.mirror_root)
+    log.debug('Found symbol opis: {}'.format(symbol_opis))
 
     for opi_path in symbol_opis:
         _, mod_name, version, rel_path = utils.parse_module_name(opi_path)
@@ -189,7 +189,8 @@ def start():
         area = module_cfg.area
 
         coords = coordinates.create(cfg.prod_root, area, mod_name, version)
-        depth = len(os.path.split(rel_path)) - 1
+        depth = len(mod_name.split(os.path.sep))
+        log.debug('The depth for module %s is %s', mod_name, depth)
         try:
             mod = module.Module(coords, module_cfg, cfg.mirror_root,
                                 increment_version=False)

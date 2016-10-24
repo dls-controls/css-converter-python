@@ -72,10 +72,10 @@ def get_module_version(root, area, module_name, config_version):
     """
     version = config_version
     if version is None:
-        log.debug("get_module_version: %s", os.path.join(root, area, module_name))
+        log.debug("Finding module version from filesystem: %s", os.path.join(root, area, module_name))
         version = get_latest_version(os.path.join(root, area, module_name))
     else:
-        log.debug("get_module_version (config): %s", config_version)
+        log.debug("Using module version from config: %s", config_version)
 
     return version
 
