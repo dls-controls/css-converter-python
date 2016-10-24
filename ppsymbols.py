@@ -189,7 +189,7 @@ def start():
         area = module_cfg.area
 
         coords = coordinates.create(cfg.prod_root, area, mod_name, version)
-        depth = len(os.path.split(rel_path)) - 1
+        depth = len(mod_name.split(os.path.sep))
         log.debug('The depth for module %s is %s', mod_name, depth)
         try:
             mod = module.Module(coords, module_cfg, cfg.mirror_root,
