@@ -207,15 +207,15 @@ def module_name(parser):
 
     try:
         module = parser.get('general', 'name')
-    except ConfigParser.NoSectionError:
-        # file doesn't exist so...
+    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+        # file doesn't exist or option not in file
         raise utils.ConfigError(
             "No module name [general/name] specified in module.ini file")
 
     return module
 
 
-def opi_path(parser, default):
+def opi_path(parser, default=None):
     """ Extract the opi-file location in the module from the module.ini file
 
     Args:
@@ -228,8 +228,8 @@ def opi_path(parser, default):
 
     try:
         opis = parser.get('general', 'opi-location')
-    except ConfigParser.NoSectionError:
-        # file doesn't exist so...
+    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+        # file doesn't exist or option not in file
         opis = default
         log.info("No opi-location in module.ini file, using default %s", default)
 
