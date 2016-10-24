@@ -18,7 +18,7 @@ import os
 import re
 import logging as log
 LOG_FORMAT = '%(levelname)s:%(pathname)s: %(message)s'
-LOG_LEVEL = log.DEBUG
+LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 import xml.etree.ElementTree as et
 
