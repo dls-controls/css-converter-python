@@ -25,7 +25,6 @@ class FileMungingTests(unittest.TestCase):
         for d in sorted(moduledirs):
             print d
 
-"""
     def test_find_module_from_path_returns_path_at_module_version_from_edlfile(self):
         path = "/dls_sw/prod/R3.14.12.3/support/mirror/4-7-3/data/mirrorKBM-I22-HFM.edl"
         expected = "/dls_sw/prod/R3.14.12.3/support/mirror/4-7-3"
@@ -52,7 +51,7 @@ class FileMungingTests(unittest.TestCase):
 
     def test_find_module_from_path_returns_path_at_module_from_midpoint_in_tree(self):
         path = "/dls_sw/prod/R3.14.12.3/ioc/LI"
-        expected = "/dls_sw/prod/R3.14.12.3/support/mirror"
+        expected = "/dls_sw/prod/R3.14.12.3/ioc/LI"
 
         actual = utils.find_module_from_path(path)
 
@@ -72,13 +71,12 @@ class FileMungingTests(unittest.TestCase):
 
         self.assertEqual(path, actual)
 
+    @unittest.skip('Test takes >1m30 parsing whole prod/support file system')
     def test_find_module_from_path_does_nothing_with_support(self):
         path = "/dls_sw/prod/R3.14.12.3/support"
         actual = utils.find_module_from_path(path)
 
         self.assertEqual(path, actual)
-"""
-
 
 class UtilsTest(unittest.TestCase):
 

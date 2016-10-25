@@ -12,8 +12,12 @@ def from_path(filepath):
     """ Separate a file path into:
             root = File location (e.g. /dls_sw/prod/R3.14.12.3)
             area = [ioc / support]
-            module = path between <area> and <version>
-            version = may be None
+            module = path between <area> and <version> may include multiple chunks
+            version =
+
+        Note: If filepath is not correctly structured, i.e.
+            <root>/<area>/<module>/<version>
+        this method WILL NOT correctly determine it's composition!
 
     :param filepath: Filepath to split
     :return: ModCoord
@@ -26,6 +30,9 @@ def from_path(filepath):
     base, version = os.path.split(filepath)
     base, module = os.path.split(base)
     root, area = os.path.split(base)
+    if area not in ("ioc", "support"):
+        module = os.path.join(area, module)
+        root, area = os.path.split(root)
 
     return create(root, area, module, version)
 
