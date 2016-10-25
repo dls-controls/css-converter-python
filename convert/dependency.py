@@ -3,6 +3,7 @@ sys.path.append('/dls_sw/work/common/python/dls_epicsparser')
 
 from convert import coordinates, configuration, utils
 import dls_epicsparser.releaseparser
+import dls_epicsparser.parser
 import os
 
 import logging as log
@@ -10,6 +11,8 @@ import logging as log
 CONFIGURE_RELEASE = 'configure/RELEASE'
 EPICS_BASE = '/dls_sw/epics/R3.14.12.3/base'
 EPICS_11_BASE = '/dls_sw/epics/R3.14.11/base'
+
+DLS_VERSION_PATTERNS = [r".*/(.*)/(dls)[0-9]+[_\-\.][0-9]+.*"]  # .../asyn/dls4-21beta
 
 KNOWN_PARSE_ISSUES = [
     "/dls_sw/prod/R3.14.12.3/ioc/BL18B/BL/3-47/configure/RELEASE",
@@ -60,6 +63,7 @@ class DependencyParser(object):
             log.info("Prefixing shadow %s" % self._mirror)
             self._module_path = os.path.join(
                 self._mirror, coordinates.as_path(module_coord)[1:])
+
     def find_dependencies(self):
         """ Generate a dictionary of dependencies for this module
 
@@ -72,7 +76,7 @@ class DependencyParser(object):
         log.debug(">Parsing %s", cr_path)
 
         try:
-            r = dls_epicsparser.releaseparser.Release(cr_path)
+            r = dls_epicsparser.releaseparser.Release(cr_path, custom_patterns=DLS_VERSION_PATTERNS)
 
             for dependency in r.flatten():
                 if self.is_valid(dependency):
@@ -89,7 +93,7 @@ class DependencyParser(object):
                     log.info("Additional dependency %s/%s", acoord.module, acoord.version)
                     dependencies[acoord.module] = coordinates.update_root(acoord, self._root)
 
-        except (dls_epicsparser.releaseparser.ParseException, KeyError, AssertionError) as ex:
+        except (dls_epicsparser.parser.ParseException, KeyError, AssertionError) as ex:
             log.error("Failed to parse RELEASE for %s: %s", cr_path, ex.message)
 
             if cr_path not in KNOWN_PARSE_ISSUES:
