@@ -3,9 +3,13 @@
 Input: IOC name, mirror root.
 Output: checkout IOC and dependencies to mirror location.
 '''
+import pkg_resources
+pkg_resources.require('dls_css_utils')
+
 from convert import arguments
+from convert import configuration
 from dls_css_utils import coordinates
-from dls_css_utils import configuration
+from dls_css_utils import config
 from convert import dependency
 from convert import utils
 import os
@@ -107,7 +111,7 @@ def checkout_coords(coords, cfg, include_deps=True, extra_deps=None, force=False
 
             extra_deps = coordinates.update_version_from_files(
                 dep_cfg.extra_deps, coords.root)
-            configuration.create_module_ini_file(
+            config.create_module_ini_file(
                 new_coords, cfg.mirror_root, dep_cfg.opi_dir, extra_deps, force)
 
         except ValueError:
