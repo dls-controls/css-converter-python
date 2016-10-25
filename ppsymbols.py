@@ -7,8 +7,8 @@ As part of the process, create the necessary PNG files.
 Since this grabs screen attention, it can be run after all other conversion
 steps are complete.
 """
-from convert import configuration
-from convert import coordinates
+from dls_css_utils import configuration
+from dls_css_utils import coordinates
 from convert import files
 from convert import module
 from convert import paths

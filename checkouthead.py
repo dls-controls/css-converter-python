@@ -4,8 +4,8 @@ Input: IOC name, mirror root.
 Output: checkout IOC and dependencies to mirror location.
 '''
 from convert import arguments
-from convert import coordinates
-from convert import configuration
+from dls_css_utils import coordinates
+from dls_css_utils import configuration
 from convert import dependency
 from convert import utils
 import os

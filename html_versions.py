@@ -7,8 +7,8 @@ import pkg_resources
 pkg_resources.require('jinja2')
 import jinja2
 
-from convert import configuration
-from convert import coordinates
+from dls_css_utils import configuration
+from dls_css_utils import coordinates
 from convert import dependency
 from convert import launcher
 from convert import spoof

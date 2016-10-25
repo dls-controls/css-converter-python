@@ -8,7 +8,7 @@ Updates are only made if the converted CSS screen is located in the
 mirror filesystem.
 """
 from __future__ import print_function
-from convert import configuration
+from dls_css_utils import configuration
 from convert import launcher
 
 import sys

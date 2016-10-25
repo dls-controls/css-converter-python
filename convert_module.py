@@ -3,8 +3,9 @@
 import os
 import sys
 
-from convert import arguments, coordinates, configuration, module
-from convert import paths, run_script, utils
+from convert import arguments, module
+from convert import paths, utils
+from dls_css_utils import coordinates, configuration, run_script
 
 import logging as log
 LOG_FORMAT = '%(levelname)s:%(pathname)s: %(message)s'
