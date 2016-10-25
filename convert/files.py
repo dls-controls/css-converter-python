@@ -146,6 +146,7 @@ def convert_edl(filename, destination):
         log.warn('Conversion of {0} failed with code {1}.'.format(filename, returncode))
         success = False
     else:
+        log.info('Successfully  converted {}'.format(filename))
         success = True
 
     return success
