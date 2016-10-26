@@ -1,4 +1,3 @@
-#!/bin/env dls-python
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from convert.colourtweak import change_colours
@@ -800,6 +799,7 @@ class ColourChangeTest(unittest.TestCase):
 
     def test_change_colours_canvas(self):
         self.assertStringsEqual(self.do_colourtweak(DISPLAY), DISPLAY_TWK)
+
 
 if __name__ == '__main__':
     unittest.main()

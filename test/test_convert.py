@@ -52,5 +52,6 @@ class DepthTest(unittest.TestCase):
         c = Converter([test_dir], [], '/tmp', {})
         self.assertEqual(c._get_depth(test_dir), 3)
 
+
 if __name__ == '__main__':
     unittest.main()
