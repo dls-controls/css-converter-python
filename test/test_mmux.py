@@ -87,7 +87,7 @@ class FindSymbolTest(unittest.TestCase):
 
         self.assertDictEqual(symbols, {"num": "val01"})
 
-        self.assertEqual("loc://$(DID)num", target_nodes[0].text)
+        self.assertEqual("loc://$(DID)num<VString>", target_nodes[0].text)
 
     def test_returns_target_value_for_one_mm_two_sets(self):
         root = ET.fromstring(ONE_MMUX_TWO_SET)
