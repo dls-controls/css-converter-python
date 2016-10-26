@@ -29,6 +29,9 @@ class Module(object):
             cfg_dict: general config info -- extra deps, edl and opi dirs
             mirror_root: root of target filesystem
         """
+        # force colour tweak to parse the lookup table
+        colourtweak.init()
+
         self.coords = coords
         self.edl_dir = module_cfg.edl_dir
         self.opi_dir = module_cfg.opi_dir
