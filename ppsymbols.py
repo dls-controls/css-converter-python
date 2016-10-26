@@ -73,7 +73,7 @@ def edit_symbol_node(node, filename):
     node.append(pv_element)
 
     rule_element = node.find('.//rule')
-    rule_element.set('prop_id', 'pv_value')
+    rule_element.set('prop_id', 'image_index')
     rule_element.set('out_exp', 'true')
 
     file_element = et.Element('image_file')
