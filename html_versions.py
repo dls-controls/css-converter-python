@@ -5,14 +5,15 @@ Inspired by Tom's /dls/cs-www/reports/scripts/list_ioc_support_modules.py
 
 import pkg_resources
 pkg_resources.require('jinja2')
+pkg_resources.require('dls_css_utils')
 import jinja2
 
-from dls_css_utils import configuration
 from dls_css_utils import coordinates
-from convert import dependency
+from dls_css_utils import dependency
+from dls_css_utils import utils
+from convert import configuration
 from convert import launcher
 from convert import spoof
-from convert import utils
 
 import os
 import collections
