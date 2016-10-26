@@ -1,10 +1,15 @@
 #!/usr/bin/env dls-python
 
+import pkg_resources
+pkg_resources.require('dls_css_utils')
+
 import os
 import sys
 
-from convert import arguments, coordinates, configuration, module
-from convert import paths, run_script, utils
+from convert import arguments, module
+from convert import paths, utils
+from convert import configuration
+from dls_css_utils import coordinates, run_script, config
 
 import logging as log
 LOG_FORMAT = '%(levelname)s:%(pathname)s: %(message)s'
@@ -118,8 +123,8 @@ def already_converted(mod):
     """
     converted = False
     try:
-        module_config = configuration.parse_module_config(coordinates.as_path(mod.coords))
-        if configuration.opi_path(module_config) is not None:
+        module_config = config.parse_module_config(coordinates.as_path(mod.coords))
+        if config.opi_path(module_config) is not None:
             converted = True
     except utils.ConfigError:
         pass # file not found

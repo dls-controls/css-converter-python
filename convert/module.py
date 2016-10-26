@@ -9,7 +9,7 @@ import utils
 import os
 import shutil
 import dependency
-import coordinates
+from dls_css_utils import coordinates
 import paths
 import logging as log
 

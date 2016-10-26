@@ -1,4 +1,5 @@
 #!/usr/bin/env dls-python
+
 """
 Post processing script to locate all the symbol widgets in converted
 EDM panels and change them into DLS symbol widgets.
@@ -7,8 +8,11 @@ As part of the process, create the necessary PNG files.
 Since this grabs screen attention, it can be run after all other conversion
 steps are complete.
 """
+import pkg_resources
+pkg_resources.require('dls_css_utils')
+
+from dls_css_utils import coordinates
 from convert import configuration
-from convert import coordinates
 from convert import files
 from convert import module
 from convert import paths
