@@ -1,11 +1,10 @@
 #!/bin/env dls-python
-import sys, os
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from convert import colourtweak
-
+import os
 import unittest
 import xml.etree.ElementTree as ET
 import difflib
+
+from convert import colourtweak
 
 DISPLAY = """<display typeId="org.csstudio.opibuilder.Display" version="1.0">
   <x>97</x>
@@ -758,7 +757,9 @@ class ColourChangeTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        colourtweak.init(filepath=os.path.join('..', colourtweak.COLOR_DEF_FILE))
+        working_dir = os.path.dirname(os.path.realpath(__file__))
+        resource_path, _ = os.path.split(working_dir)
+        colourtweak.init(filepath=os.path.join(resource_path, colourtweak.COLOR_DEF_FILE))
 
     def assertStringsEqual(self, first, second, msg=None):
         """Assert that two multi-line strings are equal.
