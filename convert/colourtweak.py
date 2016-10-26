@@ -5,7 +5,7 @@ import logging as log
 
 import utils
 
-COLOR_DEF = 'res/colourtweak.def'
+COLOR_DEF_FILE = 'res/colourtweak.def'
 
 DISPLAY = "org.csstudio.opibuilder.Display"
 ACTIONBUTTON = "org.csstudio.opibuilder.widgets.ActionButton"
@@ -22,17 +22,26 @@ CHOICEBUTTON = "org.csstudio.opibuilder.widgets.choiceButton"
 BYTEMONITOR = "org.csstudio.opibuilder.widgets.bytemonitor"
 BOOLBUTTON = "org.csstudio.opibuilder.widgets.BoolButton"
 
-# colour_dict["Red"] = (255, 0, 0)
+# dictionary of KEY:(r,g,b) tuple
 colour_dict = {}
-with open(COLOR_DEF) as f:
-    for line in f:
-        # get rid of comments
-        split = line.strip().split("#")
-        if split[0]:
-            # name = r, g, b
-            name, rgb = split[0].split("=")
-            r, g, b = rgb.split(",")
-            colour_dict[name.strip()] = (r.strip(), g.strip(), b.strip())
+
+
+def init(filepath=COLOR_DEF_FILE):
+    """ Parse a colour definitions file containing "key = r, g, b" lines
+    Args:
+        filepath: file to load
+
+    """
+    with open(filepath) as f:
+        for line in f:
+            # get rid of comments
+            split = line.strip().split("#")
+            if split[0]:
+                # name = r, g, b
+                name, rgb = split[0].split("=")
+                r, g, b = rgb.split(",")
+                colour_dict[name.strip()] = (r.strip(), g.strip(), b.strip())
+
 
 def set_colour(el, name):
     # set colour attributes to be according to the named colour
@@ -43,7 +52,7 @@ def set_colour(el, name):
     el.set("name", name)
 
 # Map of colours with no widget specific changes
-colour_map = {
+COLOUR_MAP = {
     "Disconn/Invalid": "White",
     "Top Shadow": "Grey 90%",
     "grey-2": "Grey 90%",
@@ -128,6 +137,7 @@ colour_map = {
     "Disconnected": "Disconnected",
 }
 
+
 def change_colours(widget):
     textControls = [ACTIONBUTTON, TEXTINPUT, MENUBUTTON, CHOICEBUTTON, BOOLBUTTON]
     textMonitors = [TEXTUPDATE]
@@ -189,11 +199,12 @@ def change_colours(widget):
         elif name == "Exit/Quit/Kill" and typeId in [ACTIONBUTTON] and prop == "foreground_color":
             set_colour(colour, "Exit: FG")
         # If we have a static map, then just use that
-        elif name in colour_map:
-            set_colour(colour, colour_map[name])
+        elif name in COLOUR_MAP:
+            set_colour(colour, COLOUR_MAP[name])
         else:
             # remove name
             colour.attrib.pop("name")
+
 
 def parse(filepath):
     try:

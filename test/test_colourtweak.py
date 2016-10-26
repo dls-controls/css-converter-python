@@ -1,7 +1,7 @@
 #!/bin/env dls-python
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from convert.colourtweak import change_colours
+from convert import colourtweak
 
 import unittest
 import xml.etree.ElementTree as ET
@@ -755,6 +755,11 @@ MISC_COLOURS_TWK = """<widget typeId="org.csstudio.opibuilder.widgets.Unknown" v
 
 
 class ColourChangeTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        colourtweak.init(filepath=os.path.join('..', colourtweak.COLOR_DEF_FILE))
+
     def assertStringsEqual(self, first, second, msg=None):
         """Assert that two multi-line strings are equal.
         If they aren't, show a nice diff.
@@ -771,7 +776,7 @@ class ColourChangeTest(unittest.TestCase):
 
     def do_colourtweak(self, text):
         root = ET.fromstring(text)
-        change_colours(root)
+        colourtweak.change_colours(root)
         return ET.tostring(root)
 
     def test_change_colours_label(self):
