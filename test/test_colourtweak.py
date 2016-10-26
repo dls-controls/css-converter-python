@@ -467,7 +467,7 @@ TEXTUPDATE_TWK = """<widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" 
     <border_width>0</border_width>
     <border_style>1</border_style>
     <border_color>
-      <color blue="0" green="255" name="Green" red="0" />
+      <color blue="0" green="192" name="Mid Green" red="0" />
     </border_color>
     <border_alarm_sensitive>false</border_alarm_sensitive>
     <precision_from_pv>true</precision_from_pv>
@@ -685,7 +685,7 @@ MISC_COLOURS_TWK = """<widget typeId="org.csstudio.opibuilder.widgets.Unknown" v
       <color blue="64" green="64" name="Grey 25%" red="64" />
       <color blue="0" green="0" name="Black" red="0" />
       <color blue="0" green="255" name="Green" red="0" />
-      <color blue="0" green="255" name="Green" red="0" />
+      <color blue="0" green="192" name="Mid Green" red="0" />
       <color blue="0" green="192" name="Mid Green" red="0" />
       <color blue="0" green="192" name="Mid Green" red="0" />
       <color blue="0" green="128" name="Dark Green" red="0" />
@@ -785,6 +785,7 @@ class ColourChangeTest(unittest.TestCase):
     def test_anon_colour(self):
         self.assertStringsEqual(self.do_colourtweak(DISPLAY_ANON_COLOUR),
                                 DISPLAY_ANON_COLOUR_TWK)
+
     def test_change_colours_action_button(self):
         self.assertStringsEqual(self.do_colourtweak(ACTIONBUTTON), ACTIONBUTTON_TWK)
 
