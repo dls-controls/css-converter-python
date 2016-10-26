@@ -1,4 +1,5 @@
 import pkg_resources
+pkg_resources.require('dls_css_utils')
 pkg_resources.require('dls_epicsparser')
 pkg_resources.require('mock')
 
@@ -6,7 +7,7 @@ import os
 import mock
 import unittest
 from convert import module
-from convert import coordinates
+from dls_css_utils import coordinates
 
 
 class ModuleTest(unittest.TestCase):

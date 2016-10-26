@@ -10,8 +10,8 @@ from convert import arguments
 from convert import configuration
 from dls_css_utils import coordinates
 from dls_css_utils import config
-from convert import dependency
-from convert import utils
+from dls_css_utils import dependency
+from dls_css_utils import utils
 import os
 import shutil
 import subprocess
