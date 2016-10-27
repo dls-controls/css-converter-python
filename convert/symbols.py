@@ -7,6 +7,7 @@ GROUP_END = 'endGroup'
 
 
 class SymbolError(Exception):
+    """ Custom exception for all all Symbol conversion errors"""
     pass
 
 

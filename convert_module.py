@@ -84,9 +84,9 @@ def convert_module(mod, gen_cfg, force):
         dep_cfg = gen_cfg.get_mod_cfg(dep)
         new_version = utils.increment_version(dep_coords.version)
         dep_edl_path = os.path.join(gen_cfg.mirror_root,
-                                coordinates.as_path(dep_coords, False)[1:],
-                                new_version,
-                                dep_cfg.edl_dir)
+                                    coordinates.as_path(dep_coords, False)[1:],
+                                    new_version,
+                                    dep_cfg.edl_dir)
         edl_dirs.append(dep_edl_path)
         for p in dep_cfg.path_dirs:
             dep_path = os.path.join(gen_cfg.mirror_root,
@@ -134,7 +134,7 @@ def prepare_conversion(mod, gen_cfg, force):
 
     Args:
         mod: module (object) to convert
-        cfg: parsed module configuration
+        gen_cfg: parsed module configuration
         force: force conversion
     """
     log.info('Preparing conversion of module %s', mod)
