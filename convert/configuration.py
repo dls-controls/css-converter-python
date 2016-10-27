@@ -1,8 +1,9 @@
+
+import logging as log
 import os
 import ConfigParser
-import logging as log
-from dls_css_utils import utils
-from dls_css_utils import config
+
+from dls_css_utils import config, utils
 
 
 VCS_SVN = 'svn'

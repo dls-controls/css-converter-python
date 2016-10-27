@@ -3,13 +3,13 @@
 import pkg_resources
 pkg_resources.require('dls_css_utils')
 
+import logging as log
 import os
 import sys
 
 from convert import arguments, module, paths, configuration
 from dls_css_utils import coordinates, run_script, config, utils
 
-import logging as log
 LOG_FORMAT = '%(levelname)s:%(pathname)s: %(message)s'
 LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)

@@ -6,17 +6,14 @@ Output: checkout IOC and dependencies to mirror location.
 import pkg_resources
 pkg_resources.require('dls_css_utils')
 
-from convert import arguments
-from convert import configuration
-from dls_css_utils import coordinates
-from dls_css_utils import config
-from dls_css_utils import dependency
-from dls_css_utils import utils
+import logging as log
 import os
 import shutil
 import subprocess
 
-import logging as log
+from convert import arguments, configuration
+from dls_css_utils import coordinates, config, dependency,utils
+
 LOG_FORMAT = '%(levelname)s:  %(message)s'
 LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
