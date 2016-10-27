@@ -69,9 +69,9 @@ def file_dict_to_path_dict(file_dict, path_dirs):
         for path in path_dirs:
             path = path.strip(os.path.sep)
             if old_key.startswith(path):
-                module, _ = old_value
+                mod, _ = old_value
                 new_key = os.path.relpath(old_key, path)
-                path_dict[new_key] = (module, path)
+                path_dict[new_key] = (mod, path)
     return path_dict
 
 
