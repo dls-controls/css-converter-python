@@ -3,13 +3,13 @@
 import pkg_resources
 pkg_resources.require('dls_css_utils')
 
+import logging as log
 import os
 import sys
 
 from convert import arguments, module, paths, configuration
 from dls_css_utils import coordinates, run_script, config, utils
 
-import logging as log
 LOG_FORMAT = '%(levelname)s:%(pathname)s: %(message)s'
 LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
@@ -69,9 +69,9 @@ def file_dict_to_path_dict(file_dict, path_dirs):
         for path in path_dirs:
             path = path.strip(os.path.sep)
             if old_key.startswith(path):
-                module, _ = old_value
+                mod, _ = old_value
                 new_key = os.path.relpath(old_key, path)
-                path_dict[new_key] = (module, path)
+                path_dict[new_key] = (mod, path)
     return path_dict
 
 
@@ -84,9 +84,9 @@ def convert_module(mod, gen_cfg, force):
         dep_cfg = gen_cfg.get_mod_cfg(dep)
         new_version = utils.increment_version(dep_coords.version)
         dep_edl_path = os.path.join(gen_cfg.mirror_root,
-                                coordinates.as_path(dep_coords, False)[1:],
-                                new_version,
-                                dep_cfg.edl_dir)
+                                    coordinates.as_path(dep_coords, False)[1:],
+                                    new_version,
+                                    dep_cfg.edl_dir)
         edl_dirs.append(dep_edl_path)
         for p in dep_cfg.path_dirs:
             dep_path = os.path.join(gen_cfg.mirror_root,
@@ -134,7 +134,7 @@ def prepare_conversion(mod, gen_cfg, force):
 
     Args:
         mod: module (object) to convert
-        cfg: parsed module configuration
+        gen_cfg: parsed module configuration
         force: force conversion
     """
     log.info('Preparing conversion of module %s', mod)

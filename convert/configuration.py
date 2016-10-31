@@ -1,8 +1,9 @@
+
+import logging as log
 import os
 import ConfigParser
-import logging as log
-from dls_css_utils import utils
-from dls_css_utils import config
+
+from dls_css_utils import config, utils
 
 
 VCS_SVN = 'svn'
@@ -14,6 +15,12 @@ MODULE_CONF = 'conf/modules.ini'
 
 
 class ModuleConfig(object):
+    """ Data class holding information parsed from the converter's module
+        configuration file for a SINGLE MODULE
+
+        Keys read from the config file section are added as instance
+        attributes. All instances contain a default set of configuration items.
+    """
 
     DEFAULT_CFG = {'edl_dir': 'data',
                    'path_dirs': [],
@@ -34,14 +41,14 @@ class ModuleConfig(object):
         cfg_section = dict(ModuleConfig.DEFAULT_CFG)
         cfg_section['opi_dir'] = opi_dir
         try:
-            items = config_parser.items(name)
-            for key, value in items:
+            # Perform post-processing on configuration values
+            for key, value in config_parser.items(name):
                 if key in ('layers', 'groups', 'symbols', 'path_dirs'):
                     cfg_section[key] = config.split_value_list(value)
                 elif key == 'extra_deps':
                     dependencies = config.split_value_list(value)
-                    cfg_section[key] = config.parse_dependency_list(dependencies,
-                                                             config_parser)
+                    cfg_section[key] = config.parse_dependency_list(
+                        dependencies, config_parser)
                 elif key == 'has_opi':
                     cfg_section[key] = config_parser.getboolean(name, key)
                 else:
@@ -58,6 +65,14 @@ class ModuleConfig(object):
 
 
 class GeneralConfig(object):
+    """ Data class holding information parsed from the general converter
+        configuration file and the module configuration
+
+        Keys read from the general config files are added as instance
+        attributes, individual modules configurations from the config file
+        are accessed via a getter.
+
+    """
 
     def __init__(self, gen_cfg_file=GEN_CONF, mod_cfg_file=MODULE_CONF):
         self._gen_cfg_file = gen_cfg_file

@@ -11,20 +11,17 @@ steps are complete.
 import pkg_resources
 pkg_resources.require('dls_css_utils')
 
-from dls_css_utils import coordinates
-from convert import configuration
-from convert import files
-from convert import module
-from convert import paths
-from convert import utils
-
+import logging as log
 import os
 import re
-import logging as log
+import xml.etree.ElementTree as et
+
+from convert import configuration, files, module, paths, utils
+from dls_css_utils import coordinates
+
 LOG_FORMAT = '%(levelname)s:%(pathname)s: %(message)s'
 LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
-import xml.etree.ElementTree as et
 
 
 SYMBOL_ID = 'org.csstudio.opibuilder.widgets.edm.symbolwidget'

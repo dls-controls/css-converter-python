@@ -7,6 +7,7 @@ GROUP_END = 'endGroup'
 
 
 class SymbolError(Exception):
+    """ Custom exception for all all Symbol conversion errors"""
     pass
 
 
@@ -94,26 +95,6 @@ def new_name(filename, width):
     parts = filename.split('.')
     return '.'.join(parts[:-1]) + '-' + str(width) + '.' + parts[-1]
 
-
-def find_groups(filename):
-    groups = []
-    current_group = []
-    with open(filename) as f:
-
-        in_group = False
-
-        for line in f:
-            if line.strip() == GROUP_HEADER:
-                in_group = True
-            elif line.strip() == GROUP_END:
-                in_group = False
-                groups.append(current_group)
-                current_group = []
-
-            if in_group:
-                current_group.append(line)
-
-    return groups
 
 def compress(filename):
     log.info('Parsing %s', filename)

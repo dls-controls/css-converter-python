@@ -6,19 +6,16 @@ Inspired by Tom's /dls/cs-www/reports/scripts/list_ioc_support_modules.py
 import pkg_resources
 pkg_resources.require('jinja2')
 pkg_resources.require('dls_css_utils')
-import jinja2
 
-from dls_css_utils import coordinates
-from dls_css_utils import dependency
-from dls_css_utils import utils
-from convert import configuration
-from convert import launcher
-from convert import spoof
-
-import os
 import collections
-import subprocess
+import jinja2
 import logging as log
+import os
+import subprocess
+
+from convert import configuration, launcher, spoof
+from dls_css_utils import coordinates, dependency, utils
+
 LOG_FORMAT = '%(levelname)s:  %(message)s'
 LOG_LEVEL = log.WARNING
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)

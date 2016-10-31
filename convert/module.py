@@ -1,3 +1,8 @@
+import logging as log
+import os
+import paths
+import shutil
+
 import colourtweak
 import files
 import fonttweak
@@ -5,14 +10,7 @@ import groups
 import layers
 import mmux
 
-import os
-import shutil
-from dls_css_utils import utils
-from dls_css_utils import dependency
-from dls_css_utils import coordinates
-import paths
-import logging as log
-
+from dls_css_utils import utils, dependency, coordinates
 
 EDL_EXTENSION = 'edl'
 OPI_EXTENSION = 'opi'

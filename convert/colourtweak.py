@@ -1,9 +1,9 @@
 #!/bin/env dls-python
-import xml.etree.ElementTree as ET
-import os
 import logging as log
+import os
+import xml.etree.ElementTree as ET
 
-import utils
+from utils import make_writeable
 
 COLOR_DEF_FILE = 'res/colourtweak.def'
 
@@ -216,7 +216,7 @@ def parse(filepath):
                 change_colours(widget)
 
             # write the new tree out to the same file
-            utils.make_writeable(filepath)
+            make_writeable(filepath)
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
         else:
             log.warn("Skipping %s, file not found", filepath)

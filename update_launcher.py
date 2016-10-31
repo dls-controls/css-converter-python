@@ -11,11 +11,11 @@ from __future__ import print_function
 import pkg_resources
 pkg_resources.require('dls_css_utils')
 
-from convert import configuration
-from convert import launcher
-
-import sys
 import logging as log
+import sys
+
+from convert import configuration, launcher
+
 LOG_FORMAT = '%(levelname)s:  %(message)s'
 LOG_LEVEL = log.INFO
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
