@@ -155,6 +155,20 @@ def change_colours(widget):
           <color blue="32" green="64" name="Related Display: FG" red="128" />
         </foreground_color>
 
+        and in rules blocks
+
+        <rules>
+          <rule name="onColorAlarm" out_exp="false" prop_id="on_color">
+            <exp bool_exp="pvSev0==-1" >
+              <value><color name="Major" /></value>
+            </exp>
+            <exp bool_exp= ... >
+              <value><color name= "Minor" /></value>
+            </exp>
+            ...
+          </rule>
+        </rules>
+
         Other colour elements may be inside child widgets (e.g. within grouping
         containers) and need to be handled in those widgets.
     Args:
@@ -165,6 +179,9 @@ def change_colours(widget):
     type_id = widget.get("typeId")
     # Parent lookup for colours
     colour_prop = {c:p.tag for p in widget.iter() for c in p}
+
+    # Note: ElementTree doesn't support xpath 'or' (|) so we parse the document
+    # twice
     for colour in widget.findall("./*/color"):
         name = colour.get("name")
         if name is None:
@@ -172,6 +189,15 @@ def change_colours(widget):
 
         prop = colour_prop[colour]
         process_element(colour, prop, name, type_id)
+
+    for colour in widget.findall("./*/rule/*/*/color"):
+        name = colour.get("name")
+        if name is None:
+            continue
+
+        prop = colour_prop[colour]
+        process_element(colour, prop, name, type_id)
+
 
 def process_element(colour, prop, name, type_id):
     """ Execute role specific overrides on the passed colour XML element
