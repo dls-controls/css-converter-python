@@ -184,19 +184,13 @@ def change_colours(widget):
     # twice
     for colour in widget.findall("./*/color"):
         name = colour.get("name")
-        if name is None:
-            continue
-
-        prop = colour_prop[colour]
-        process_element(colour, prop, name, type_id)
+        if name is not None:
+            process_element(colour, colour_prop[colour], name, type_id)
 
     for colour in widget.findall("./*/rule/*/*/color"):
         name = colour.get("name")
-        if name is None:
-            continue
-
-        prop = colour_prop[colour]
-        process_element(colour, prop, name, type_id)
+        if name is not None:
+            process_element(colour, colour_prop[colour], name, type_id)
 
 
 def process_element(colour, prop, name, type_id):
