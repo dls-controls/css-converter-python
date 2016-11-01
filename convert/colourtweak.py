@@ -137,73 +137,127 @@ COLOUR_MAP = {
     "Disconnected": "Disconnected",
 }
 
+TEXT_CONTROLS = [ACTIONBUTTON, TEXTINPUT, MENUBUTTON, CHOICEBUTTON, BOOLBUTTON]
+TEXT_MONITORS = [TEXTUPDATE]
+TEXT_STATIC = [LINKINGCONTAINER, LABEL, DETAILPANEL, GROUPINGCONTAINER]
+NON_TEXT = [MULTISTATESYMBOLMONITOR, RECTANGLE, BYTEMONITOR]
+
 
 def change_colours(widget):
-    textControls = [ACTIONBUTTON, TEXTINPUT, MENUBUTTON, CHOICEBUTTON, BOOLBUTTON]
-    textMonitors = [TEXTUPDATE]
-    textStatic = [LINKINGCONTAINER, LABEL, DETAILPANEL, GROUPINGCONTAINER]
-    nonText = [MULTISTATESYMBOLMONITOR, RECTANGLE, BYTEMONITOR]
+    """ Perform colour substitutions in the constructed OPI files.
+
+        These are specified as specific widget/colour updates or statically
+        defined colour mapping (COLOUR_MAP)
+
+        Look for colour elements two elements below, e.g.
+
+        <foreground_color>
+          <color blue="32" green="64" name="Related Display: FG" red="128" />
+        </foreground_color>
+
+        and in rules blocks
+
+        <rules>
+          <rule name="onColorAlarm" out_exp="false" prop_id="on_color">
+            <exp bool_exp="pvSev0==-1" >
+              <value><color name="Major" /></value>
+            </exp>
+            <exp bool_exp= ... >
+              <value><color name= "Minor" /></value>
+            </exp>
+            ...
+          </rule>
+        </rules>
+
+        Other colour elements may be inside child widgets (e.g. within grouping
+        containers) and need to be handled in those widgets.
+    Args:
+        widget: XML widget element
+
+    """
     # Get the widget type
-    typeId = widget.get("typeId")
+    type_id = widget.get("typeId")
     # Parent lookup for colours
     colour_prop = {c:p.tag for p in widget.iter() for c in p}
-    # Look for colour elements two elements below.
-    # <foreground_color>
-    #   <color blue="32" green="64" name="Related Display: FG" red="128" />
-    # </foreground_color>
-    # Other colour elements may be inside child widgets (e.g. within grouping
-    # containers) and need to be handled in those widgets.
+
+    # Note: ElementTree doesn't support xpath 'or' (|) so we parse the document
+    # twice
     for colour in widget.findall("./*/color"):
-        # Map colours
         name = colour.get("name")
-        if name is None:
-            continue
-        prop = colour_prop[colour]
-        # Role specific overrides
-        if name.split()[-1].lower() == "canvas" and typeId in textStatic + [DISPLAY] and prop == "background_color":
-            set_colour(colour, "Canvas")
-        elif name == "Canvas" and typeId in textControls and prop in ["background_color", "off_color", "value"]:
-            set_colour(colour, "Controller: BG")
-        elif name == "Button: On" and typeId == CHOICEBUTTON and prop == "selected_color":
-            set_colour(colour, "Button: On")
-        elif name == "Button: On" and typeId == BOOLBUTTON:
-            set_colour(colour, "Button: On")
-        elif name == "Monitor BG" and typeId in textMonitors and prop == "background_color":
-            set_colour(colour, "Monitor: BG")
-        elif name == "Black" and typeId in textStatic + [ACTIONBUTTON] and prop == "foreground_color":
-            set_colour(colour, "Text: FG")
-        elif name == "Green LED: On" and typeId == BYTEMONITOR and prop in ["on_color", "off_color"]:
-            set_colour(colour, "Green LED: On" )
-        elif name == "Green LED: Off" and typeId == BYTEMONITOR and prop  in ["on_color", "off_color"]:
-            set_colour(colour, "Green LED: Off" )
-        elif name == "Red LED: On" and typeId == BYTEMONITOR and prop in ["on_color", "off_color"]:
-            set_colour(colour, "Red LED: On" )
-        elif name == "Red LED: Off" and typeId == BYTEMONITOR and prop  in ["on_color", "off_color"]:
-            set_colour(colour, "Red LED: Off" )
-        elif name == "Yellow LED: On" and typeId == BYTEMONITOR and prop in ["on_color", "off_color"]:
-            set_colour(colour, "Yellow LED: On" )
-        elif name == "Yellow LED: Off" and typeId == BYTEMONITOR and prop  in ["on_color", "off_color"]:
-            set_colour(colour, "Yellow LED: Off" )
-        elif name == "Controller/alt" and typeId == BYTEMONITOR and prop in ["on_color", "off_color"]:
-            set_colour(colour, "Blue LED: On")
-        elif name == "cyan-34" and typeId == BYTEMONITOR and prop in ["on_color", "off_color"]:
-            set_colour(colour, "Blue LED: Off")
-        elif name == "Monitor: NORMAL" and typeId in textMonitors and prop == "foreground_color":
-            set_colour(colour, "Monitor: FG")
-        elif name == "Controller" and typeId in textControls and prop == "foreground_color":
-            set_colour(colour, "Controller: FG")
-        elif name == "Shell/reldsp-alt" and typeId in [ACTIONBUTTON] and prop == "foreground_color":
-            set_colour(colour, "Text: FG")
-        elif name == "Related display" and typeId in [ACTIONBUTTON, MENUBUTTON] and prop == "foreground_color":
-            set_colour(colour, "Related Display: FG")
-        elif name == "Exit/Quit/Kill" and typeId in [ACTIONBUTTON] and prop == "foreground_color":
-            set_colour(colour, "Exit: FG")
-        # If we have a static map, then just use that
-        elif name in COLOUR_MAP:
-            set_colour(colour, COLOUR_MAP[name])
-        else:
-            # remove name
-            colour.attrib.pop("name")
+        if name is not None:
+            process_element(colour, colour_prop[colour], name, type_id)
+
+    for colour in widget.findall("./*/rule/*/*/color"):
+        name = colour.get("name")
+        if name is not None:
+            process_element(colour, colour_prop[colour], name, type_id)
+
+
+def process_element(colour, prop, name, type_id):
+    """ Execute role specific overrides on the passed colour XML element
+    Args:
+        colour: XML color element
+        prop: enclosing element name
+        name: EDM colour name
+        type_id: CSS widget typeId
+
+    Returns:
+
+    """
+    def match_colour_role(n, t, p=None):
+        """ Helper method to evaluate match on three arguments
+
+        Args:
+            n (String): EDM colour name
+            t: (String or [String]): name or list of element typeIds
+            p (String, [String]) (optional): property name or list
+        """
+        return name == n and type_id in t and (p is None or prop in p)
+
+    if name.split()[-1].lower() == "canvas" and type_id in TEXT_STATIC + [DISPLAY] and prop == "background_color":
+        set_colour(colour, "Canvas")
+    elif match_colour_role("Canvas", TEXT_CONTROLS, ["background_color", "off_color", "value"]):
+        set_colour(colour, "Controller: BG")
+    elif match_colour_role("Button: On", CHOICEBUTTON, "selected_color"):
+        set_colour(colour, "Button: On")
+    elif match_colour_role("Button: On", BOOLBUTTON):
+        set_colour(colour, "Button: On")
+    elif match_colour_role("Monitor BG", TEXT_MONITORS, "background_color"):
+        set_colour(colour, "Monitor: BG")
+    elif match_colour_role("Black", TEXT_STATIC + [ACTIONBUTTON], "foreground_color"):
+        set_colour(colour, "Text: FG")
+    elif match_colour_role("Green LED: On", BYTEMONITOR, ["on_color", "off_color"]):
+        set_colour(colour, "Green LED: On")
+    elif match_colour_role("Green LED: Off", BYTEMONITOR, ["on_color", "off_color"]):
+        set_colour(colour, "Green LED: Off")
+    elif match_colour_role("Red LED: On", BYTEMONITOR, ["on_color", "off_color"]):
+        set_colour(colour, "Red LED: On")
+    elif match_colour_role("Red LED: Off", BYTEMONITOR, ["on_color", "off_color"]):
+        set_colour(colour, "Red LED: Off")
+    elif match_colour_role("Yellow LED: On", BYTEMONITOR, ["on_color", "off_color"]):
+        set_colour(colour, "Yellow LED: On")
+    elif match_colour_role("Yellow LED: Off", BYTEMONITOR, ["on_color", "off_color"]):
+        set_colour(colour, "Yellow LED: Off")
+    elif match_colour_role("Controller/alt", BYTEMONITOR, ["on_color", "off_color"]):
+        set_colour(colour, "Blue LED: On")
+    elif match_colour_role("cyan-34", BYTEMONITOR, ["on_color", "off_color"]):
+        set_colour(colour, "Blue LED: Off")
+    elif match_colour_role("Monitor: NORMAL", TEXT_MONITORS, "foreground_color"):
+        set_colour(colour, "Monitor: FG")
+    elif match_colour_role("Controller", TEXT_CONTROLS, "foreground_color"):
+        set_colour(colour, "Controller: FG")
+    elif match_colour_role("Shell/reldsp-alt", ACTIONBUTTON, "foreground_color"):
+        set_colour(colour, "Text: FG")
+    elif match_colour_role("Related display", [ACTIONBUTTON, MENUBUTTON], "foreground_color"):
+        set_colour(colour, "Related Display: FG")
+    elif match_colour_role("Exit/Quit/Kill", ACTIONBUTTON, "foreground_color"):
+        set_colour(colour, "Exit: FG")
+    # If we have a static map, then just use that
+    elif name in COLOUR_MAP:
+        set_colour(colour, COLOUR_MAP[name])
+    else:
+        # remove name
+        colour.attrib.pop("name")
 
 
 def parse(filepath):
