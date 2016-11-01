@@ -204,17 +204,25 @@ def process_element(colour, name, type_id, prop):
     Returns:
 
     """
-    def match_colour_role(n, t, p=None):
-        """ Helper method to evaluate match on three arguments
+    def match_colour_role(n, t, p=None, reference_name=None):
+        """ Helper method to evaluate match on three arguments.
+
+            The arguments define the subset of widget color rules the
+            transformation should be applied to.
 
         Args:
-            n (String): EDM colour name
+            n (String): EDM colour name for rule
             t: (String or [String]): name or list of element typeIds
-            p (String, [String]) (optional): property name or list
+            p (String or [String]) (optional): property name or list
+            reference_name (String) (optional): EDM colour name for comparison,
+                defaults to process_element 'name' argument
         """
-        return name == n and type_id in t and (p is None or prop in p)
+        if reference_name is None:
+            reference_name = name
+        return reference_name == n and type_id in t and (p is None or prop in p)
 
-    if name.split()[-1].lower() == "canvas" and type_id in TEXT_STATIC + [DISPLAY] and prop == "background_color":
+    if match_colour_role("canvas", TEXT_STATIC + [DISPLAY], "background_color",
+                         reference_name=name.split()[-1].lower()):
         set_colour(colour, "Canvas")
     elif match_colour_role("Canvas", TEXT_CONTROLS, ["background_color", "off_color", "value"]):
         set_colour(colour, "Controller: BG")
