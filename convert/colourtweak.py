@@ -185,15 +185,15 @@ def change_colours(widget):
     for colour in widget.findall("./*/color"):
         name = colour.get("name")
         if name is not None:
-            process_element(colour, colour_prop[colour], name, type_id)
+            process_element(colour, name, type_id, colour_prop[colour])
 
     for colour in widget.findall("./*/rule/*/*/color"):
         name = colour.get("name")
         if name is not None:
-            process_element(colour, colour_prop[colour], name, type_id)
+            process_element(colour, name, type_id, colour_prop[colour])
 
 
-def process_element(colour, prop, name, type_id):
+def process_element(colour, name, type_id, prop):
     """ Execute role specific overrides on the passed colour XML element
     Args:
         colour: XML color element
