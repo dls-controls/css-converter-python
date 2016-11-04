@@ -70,7 +70,7 @@ class Module(object):
         """
         new_version = utils.increment_version(self.coords.version)
         shadow_coord = coordinates.update_version(self.coords, new_version)
-        dp = dependency.DependencyParser(
+        dp = dependency.DependencyParser.from_coord(
             shadow_coord, mirror_root=self.mirror_root, additional_depends=self.extra_deps)
         return dp.find_dependencies()
 
