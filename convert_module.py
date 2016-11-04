@@ -7,8 +7,9 @@ import logging as log
 import os
 import sys
 
-from convert import arguments, module, paths, configuration
-from dls_css_utils import coordinates, run_script, config, utils
+
+from convert import arguments, module, paths, configuration, utils
+from dls_css_utils import coordinates, run_script, config
 
 LOG_FORMAT = '%(levelname)s:%(pathname)s: %(message)s'
 LOG_LEVEL = log.INFO

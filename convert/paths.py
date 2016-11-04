@@ -9,6 +9,8 @@ import xml.etree.ElementTree as et
 import utils
 import logging as log
 
+from dls_css_utils import utils as css_utils
+
 TAGS_TO_UPDATE = ['path', 'image_file']
 
 
@@ -30,7 +32,7 @@ def _index_dir(root, directory, recurse):
     log.debug('Indexing directory %s', directory)
     # path_within_module is always relative to root - the EDMDATAFILE
     # or path variable.
-    _, module, _, path_within_module = utils.parse_module_name(root)
+    _, module, _, path_within_module = css_utils.parse_module_name(root)
     if path_within_module is None:
         path_within_module = ''
     for entry in os.listdir(directory):
