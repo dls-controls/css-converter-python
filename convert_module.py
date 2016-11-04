@@ -105,7 +105,7 @@ def convert_module(mod, gen_cfg, force):
         mod.convert(force)
         new_version = utils.increment_version(mod.coords.version)
         run_script.generate(mod.coords, new_version, prefix=gen_cfg.mirror_root,
-                            opi_dir=mod.get_opi_path(), config=gen_cfg,
+                            opi_dir=mod.opi_dir, converter_config=gen_cfg,
                             extra_depends=extra_depends)
     except ValueError as e:
         log.warn('Conversion of %s failed:', mod)
