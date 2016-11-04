@@ -83,7 +83,6 @@ class Converter(object):
                 self.depths[datadir] = len(rel_path.split('/')) + len(mparts)
         log.info("Path depths: %s", self.depths)
 
-
     def _get_depth(self, directory):
         """
         Each directory converted must be relative to one in self.dirs.
@@ -95,9 +94,6 @@ class Converter(object):
                 rel_path = os.path.relpath(directory, root_dir)
                 return self.depths[root_dir] + len(rel_path.split('/'))
         raise ValueError('???')
-
-    def get_symbol_paths(self):
-        return self.symbol_dict
 
     def _process_one_directory(self, datadir, entry, force, working_path):
         """ Process a single directory
