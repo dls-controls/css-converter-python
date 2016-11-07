@@ -151,7 +151,7 @@ def prepare_conversion(mod, gen_cfg, force):
 def start_conversion():
     args = arguments.parse_arguments()
     gen_cfg = configuration.GeneralConfig(args.general_config, args.module_config)
-    area = utils.AREA_IOC if args.ioc else utils.AREA_SUPPORT
+    area = css_utils.AREA_IOC if args.ioc else css_utils.AREA_SUPPORT
 
     if not os.path.exists(files.JAVA):
         log.fatal('Cannot find java executable {}'.format(files.JAVA))

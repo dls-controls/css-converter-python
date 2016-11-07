@@ -1,27 +1,9 @@
 import os
-import re
 import stat
 import logging as log
-import string
 import dls_css_utils.utils as css_utils
 
-EPICS_ROOT = '/dls_sw/prod/R3.14.12.3'
-AREA_IOC = 'ioc'
-AREA_SUPPORT = 'support'
-
-VERSION_FILE = 'configure/VERSION'
-
-PROJECT_TEMPLATE = 'res/project.template'
-PROJECT_FILENAME = '.project'
-
-IGNORE_DIR_IN_SEARCH = ('.svn', 'Db', 'bin', 'configure', 'data', 'db', 'dbd', 'etc', 'iocBoot', 'opi', 'src')
 EXPECTED_DIR_IN_MODULE = ('bin', 'configure', 'data', 'db', 'etc')
-
-VERSION_NUMBER_PATTERNS = [
-        re.compile(r"(dls)[0-9]+[_\-\.][0-9]+.*"),# dls4-21beta
-        re.compile(r"[0-9]+[_\-\.][0-9]+.*"),    # 4-21beta
-        re.compile(r"[0-9]+[_\-\.](Run)[0-9]+.*") # 2015-Run2-4 (support/pgmNextGen_EPICS)
-    ]
 
 
 def find_modules(filepath):
