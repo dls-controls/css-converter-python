@@ -76,21 +76,6 @@ def get_module_version(root, area, module_name, config_version):
     return version
 
 
-def get_version(configuration_path):
-    """ Read the current version number from the VERSION file in a fully
-        qualified modulepath (e.g. /dls_sw/..../modulename/version)
-
-        :return Version string (e.g. '4-2dls2')
-    """
-    version = ""
-    path = os.path.join(configuration_path, VERSION_FILE)
-    if os.path.exists(path):
-        with open(path, 'r') as content_file:
-            version = content_file.read()
-
-    return version.rstrip()
-
-
 def get_latest_version(filepath):
     """ Find the 'latest' version from a release directory containing version
         numbered folders.
@@ -287,17 +272,6 @@ def increment_version(version_string):
 
     parts.append(new_version)
     return ''.join(parts)
-
-
-def make_read_only(filename, executable=False):
-    """
-    Remove write permissions from the file for everyone.
-    """
-    try:
-        st = os.stat(filename)
-        os.chmod(filename, st.st_mode & ~stat.S_IWUSR & ~stat.S_IWGRP & ~stat.S_IWOTH)
-    except OSError:
-        log.debug('Failed to make file %s read-only.', filename)
 
 
 def make_writeable(filename):
