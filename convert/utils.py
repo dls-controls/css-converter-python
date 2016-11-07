@@ -285,46 +285,6 @@ def make_writeable(filename):
         log.debug('Failed to make file %s writeable.', filename)
 
 
-def read_conf_file(filename):
-    """
-    Read generic config file into list of lines.
-    """
-    with open(filename) as f:
-        lines = f.readlines()
-        lines = [line.strip() for line in lines if not line.startswith('#')]
-        lines = [line.strip() for line in lines if not line == '']
-    return lines
-
-
-def read_symbols_file(filename):
-    """
-    Read config file consisting of lines of the form:
-    key: value
-    Return a list of keys.  This is specifically useful for parsing
-    our symbols configuration.
-    """
-    lines = read_conf_file(filename)
-    symbols = [l.split(':')[0] for l in lines]
-    return symbols
-
-
-def generate_project_file(outdir, module_name, version):
-    """
-    Create an Eclipse project file for this set of OPIs.
-    """
-    try:
-        os.makedirs(outdir)
-    except OSError:
-        pass
-    with open(os.path.join(outdir, PROJECT_FILENAME), 'w') as f:
-        with open(PROJECT_TEMPLATE) as template:
-            content = template.read()
-            s = string.Template(content)
-            updated_content = s.substitute(module_name=module_name,
-                                           version=version)
-            f.write(updated_content)
-
-
 def grep(filename, string):
     with open(filename) as f:
         for line in f:
