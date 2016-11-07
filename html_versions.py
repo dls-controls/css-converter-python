@@ -111,7 +111,7 @@ def handle_one_module(module_name, module_cfg, launcher_version, cfg_ioc_version
         vcoords = coordinates.update_version(coords, latest_release)
 
     log.debug('Dependencies of {} plus {}'.format(vcoords, module_cfg.extra_deps))
-    dp = dependency.DependencyParser(vcoords, module_cfg.extra_deps)
+    dp = dependency.DependencyParser.from_coord(vcoords, additional_depends=module_cfg.extra_deps)
     deps = dp.find_dependencies()
     log.debug('{}: {}, {}'.format(module_name, latest_release, config_version))
 
