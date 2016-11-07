@@ -9,8 +9,9 @@ import fonttweak
 import groups
 import layers
 import mmux
+import utils
 
-from dls_css_utils import utils, dependency, coordinates
+from dls_css_utils import dependency, coordinates
 
 EDL_EXTENSION = 'edl'
 OPI_EXTENSION = 'opi'
