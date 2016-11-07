@@ -16,10 +16,6 @@ PROJECT_FILENAME = '.project'
 IGNORE_DIR_IN_SEARCH = ('.svn', 'Db', 'bin', 'configure', 'data', 'db', 'dbd', 'etc', 'iocBoot', 'opi', 'src')
 EXPECTED_DIR_IN_MODULE = ('bin', 'configure', 'data', 'db', 'etc')
 
-
-class ConfigError(Exception):
-    pass
-
 VERSION_NUMBER_PATTERNS = [
         re.compile(r"(dls)[0-9]+[_\-\.][0-9]+.*"),# dls4-21beta
         re.compile(r"[0-9]+[_\-\.][0-9]+.*"),    # 4-21beta

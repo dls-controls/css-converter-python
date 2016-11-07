@@ -7,8 +7,7 @@ import logging as log
 import os
 import sys
 
-
-from convert import arguments, module, paths, configuration, utils
+from convert import arguments, files, module, paths, configuration, utils
 from dls_css_utils import coordinates, run_script, config
 
 LOG_FORMAT = '%(levelname)s:%(pathname)s: %(message)s'
@@ -125,7 +124,7 @@ def already_converted(mod):
         module_config = config.parse_module_config(coordinates.as_path(mod.coords))
         if config.opi_path(module_config) is not None:
             converted = True
-    except utils.ConfigError:
+    except config.ConfigError:
         pass # file not found
     return converted
 
@@ -154,6 +153,14 @@ def start_conversion():
     gen_cfg = configuration.GeneralConfig(args.general_config, args.module_config)
     area = utils.AREA_IOC if args.ioc else utils.AREA_SUPPORT
 
+    if not os.path.exists(files.JAVA):
+        log.fatal('Cannot find java executable {}'.format(files.JAVA))
+        sys.exit()
+
+    if not os.path.exists(files.JAR_FILE):
+        log.fatal('Cannot find jar file {}'.format(files.JAR_FILE))
+        sys.exit()
+
     try:
         modules = get_modules(args, gen_cfg, area)
     except ValueError as e:
@@ -163,7 +170,7 @@ def start_conversion():
     try:
         for mod in modules:
             prepare_conversion(mod, gen_cfg, args.force)
-    except utils.ConfigError as e:
+    except config.ConfigError as e:
         log.fatal('Incorrect configuration: %s', e)
         log.fatal('System will exit.')
 
