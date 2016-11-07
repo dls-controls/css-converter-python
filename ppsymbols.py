@@ -17,7 +17,7 @@ import re
 import xml.etree.ElementTree as et
 
 from convert import configuration, files, module, paths, utils
-from dls_css_utils import coordinates
+from dls_css_utils import coordinates, utils as css_utils
 
 LOG_FORMAT = '%(levelname)s:%(pathname)s: %(message)s'
 LOG_LEVEL = log.INFO
@@ -45,7 +45,7 @@ def get_edl_dirs(mod, gen_cfg):
         log.info("Dependency: %s", coordinates.as_path(dep_coords))
         dep_edl_path = os.path.join(mod.mirror_root,
                                     coordinates.as_path(dep_coords, False)[1:],
-                                    utils.increment_version(dep_coords.version),
+                                    css_utils.increment_version(dep_coords.version),
                                     dep_cfg.edl_dir)
         edl_dirs.append(dep_edl_path)
     return edl_dirs
@@ -185,7 +185,7 @@ def start():
     log.debug('Found symbol opis: {}'.format(symbol_opis))
 
     for opi_path in symbol_opis:
-        _, mod_name, version, rel_path = utils.parse_module_name(opi_path)
+        _, mod_name, version, rel_path = css_utils.parse_module_name(opi_path)
         module_cfg = cfg.get_mod_cfg(mod_name)
         area = module_cfg.area
 

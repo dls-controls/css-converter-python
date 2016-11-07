@@ -31,6 +31,7 @@ import shutil
 import collections
 
 import logging as log
+import dls_css_utils.utils as css_utils
 
 OPI_EXT = 'opi'
 EDL_EXT = 'edl'
@@ -73,7 +74,7 @@ class Converter(object):
 
         self.depths = {}
         for datadir in self.dirs:
-            _, module, _, rel_path = utils.parse_module_name(datadir)
+            _, module, _, rel_path = css_utils.parse_module_name(datadir)
             mparts = module.strip('/').split('/')
             if module == '':
                 self.depths[datadir] = 0

@@ -8,7 +8,7 @@ import os
 import sys
 
 from convert import arguments, files, module, paths, configuration, utils
-from dls_css_utils import coordinates, run_script, config
+from dls_css_utils import coordinates, run_script, config, utils as css_utils
 
 LOG_FORMAT = '%(levelname)s:%(pathname)s: %(message)s'
 LOG_LEVEL = log.INFO
@@ -82,7 +82,7 @@ def convert_module(mod, gen_cfg, force):
     path_dirs = mod.get_path_dirs()
     for dep, dep_coords in dependencies.items():
         dep_cfg = gen_cfg.get_mod_cfg(dep)
-        new_version = utils.increment_version(dep_coords.version)
+        new_version = css_utils.increment_version(dep_coords.version)
         dep_edl_path = os.path.join(gen_cfg.mirror_root,
                                     coordinates.as_path(dep_coords, False)[1:],
                                     new_version,
@@ -103,7 +103,7 @@ def convert_module(mod, gen_cfg, force):
     mod.path_dict = file_dict_to_path_dict(mod.file_dict, path_dirs)
     try:
         mod.convert(force)
-        new_version = utils.increment_version(mod.coords.version)
+        new_version = css_utils.increment_version(mod.coords.version)
         run_script.generate(mod.coords, new_version, gen_cfg.mirror_root,
                             opi_dir=mod.opi_dir, converter_config=gen_cfg,
                             extra_depends=extra_depends)
