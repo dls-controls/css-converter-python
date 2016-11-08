@@ -1,4 +1,5 @@
-
+import pkg_resources
+pkg_resources.require('dls_css_utils')
 from convert.paths import _index_dir
 
 import unittest

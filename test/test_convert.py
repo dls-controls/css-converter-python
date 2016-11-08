@@ -1,5 +1,6 @@
 from pkg_resources import require
 require('mock')
+require('dls_css_utils')
 
 from convert.converter import Converter
 import unittest

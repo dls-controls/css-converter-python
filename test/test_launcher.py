@@ -1,3 +1,5 @@
+import pkg_resources
+pkg_resources.require('dls_css_utils')
 from convert.launcher import _get_macros, LauncherCommand
 import unittest
 
