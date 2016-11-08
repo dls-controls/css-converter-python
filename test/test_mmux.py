@@ -1,3 +1,5 @@
+import pkg_resources
+pkg_resources.require('dls_css_utils')
 from convert.mmux import find_mm_symbols, try_replace
 
 __author__ = 'xzl80115'

@@ -1,4 +1,5 @@
-#!/bin/env dls-python
+import pkg_resources
+pkg_resources.require('dls_css_utils')
 import os
 import unittest
 import xml.etree.ElementTree as ET
