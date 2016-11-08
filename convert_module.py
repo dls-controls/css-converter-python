@@ -7,8 +7,8 @@ import logging as log
 import os
 import sys
 
-from convert import arguments, module, paths, configuration
-from dls_css_utils import coordinates, run_script, config, utils
+from convert import arguments, files, module, paths, configuration, utils
+from dls_css_utils import coordinates, run_script, config, utils as css_utils
 
 LOG_FORMAT = '%(levelname)s:%(pathname)s: %(message)s'
 LOG_LEVEL = log.INFO
@@ -82,7 +82,7 @@ def convert_module(mod, gen_cfg, force):
     path_dirs = mod.get_path_dirs()
     for dep, dep_coords in dependencies.items():
         dep_cfg = gen_cfg.get_mod_cfg(dep)
-        new_version = utils.increment_version(dep_coords.version)
+        new_version = css_utils.increment_version(dep_coords.version)
         dep_edl_path = os.path.join(gen_cfg.mirror_root,
                                     coordinates.as_path(dep_coords, False)[1:],
                                     new_version,
@@ -103,9 +103,9 @@ def convert_module(mod, gen_cfg, force):
     mod.path_dict = file_dict_to_path_dict(mod.file_dict, path_dirs)
     try:
         mod.convert(force)
-        new_version = utils.increment_version(mod.coords.version)
-        run_script.generate(mod.coords, new_version, prefix=gen_cfg.mirror_root,
-                            opi_dir=mod.get_opi_path(), config=gen_cfg,
+        new_version = css_utils.increment_version(mod.coords.version)
+        run_script.generate(mod.coords, new_version, gen_cfg.mirror_root,
+                            opi_dir=mod.opi_dir, converter_config=gen_cfg,
                             extra_depends=extra_depends)
     except ValueError as e:
         log.warn('Conversion of %s failed:', mod)
@@ -124,7 +124,7 @@ def already_converted(mod):
         module_config = config.parse_module_config(coordinates.as_path(mod.coords))
         if config.opi_path(module_config) is not None:
             converted = True
-    except utils.ConfigError:
+    except config.ConfigError:
         pass # file not found
     return converted
 
@@ -151,7 +151,15 @@ def prepare_conversion(mod, gen_cfg, force):
 def start_conversion():
     args = arguments.parse_arguments()
     gen_cfg = configuration.GeneralConfig(args.general_config, args.module_config)
-    area = utils.AREA_IOC if args.ioc else utils.AREA_SUPPORT
+    area = css_utils.AREA_IOC if args.ioc else css_utils.AREA_SUPPORT
+
+    if not os.path.exists(files.JAVA):
+        log.fatal('Cannot find java executable {}'.format(files.JAVA))
+        sys.exit()
+
+    if not os.path.exists(files.JAR_FILE):
+        log.fatal('Cannot find jar file {}'.format(files.JAR_FILE))
+        sys.exit()
 
     try:
         modules = get_modules(args, gen_cfg, area)
@@ -162,7 +170,7 @@ def start_conversion():
     try:
         for mod in modules:
             prepare_conversion(mod, gen_cfg, args.force)
-    except utils.ConfigError as e:
+    except config.ConfigError as e:
         log.fatal('Incorrect configuration: %s', e)
         log.fatal('System will exit.')
 

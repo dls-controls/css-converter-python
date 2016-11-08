@@ -11,8 +11,8 @@ import os
 import shutil
 import subprocess
 
-from convert import arguments, configuration
-from dls_css_utils import coordinates, config, dependency,utils
+from convert import arguments, configuration, utils
+from dls_css_utils import coordinates, config, dependency, utils as css_utils
 
 LOG_FORMAT = '%(levelname)s:  %(message)s'
 LOG_LEVEL = log.INFO
@@ -32,7 +32,7 @@ def checkout_module(name, version, path, mirror_root, git):
         log.info('%s already present at %s; skipping', name, mirror_location)
         return
 
-    module_type = utils.AREA_IOC if 'ioc' in path else utils.AREA_SUPPORT
+    module_type = css_utils.AREA_IOC if 'ioc' in path else css_utils.AREA_SUPPORT
     module_name = name if name is not None else ''
 
     if git:
@@ -72,7 +72,7 @@ def checkout_coords(coords, cfg, include_deps=True, extra_deps=None, force=False
     log.info('Checking out module at: %s', coords)
     log.info('Extra dependencies: %s', extra_deps)
     if include_deps:
-        dp = dependency.DependencyParser(coords, additional_depends=extra_deps)
+        dp = dependency.DependencyParser.from_coord(coords, additional_depends=extra_deps)
         log.info('Finding dependencies of %s', coords)
         to_checkout = dp.find_dependencies()
     else:
@@ -90,7 +90,7 @@ def checkout_coords(coords, cfg, include_deps=True, extra_deps=None, force=False
                             mcoords.area, mcoords.module, mcoords.version)
                 continue
 
-            new_version = utils.increment_version(mcoords.version)
+            new_version = css_utils.increment_version(mcoords.version)
             log.info('Updated version %s/%s: %s', mcoords.area, mcoords.module, new_version)
             new_coords = coordinates.update_version(mcoords, new_version)
 
@@ -142,7 +142,7 @@ def opi_dir_is_empty(checkout_path, dep_cfg):
 if __name__ == '__main__':
     args = arguments.parse_arguments()
     cfg = configuration.GeneralConfig(args.general_config, args.module_config)
-    area = utils.AREA_IOC if args.ioc else utils.AREA_SUPPORT
+    area = css_utils.AREA_IOC if args.ioc else css_utils.AREA_SUPPORT
 
     if args.all:
         log.info("Searching for all '%s' modules for checkout.", area)

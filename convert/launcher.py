@@ -7,6 +7,7 @@ import xml.etree.ElementTree as et
 import paths
 import spoof
 import utils
+import dls_css_utils.utils as css_utils
 
 
 LAUNCHER_DIR = '/dls_sw/prod/etc/Launcher/'
@@ -34,12 +35,12 @@ def update_cmd(cmd, cfg):
     """
     # Determine properties of command in launcher
     cmd.interpret()
-    p, n, v, rp = utils.parse_module_name(cmd.path_to_run)
+    p, n, v, rp = css_utils.parse_module_name(cmd.path_to_run)
     if v is None:
         raise ValueError('Version string not parsed from path {}'.format(cmd.path_to_run))
     # Switch back to edl extension
     edl_rp = rp[:-3] + 'edl'
-    nv = utils.increment_version(v)
+    nv = css_utils.increment_version(v)
     updated_edl_path = os.path.join(p, n, nv, edl_rp)
     # Remove leading slash from path to allow os.path.join() to work
     path_to_module = os.path.join(cfg.mirror_root, p[1:], n, nv)
@@ -237,7 +238,7 @@ class LauncherCommand(object):
             path_to_run = path_to_run[:-3] + 'opi'
         else:
             path_to_run += '.opi'
-        mpath, mname, mversion, rel_path = utils.parse_module_name(path_to_run)
+        mpath, mname, mversion, rel_path = css_utils.parse_module_name(path_to_run)
         if mname != '':
             # Project name example: LI_TI_5-2 - i.e. replace / with _
             flat_mname = '_'.join(mname.split('/'))
@@ -270,7 +271,7 @@ class LauncherCommand(object):
         edl_files = [a for a in spoofed_args if a.endswith('edl')]
         edl_file = edl_files[0] if len(edl_files) > 0 else spoofed_args[-1]
         try:
-            _, module_name, version, _ = utils.parse_module_name(working_dir)
+            _, module_name, version, _ = css_utils.parse_module_name(working_dir)
         except ValueError:
             log.warn("Didn't understand script's working directory: {}".format(cmd))
             module_name = os.path.basename(cmd)
@@ -334,7 +335,7 @@ class LauncherCommand(object):
         module_dict = {}
         for directory in self.all_dirs:
             try:
-                mpath, mname, mversion, _ = utils.parse_module_name(directory)
+                mpath, mname, mversion, _ = css_utils.parse_module_name(directory)
                 if mversion is None:
                     mversion = ''
                 p = os.path.join(root_dir, mpath.lstrip('/'),

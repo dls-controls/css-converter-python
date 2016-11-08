@@ -131,10 +131,6 @@ def convert_edl(filename, destination):
     """
     if is_old_edl(filename):
         raise OldEdlError('EDL file in old format')
-    if not os.path.exists(JAVA):
-        raise utils.ConfigError('Cannot find java executable {}'.format(JAVA))
-    if not os.path.exists(JAR_FILE):
-        raise utils.ConfigError('Cannot find jar file {}'.format(JAR_FILE))
 
     utils.make_writeable(destination)
     log.debug('Converting %s to %s', filename, destination)

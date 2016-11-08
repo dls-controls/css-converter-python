@@ -31,6 +31,7 @@ import shutil
 import collections
 
 import logging as log
+import dls_css_utils.utils as css_utils
 
 OPI_EXT = 'opi'
 EDL_EXT = 'edl'
@@ -73,7 +74,7 @@ class Converter(object):
 
         self.depths = {}
         for datadir in self.dirs:
-            _, module, _, rel_path = utils.parse_module_name(datadir)
+            _, module, _, rel_path = css_utils.parse_module_name(datadir)
             mparts = module.strip('/').split('/')
             if module == '':
                 self.depths[datadir] = 0
@@ -82,7 +83,6 @@ class Converter(object):
             else:
                 self.depths[datadir] = len(rel_path.split('/')) + len(mparts)
         log.info("Path depths: %s", self.depths)
-
 
     def _get_depth(self, directory):
         """
@@ -95,9 +95,6 @@ class Converter(object):
                 rel_path = os.path.relpath(directory, root_dir)
                 return self.depths[root_dir] + len(rel_path.split('/'))
         raise ValueError('???')
-
-    def get_symbol_paths(self):
-        return self.symbol_dict
 
     def _process_one_directory(self, datadir, entry, force, working_path):
         """ Process a single directory

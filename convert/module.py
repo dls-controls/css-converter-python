@@ -9,8 +9,9 @@ import fonttweak
 import groups
 import layers
 import mmux
+import utils
 
-from dls_css_utils import utils, dependency, coordinates
+from dls_css_utils import dependency, coordinates, utils as css_utils
 
 EDL_EXTENSION = 'edl'
 OPI_EXTENSION = 'opi'
@@ -46,7 +47,7 @@ class Module(object):
         self.path_dict = {}
 
         if increment_version:
-            self.new_version = utils.increment_version(coords.version)
+            self.new_version = css_utils.increment_version(coords.version)
         else:
             self.new_version = coords.version
 
@@ -68,9 +69,9 @@ class Module(object):
         Returns:
             dict {name: coords} for all module dependencies
         """
-        new_version = utils.increment_version(self.coords.version)
+        new_version = css_utils.increment_version(self.coords.version)
         shadow_coord = coordinates.update_version(self.coords, new_version)
-        dp = dependency.DependencyParser(
+        dp = dependency.DependencyParser.from_coord(
             shadow_coord, mirror_root=self.mirror_root, additional_depends=self.extra_deps)
         return dp.find_dependencies()
 
