@@ -111,7 +111,8 @@ def update_opi_path(filename, depth, file_index, module, use_rel):
     only need to put ../<lastdir>/relative/path
     '''
     # Remove a leading './' if necessary.
-    filename = os.path.normpath(filename)
+    if filename.startswith('./'):
+        filename = filename[2:]
     # Symbol files are converted to pngs with different names
     # We have to update the new filenames, but the old ones are
     # in the index.
