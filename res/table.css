@@ -8,19 +8,19 @@ th {
 }
 
 td {
-    cursor: default;
+    text-align: center;
 }
 
 .configured {
-    background-color: #F6F28B;
+    background-color: #F6F28B !important;
 }
 
 .out-of-date {
-    background-color: #FBA799;
+    background-color: #FBA799 !important;
 }
 
 .no-release {
-    background-color: #F99D67;
+    background-color: #F99D67 !important;
 }
 
 .dep-col {
