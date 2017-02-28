@@ -11,6 +11,10 @@ td {
     text-align: center;
 }
 
+.module-page {
+    background-color: #EFF2F7
+}
+
 .configured {
     background-color: #F6F28B !important;
 }
