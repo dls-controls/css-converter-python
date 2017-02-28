@@ -40,6 +40,7 @@ class ModDetails(object):
     OUT_OF_DATE = 'out-of-date'
     CONFIGURED = 'configured'
     NO_RELEASE = 'no-release'
+    NO_DEPS = 'no-deps'
     # Informational messages
     CONFIGURED_MSG = 'The latest version is specified in modules.ini'
     OUT_OF_DATE_MSG = 'Latest version {}; the older version is in modules.ini'
@@ -59,7 +60,7 @@ class ModDetails(object):
         self.launcher_version_class = ModDetails.OK
         self.cfg_ioc_version_class = ModDetails.OK
         self.requested_version_class = ModDetails.OK
-        self.deps_class = ModDetails.OK
+        self.deps_class = ModDetails.OK if self.deps else ModDetails.NO_DEPS
         self._assess_versions()
 
     def _assess_versions(self):
