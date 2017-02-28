@@ -77,7 +77,8 @@ def newer_version(v1, v2):
         return False
     elif v2 is None:
         return True
-    for i, j in zip(css_utils.parse_version(v1), css_utils.parse_version(v2)):
+    # Like zip() but substitute None if lengths don't match.
+    for i, j in map(None, css_utils.parse_version(v1), css_utils.parse_version(v2)):
         if i > j:
             return True
     return False
