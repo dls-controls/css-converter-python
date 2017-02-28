@@ -26,8 +26,9 @@
           "deferRender": "true",
           "createdRow": function(row, data, index) {
               $(row).click(function() {
-                   document.location.href = './' + row.cells[0].textContent + '.html'
-                   });
+                module_name = row.cells[0].textContent
+                document.location.href = './' + module_name.replace("/", "-") + '.html'
+              });
               $(row).css('cursor', 'pointer');
               console.log(data.version_class);
               if (data.version_class !== "ok") {
