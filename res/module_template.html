@@ -12,19 +12,19 @@
     $(document).ready(function() {
       $('#dependency-table').DataTable({
         "ajax": {
-        "url": "deps.json",
-        "dataSrc": function(json) {
-        var module = "{{ name }}";
-          for (var i=0, length=json.data.length; i< length; i++) {
-          var n = json.data[i].name;
-          if (n === module) {
-            return json.data[i].deps;
-          }
-          }
+          "url": "deps.json",
+          "dataSrc": function(json) {
+          var module = "{{ name }}";
+            for (var i=0, length=json.data.length; i< length; i++) {
+              var n = json.data[i].name;
+              if (n === module) {
+                return json.data[i].deps;
+              }
+            }
             return [];
-        }
+          }
         },
-          "columns": [
+        "columns": [
           {"data": "name"},
           {"data": "latest"},
           {"data": "requested"},
@@ -36,8 +36,8 @@
             $(row).addClass('out-of-date');
           }
         }
-          })
-      });
+      })
+    });
     </script>
     </head>
   <body>

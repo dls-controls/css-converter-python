@@ -12,32 +12,32 @@
     <script type="text/javascript" language="javascript" class="init">
     $(document).ready(function() {
       $('#ioc-table').DataTable({
-          "ajax": {
+        "ajax": {
           "url": "deps.json",
           "dataSrc": "data"
-          },
-          "columns": [
-            {"data": "name"},
-            {"data": "latest_release"},
-            {"data": "launcher_version"},
-            {"data": "cfg_ioc_version"},
-            {"data": "deps_class"}
+        },
+        "columns": [
+          {"data": "name"},
+          {"data": "latest_release"},
+          {"data": "launcher_version"},
+          {"data": "cfg_ioc_version"},
+          {"data": "deps_class"}
           ],
-          "deferRender": "true",
-          "createdRow": function(row, data, index) {
-              $(row).click(function() {
-                module_name = row.cells[0].textContent
-                document.location.href = './' + module_name.replace("/", "-") + '.html'
-              });
-              $(row).css('cursor', 'pointer');
-              console.log(data.version_class);
-              if (data.version_class !== "ok") {
-                $('td', row).eq(1).addClass('out-of-date');
-              }
-              if (data.deps_class !== "ok") {
-                $('td', row).eq(4).addClass('out-of-date');
-              }
+        "deferRender": "true",
+        "createdRow": function(row, data, index) {
+          $(row).click(function() {
+            module_name = row.cells[0].textContent
+            document.location.href = './' + module_name.replace("/", "-") + '.html'
+          });
+          $(row).css('cursor', 'pointer');
+          console.log(data.version_class);
+          if (data.version_class === "out-of-date") {
+            $('td', row).eq(1).addClass('out-of-date');
           }
+          if (data.deps_class === "out-of-date") {
+            $('td', row).eq(4).addClass('out-of-date');
+          }
+        }
       });
     });
     </script>
