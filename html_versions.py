@@ -169,25 +169,25 @@ def get_launcher_versions(gen_cfg):
     return launcher_versions
 
 
-def get_configure_ioc_versions(ioc_names):
+def get_configure_ioc_versions(module_names):
     """Determine where possible versions of modules used in configure-ioc.
 
     Returns:
         dict: module name => version string or 'work'
     """
     cfg_ioc = subprocess.check_output(CFG_IOC_CMD).strip().split('\n')
-    ioc_paths = [path for _, path in (line.split() for line in cfg_ioc)]
+    cfg_ioc_paths = [path for _, path in (line.split() for line in cfg_ioc)]
     versions = {}
-    for ioc_name in ioc_names:
-        for ioc_path in ioc_paths:
-            if ioc_name in ioc_path:
+    for module_name in module_names:
+        for ioc_path in cfg_ioc_paths:
+            if module_name in ioc_path:
                 if '/work/' in ioc_path:
-                    versions[ioc_name] = 'work'
+                    versions[module_name] = 'work'
                 else:
-                    index = ioc_path.index(ioc_name)
-                    end = ioc_path[index+len(ioc_name)+1:]
+                    index = ioc_path.index(module_name)
+                    end = ioc_path[index+len(module_name)+1:]
                     version = end.split(os.path.sep)[0]
-                    versions[ioc_name] = version
+                    versions[module_name] = version
     return versions
 
 
@@ -235,7 +235,8 @@ def render(mod_details, env, template):
     sorted_details = sorted(mod_details, key=lambda md: md.name)
     template = env.get_template(template)
     header_tags = ['thead', 'tfoot']
-    full_string = template.render(header_tags=header_tags, nheaders=max_deps,
+    full_string = template.render(header_tags=header_tags,
+                                  nheaders=max_deps,
                                   mod_details=sorted_details)
     return full_string
 
@@ -260,10 +261,7 @@ def create_page(mod_details, env, template):
 def start():
     gen_cfg = configuration.GeneralConfig()
     module_details = get_module_details(gen_cfg)
-    # Use script name as module i.e. no trailing .py
-    script_name = os.path.split(__file__)[-1].split('.')[0]
-    env = jinja2.Environment(loader=jinja2.PackageLoader(script_name,
-                                                         RESOURCES_DIR))
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(RESOURCES_DIR))
     out = render(module_details, env, JSON_TEMPLATE)
     if not os.path.exists(REPORT_DIR):
         os.makedirs(REPORT_DIR)

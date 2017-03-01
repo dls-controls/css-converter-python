@@ -20,6 +20,7 @@ def test_render_creates_valid_json(dummy_md):
     res_dir = os.path.join(os.curdir, RESOURCES_DIR)
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(res_dir))
     ans = render([dummy_md], env, JSON_TEMPLATE)
+    # throws an exception if json invalid
     json.loads(ans)
 
 
