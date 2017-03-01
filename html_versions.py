@@ -12,20 +12,25 @@ import jinja2
 import logging as log
 import os
 import subprocess
+import shutil
 
-from convert import configuration, launcher, spoof
-from dls_css_utils import coordinates, dependency, utils
+from convert import configuration, launcher, spoof, utils
+from dls_css_utils import coordinates, dependency, utils as css_utils
 
 LOG_FORMAT = '%(levelname)s:  %(message)s'
 LOG_LEVEL = log.WARNING
 log.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
-SUPPORT_PATH = os.path.join(utils.EPICS_ROOT, utils.AREA_SUPPORT)
-IOC_PATH = os.path.join(utils.EPICS_ROOT, utils.AREA_IOC)
+SUPPORT_PATH = os.path.join(css_utils.EPICS_ROOT, css_utils.AREA_SUPPORT)
+IOC_PATH = os.path.join(css_utils.EPICS_ROOT, css_utils.AREA_IOC)
 RESOURCES_DIR = 'res'
 HTML_TEMPLATE = 'template.html'
-REPORT = 'deps.html'
+JSON_TEMPLATE = 'template.json'
+MODULE_TEMPLATE = 'module_template.html'
+MODULE_PAGE = 'modules.html'
+REPORT_DIR = 'html'
+REPORT = 'deps.json'
 CFG_IOC_CMD = ["configure-ioc", "l"]
 
 
@@ -35,6 +40,7 @@ class ModDetails(object):
     OUT_OF_DATE = 'out-of-date'
     CONFIGURED = 'configured'
     NO_RELEASE = 'no-release'
+    NO_DEPS = 'no-deps'
     # Informational messages
     CONFIGURED_MSG = 'The latest version is specified in modules.ini'
     OUT_OF_DATE_MSG = 'Latest version {}; the older version is in modules.ini'
@@ -54,6 +60,7 @@ class ModDetails(object):
         self.launcher_version_class = ModDetails.OK
         self.cfg_ioc_version_class = ModDetails.OK
         self.requested_version_class = ModDetails.OK
+        self.deps_class = ModDetails.OK if self.deps else ModDetails.NO_DEPS
         self._assess_versions()
 
     def _assess_versions(self):
@@ -80,11 +87,15 @@ class ModDetails(object):
                 self.requested_version_class = ModDetails.NO_RELEASE
             elif utils.newer_version(self.latest_release, self.requested):
                 self.requested_version_class = ModDetails.OUT_OF_DATE
+        for md in self.deps.values():
+            if utils.newer_version(md.latest_release, md.requested):
+                self.deps_class = ModDetails.OUT_OF_DATE
+                break
 
 
 def get_versions(module_cfg, coords):
     try:
-        latest_release = utils.get_latest_version(coordinates.as_path(coords,
+        latest_release = css_utils.get_latest_version(coordinates.as_path(coords,
                                                                       False))
     except ValueError:
         latest_release = None
@@ -103,7 +114,7 @@ def find_support_modules():
 
 
 def handle_one_module(module_name, module_cfg, launcher_version, cfg_ioc_version, area):
-    coords = coordinates.ModCoord(utils.EPICS_ROOT, area, module_name, None)
+    coords = coordinates.ModCoord(css_utils.EPICS_ROOT, area, module_name, None)
     latest_release, config_version = get_versions(module_cfg, coords)
     if config_version is not None:
         vcoords = coordinates.update_version(coords, config_version)
@@ -158,25 +169,25 @@ def get_launcher_versions(gen_cfg):
     return launcher_versions
 
 
-def get_configure_ioc_versions(ioc_names):
+def get_configure_ioc_versions(module_names):
     """Determine where possible versions of modules used in configure-ioc.
 
     Returns:
         dict: module name => version string or 'work'
     """
     cfg_ioc = subprocess.check_output(CFG_IOC_CMD).strip().split('\n')
-    ioc_paths = [path for _, path in (line.split() for line in cfg_ioc)]
+    cfg_ioc_paths = [path for _, path in (line.split() for line in cfg_ioc)]
     versions = {}
-    for ioc_name in ioc_names:
-        for ioc_path in ioc_paths:
-            if ioc_name in ioc_path:
+    for module_name in module_names:
+        for ioc_path in cfg_ioc_paths:
+            if module_name in ioc_path:
                 if '/work/' in ioc_path:
-                    versions[ioc_name] = 'work'
+                    versions[module_name] = 'work'
                 else:
-                    index = ioc_path.index(ioc_name)
-                    end = ioc_path[index+len(ioc_name)+1:]
+                    index = ioc_path.index(module_name)
+                    end = ioc_path[index+len(module_name)+1:]
                     version = end.split(os.path.sep)[0]
-                    versions[ioc_name] = version
+                    versions[module_name] = version
     return versions
 
 
@@ -193,8 +204,8 @@ def get_module_details(gen_cfg):
     cfg_ioc_versions.update(get_configure_ioc_versions(iocs))
 
     module_details = []
-    for modules, area in ((support_modules,  utils.AREA_SUPPORT),
-                          (iocs, utils.AREA_IOC)):
+    for modules, area in ((support_modules,  css_utils.AREA_SUPPORT),
+                          (iocs, css_utils.AREA_IOC)):
         for module in modules:
             launcher_version = launcher_versions.get(module, None)
             cfg_ioc_version = cfg_ioc_versions.get(module, None)
@@ -209,34 +220,61 @@ def get_module_details(gen_cfg):
     return module_details
 
 
-def render(mod_details):
-    """Create and write HTML report for list of modules.
+def render(mod_details, env, template):
+    """Use jinja2 to render a string from the provided environment.
 
     Args:
-        List of ModDetails objects
+        mod_details: List of ModDetails objects
+        env: jinja2 environment to use
+    Returns:
+        rendered string
     """
     # The largest number of dependencies for any one module
     max_deps = max(len(details.deps) for details in mod_details)
     # Sort by module name
     sorted_details = sorted(mod_details, key=lambda md: md.name)
-    # Use script name as module i.e. no trailing .py
-    script_name = os.path.split(__file__)[-1].split('.')[0]
-    env = jinja2.Environment(loader=jinja2.PackageLoader(script_name,
-                                                         RESOURCES_DIR))
-    template = env.get_template(HTML_TEMPLATE)
+    template = env.get_template(template)
     header_tags = ['thead', 'tfoot']
-    full_html = template.render(header_tags=header_tags, nheaders=max_deps,
-                                mod_details=sorted_details)
+    full_string = template.render(header_tags=header_tags,
+                                  nheaders=max_deps,
+                                  mod_details=sorted_details)
+    return full_string
 
-    with open(REPORT, 'w') as f:
-        f.write(full_html)
-    print('Created HTML report: {}'.format(REPORT))
+
+def create_page(mod_details, env, template):
+    """Use jinja2 to render a string from the provided environment.
+
+    Args:
+        mod_details: List of ModDetails objects
+        env: jinja2 environment to use
+    Returns:
+        rendered string
+    """
+    # Sort by module name
+    sorted_details = sorted(mod_details.deps)
+    template = env.get_template(template)
+    full_html = template.render(name=mod_details.name,
+                                mod_details=sorted_details)
+    return full_html
 
 
 def start():
     gen_cfg = configuration.GeneralConfig()
     module_details = get_module_details(gen_cfg)
-    render(module_details)
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(RESOURCES_DIR))
+    out = render(module_details, env, JSON_TEMPLATE)
+    if not os.path.exists(REPORT_DIR):
+        os.makedirs(REPORT_DIR)
+    shutil.copy2(os.path.join(RESOURCES_DIR, MODULE_PAGE), REPORT_DIR)
+    for m in module_details:
+        mod_page = create_page(m, env, MODULE_TEMPLATE)
+        page_name = m.name.replace('/', '-')
+        with open(os.path.join(REPORT_DIR, '{}.html'.format(page_name)), 'w') as f:
+            f.write(mod_page)
+    report_location = os.path.join(REPORT_DIR, REPORT)
+    with open(report_location, 'w') as f:
+        f.write(out)
+    print('Created HTML report: {}'.format(REPORT))
 
 
 if __name__ == '__main__':

@@ -1,0 +1,29 @@
+{ "data":
+
+  [
+  {% for md in mod_details %}
+  {"name": "{{md.name}}",
+  "title": "{{md.version_message}}",
+  "version_class": "{{md.version_class}}",
+  "latest_release": "{{md.latest_release}}",
+  "launcher_version_class": "{{md.launcher_version_class}}",
+  "launcher_version": "{{md.launcher_version}}",
+  "cfg_ioc_version_class": "{{md.cfg_ioc_version_class}}",
+  "cfg_ioc_version": "{{md.cfg_ioc_version}}",
+  "deps_class": "{{md.deps_class}}",
+  "deps": [
+      {% if md.deps %}
+      {% for dep in md.deps %}
+    {
+      "{{"name"}}": "{{md.deps[dep].name}}",
+      "{{"latest"}}": "{{md.deps[dep].latest_release}}",
+      "{{"requested"}}": "{{md.deps[dep].requested}}",
+      "{{"version_class"}}": "{{md.deps[dep].requested_version_class}}"
+    } {% if not loop.last %} , {% endif %}
+      {% endfor %}
+      {% endif %}
+    ]
+  } {% if not loop.last %} , {% endif %}
+  {% endfor %}
+  ]
+}

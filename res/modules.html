@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!-- This page uses Jinja2 for rendering. -->
+<html>
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <link rel="stylesheet" type="text/css" href="../res/table.css" />
+    <link rel="stylesheet" type="text/css" href="/dls/cs-www/reports/css/jquery.dataTables.css" />
+    <script type="text/javascript" language="javascript" src="/dls/cs-www/reports/js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" language="javascript" src="/dls/cs-www/reports/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" language="javascript" src="/dls/cs-www/reports/js/shCore.js"></script>
+    <script type="text/javascript" language="javascript" src="/dls/cs-www/reports/js/demo.js"></script>
+    <script type="text/javascript" language="javascript" class="init">
+    $(document).ready(function() {
+      $('#ioc-table').DataTable({
+        "ajax": {
+          "url": "deps.json",
+          "dataSrc": "data"
+        },
+        "columns": [
+          {"data": "name"},
+          {"data": "latest_release"},
+          {"data": "launcher_version"},
+          {"data": "cfg_ioc_version"},
+          {"data": "deps_class"}
+          ],
+        "deferRender": "true",
+        "createdRow": function(row, data, index) {
+          $(row).click(function() {
+            module_name = row.cells[0].textContent
+            document.location.href = './' + module_name.replace("/", "-") + '.html'
+          });
+          $(row).css('cursor', 'pointer');
+          console.log(data.version_class);
+          if (data.version_class === "out-of-date") {
+            $('td', row).eq(1).addClass('out-of-date');
+          }
+          if (data.deps_class === "out-of-date") {
+            $('td', row).eq(4).addClass('out-of-date');
+          }
+        }
+      });
+    });
+    </script>
+    </head>
+  <body class="all-page">
+    <h1>IOCs, support modules and their dependencies</h1>
+    <ul>
+      <li><strong>Launcher Version</strong> is determined by trawling through the Launcher code.</li>
+      <li><strong>Configure IOC Version</strong> is determined by parsing the output of configure-ioc for this module.</li>
+    </ul>
+    <table id="ioc-table" class="display">
+      <thead>
+        <tr>
+          <th>Module name</th>
+          <th>Latest Version</th>
+          <th>Launcher Version</th>
+          <th>Configure IOC Version</th>
+          <th>Dependency state</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <th>Module name</th>
+          <th>Latest Version</th>
+          <th>Launcher Version</th>
+          <th>Configure IOC Version</th>
+          <th>Dependency state</th>
+        </tr>
+      </tfoot>
+    </table>
+  </body>
+</html>

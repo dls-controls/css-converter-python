@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<!-- This page uses Jinja2 for rendering. -->
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="../res/table.css">
+    <link rel="stylesheet" type="text/css" href="/dls/cs-www/reports/css/jquery.dataTables.css">
+    <script type="text/javascript" language="javascript" src="/dls/cs-www/reports/js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" language="javascript" src="/dls/cs-www/reports/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" language="javascript" src="/dls/cs-www/reports/js/shCore.js"></script>
+    <script type="text/javascript" language="javascript" src="/dls/cs-www/reports/js/demo.js"></script>
+    <script type="text/javascript" language="javascript" class="init">
+    $(document).ready(function() {
+      $('#dependency-table').DataTable({
+        "ajax": {
+          "url": "deps.json",
+          "dataSrc": function(json) {
+          var module = "{{ name }}";
+            for (var i=0, length=json.data.length; i< length; i++) {
+              var n = json.data[i].name;
+              if (n === module) {
+                return json.data[i].deps;
+              }
+            }
+            return [];
+          }
+        },
+        "columns": [
+          {"data": "name"},
+          {"data": "requested"},
+          {"data": "latest"},
+          ],
+        "createdRow": function(row, data, index) {
+          console.log(data.name);
+          console.log(data.version_class);
+          if (data.version_class !== "ok") {
+            $(row).addClass('out-of-date');
+          }
+        }
+      })
+    });
+    </script>
+    </head>
+  <body class="module-page">
+    <h1>Dependencies of {{ name }}</h1>
+    <p>Back to <a href="modules.html">table of modules</a>.</p>
+    <table id="dependency-table" class="display">
+      <thead>
+        <tr>
+          <th>Module name</th>
+          <th>Requested Version</th>
+          <th>Latest Version</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <th>Module name</th>
+          <th>Requested Version</th>
+          <th>Latest Version</th>
+        </tr>
+      </tfoot>
+    </table>
+  </body>
+</html>
