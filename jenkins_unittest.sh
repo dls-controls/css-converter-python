@@ -14,7 +14,7 @@ set +e
 mkdir logs
 
 # run tests
-nosetests --with-xunit --xunit-file=${WORKSPACE}/logs/nosetests.xml
+py.test --junitxml=${WORKSPACE}/logs/nosetests.xml
 
 # run pylint
 touch ${WORKSPACE}/__init__.py
