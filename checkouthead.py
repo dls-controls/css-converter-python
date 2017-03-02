@@ -90,17 +90,13 @@ def checkout_coords(coords, cfg, include_deps=True, extra_deps=None, force=False
                             mcoords.area, mcoords.module, mcoords.version)
                 continue
 
-            new_version = css_utils.increment_version(mcoords.version)
-            log.info('Updated version %s/%s: %s', mcoords.area, mcoords.module, new_version)
-            new_coords = coordinates.update_version(mcoords, new_version)
-
-            new_path = coordinates.as_path(new_coords)
+            new_path = coordinates.as_path(mcoords)
             checkout_path = os.path.join(cfg.mirror_root, new_path[1:])
             if force and os.path.exists(checkout_path):
                 log.info('Removing %s before checking out', new_path)
                 shutil.rmtree(checkout_path)
 
-            checkout_module(new_coords.module, new_version, new_path,
+            checkout_module(mcoords.module, mcoords.version, new_path,
                             cfg.mirror_root, dep_cfg.is_git())
 
             if not opi_dir_is_empty(checkout_path, dep_cfg):
@@ -109,7 +105,7 @@ def checkout_coords(coords, cfg, include_deps=True, extra_deps=None, force=False
             extra_deps = coordinates.update_version_from_files(
                 dep_cfg.extra_deps, coords.root)
             config.create_module_ini_file(
-                new_coords, cfg.mirror_root, dep_cfg.opi_dir, extra_deps, force)
+                mcoords, cfg.mirror_root, dep_cfg.opi_dir, extra_deps, force)
 
         except ValueError:
             log.warn('Cannot handle coordinates %s', mcoords)
