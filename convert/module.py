@@ -20,7 +20,7 @@ OPI_EXTENSION = 'opi'
 class Module(object):
     """Object representing one IOC or support module."""
 
-    def __init__(self, coords, module_cfg, mirror_root, increment_version=True):
+    def __init__(self, coords, module_cfg, mirror_root):
         """
 
         Args:
@@ -46,16 +46,11 @@ class Module(object):
         # Used for locating an executable given only its name.
         self.path_dict = {}
 
-        if increment_version:
-            self.new_version = css_utils.increment_version(coords.version)
-        else:
-            self.new_version = coords.version
-
         prod_path = coordinates.as_path(coords, False)
         # prod_path[1:] strips leading / to allow creation of shadow
         # file system INSIDE a containing dir /.../dls_sw/prod/R3...
         self.conversion_root = os.path.join(mirror_root, prod_path[1:],
-                                            self.new_version)
+                                            coords.version)
 
         if not os.path.exists(self.conversion_root) and module_cfg.has_opi:
             err_msg = 'Module to be converted does not exist: {}'
@@ -69,10 +64,8 @@ class Module(object):
         Returns:
             dict {name: coords} for all module dependencies
         """
-        new_version = css_utils.increment_version(self.coords.version)
-        shadow_coord = coordinates.update_version(self.coords, new_version)
         dp = dependency.DependencyParser.from_coord(
-            shadow_coord, mirror_root=self.mirror_root, additional_depends=self.extra_deps)
+            self.coords, mirror_root=self.mirror_root, additional_depends=self.extra_deps)
         return dp.find_dependencies()
 
     def get_path_dirs(self):

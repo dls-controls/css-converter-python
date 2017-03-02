@@ -193,8 +193,7 @@ def start():
         depth = len(mod_name.split(os.path.sep))
         log.debug('The depth for module %s is %s', mod_name, depth)
         try:
-            mod = module.Module(coords, module_cfg, cfg.mirror_root,
-                                increment_version=False)
+            mod = module.Module(coords, module_cfg, cfg.mirror_root)
             edl_dirs = get_edl_dirs(mod, cfg)
 
             file_dict = paths.index_paths(edl_dirs, True)
