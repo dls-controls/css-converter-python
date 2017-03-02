@@ -14,7 +14,6 @@ class ModuleTest(unittest.TestCase):
 
     def setUp(self):
         self.version = '5-3'
-        self.new_version = '5-4'
         self.module_path = '/dls_sw/prod/R3.14.12.3/ioc/LI/TI/'
         self.edl_path = 'MyApp/opi/edl'
         self.opi_path = 'MyApp/opi/opi'
@@ -51,14 +50,14 @@ class ModuleTest(unittest.TestCase):
     def test_get_edl_path(self):
         edl_path = os.path.join(self.mirror_root,
                                 self.module_path[1:],
-                                self.new_version,
+                                self.version,
                                 self.edl_path)
         self.assertEqual(os.path.normpath(edl_path), self.m.get_edl_path())
 
     def test_get_opi_path(self):
         opi_path = os.path.join(self.mirror_root,
                                 self.module_path[1:],
-                                self.new_version,
+                                self.version,
                                 self.opi_path)
         self.assertEqual(os.path.normpath(opi_path), self.m.get_opi_path())
 
