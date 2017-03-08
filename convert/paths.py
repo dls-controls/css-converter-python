@@ -105,26 +105,34 @@ def index_paths(directories, recurse):
 def update_opi_path(filename, depth, file_index, module, use_rel):
     '''
     Return the corrected path according to the contents of the
-    file_index.
+    file_index.  See also index_paths().
 
     Note that if the 'module' of a file is nested directories, we
     only need to put ../<lastdir>/relative/path
+
+    Arguments:
+     - filename: name of file to find in the index
+     - depth: name of file to find in the index
+     - file_index: dict: relative-filename -> (module, path-within-module)
+     - module: module being converted
+     - use_rel: whether to recontruct the path including path-within-module
+                or to exclude path-within-module
     '''
-    # Remove a leading './' if necessary.
-    if filename.startswith('./'):
-        filename = filename[2:]
+    # The keys in the dict file_index are the filenames.
+    # Remove any leading './' for looking in the index.
+    index_key = filename[2:] if filename.startswith('./') else filename
     # Symbol files are converted to pngs with different names
     # We have to update the new filenames, but the old ones are
     # in the index.
-    if filename.endswith('png'):
+    if index_key.endswith('png'):
         # Remove everything after the last -
-        stub = '-'.join(p for p in filename.split('-')[:-1])
+        stub = '-'.join(p for p in index_key.split('-')[:-1])
         original_name = stub + '.opi'
         if original_name in file_index:
-            file_index[filename] = file_index[original_name]
-        log.debug("Updated file_index for %s", filename)
+            file_index[index_key] = file_index[original_name]
+        log.debug("Updated file_index for %s", index_key)
 
-    pair = file_index.get(filename)
+    pair = file_index.get(index_key)
     if pair is not None:
         (file_module, path_in_module) = pair
         # Path in module is not relevant if Eclipse links are directly to
@@ -142,7 +150,7 @@ def update_opi_path(filename, depth, file_index, module, use_rel):
         down = os.sep.join(['..'] * depth)
         if down == '':
             down = './'
-        rel = os.path.join(down, file_module, path_in_module, filename)
+        rel = os.path.join(down, file_module, path_in_module, index_key)
     else:
         log.debug('Not correcting %s', filename)
 

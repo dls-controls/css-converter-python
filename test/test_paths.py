@@ -1,11 +1,11 @@
 import pkg_resources
 pkg_resources.require('dls_css_utils')
-from convert.paths import _index_dir
+from convert.paths import _index_dir, update_opi_path
 
 import unittest
 
 
-class UpdatePathsTest(unittest.TestCase):
+class IndexDirTest(unittest.TestCase):
 
     def test_index_path_no_recurse_in_prod(self):
         '''
@@ -41,8 +41,8 @@ class UpdatePathsTest(unittest.TestCase):
                     'tmbf/peak_graphs.opi': ('TMBF', 'opi'),
                     'tmbf/dac_setup.opi': ('TMBF', 'opi'),
                     'scripts/setup_tunemeasurement': ('TMBF', 'opi'),
-                    'tmbf/tune_waveform_log.opi': ('TMBF', 'opi'), 
-                    'runtmbf': ('TMBF', 'opi'), 
+                    'tmbf/tune_waveform_log.opi': ('TMBF', 'opi'),
+                    'runtmbf': ('TMBF', 'opi'),
                     'scripts/set_one_bunch': ('TMBF', 'opi'),
                     'tmbf/fir_state.opi': ('TMBF', 'opi'),
                     'tmbf/tune.opi': ('TMBF', 'opi'),
@@ -69,6 +69,76 @@ class UpdatePathsTest(unittest.TestCase):
                     'tmbf/tmbf_overview.opi': ('TMBF', 'opi'),
                     'scripts/TMBF_tune.config': ('TMBF', 'opi')}
         self.assertEqual(index, contents)
+
+
+class UpdatePathsTest(unittest.TestCase):
+
+    def test_filename_unchanged_if_not_found_in_index(self):
+        filenames = ['dummy', './dummy', 'asda', 'a/b.opi']
+        for filename in filenames:
+            updated_path = update_opi_path(filename, 0, {}, 'dummy', True)
+            self.assertEqual(filename, updated_path)
+
+    def test_filename_updated_from_index_with_depth_zero(self):
+        filename = 'dummy.opi'
+        index = {filename: ('mod', 'dir')}
+        updated_path = update_opi_path(filename, 0, index, 'dummy', True)
+        self.assertEqual('./mod/dir/dummy.opi', updated_path)
+
+    def test_filename_found_in_index_if_prefixed_with_dot_slash(self):
+        filename = './dummy.opi'
+        index = {'dummy.opi': ('mod', 'dir')}
+        updated_path = update_opi_path(filename, 0, index, 'dummy', True)
+        self.assertEqual('./mod/dir/dummy.opi', updated_path)
+
+    def test_filename_updated_from_index_with_depth_one(self):
+        filename = 'dummy.opi'
+        index = {filename: ('mod', 'dir')}
+        updated_path = update_opi_path(filename, 1, index, 'dummy', True)
+        self.assertEqual('../mod/dir/dummy.opi', updated_path)
+
+    def test_filename_updated_from_index_ignoring_path_within_module_depth_zero(self):
+        filename = 'dummy.opi'
+        index = {filename: ('mod', 'dir')}
+        updated_path = update_opi_path(filename, 0, index, 'dummy', False)
+        self.assertEqual('./mod/dummy.opi', updated_path)
+
+    def test_filename_updated_from_index_ignoring_path_within_module_depth_one(self):
+        filename = 'dummy.opi'
+        index = {filename: ('mod', 'dir')}
+        updated_path = update_opi_path(filename, 1, index, 'dummy', False)
+        self.assertEqual('../mod/dummy.opi', updated_path)
+
+    def test_module_excluded_when_same_as_current_module(self):
+        filename = 'dummy.opi'
+        index = {filename: ('mod', 'dir')}
+        updated_path = update_opi_path(filename, 0, index, 'mod', True)
+        self.assertEqual('./dir/dummy.opi', updated_path)
+
+    def test_module_excluded_when_same_as_current_module_with_depth_one(self):
+        filename = 'dummy.opi'
+        index = {filename: ('mod', 'dir')}
+        updated_path = update_opi_path(filename, 1, index, 'mod', True)
+        # Depth 1 ignored since we no longer have to go up a directory for
+        # module name
+        self.assertEqual('./dir/dummy.opi', updated_path)
+
+    def test_module_excluded_when_same_as_current_module_with_depth_two(self):
+        filename = 'dummy.opi'
+        index = {filename: ('mod', 'dir')}
+        updated_path = update_opi_path(filename, 2, index, 'mod', True)
+        # Depth 2 reduced to one since we no longer have to go up a directory for
+        # module name
+        self.assertEqual('../dir/dummy.opi', updated_path)
+
+    def test_module_excluded_when_same_as_current_double_barrelled_module_with_depth_two(self):
+        filename = 'dummy.opi'
+        index = {filename: ('mod/dom', 'dir')}
+        updated_path = update_opi_path(filename, 2, index, 'mod/dom', True)
+        # Depth 2 reduced to zero since we no longer have to go up two
+        # directories for module name
+        self.assertEqual('./dir/dummy.opi', updated_path)
+
 
 if __name__ == '__main__':
     unittest.main()
