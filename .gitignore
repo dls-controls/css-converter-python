@@ -11,6 +11,7 @@ res/converter.jar
 # python coverage
 .coverage
 coverage.xml
+htmlcov
 # vim ctags file
 tags
 # datafile directories
