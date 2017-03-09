@@ -14,7 +14,8 @@ set +e
 mkdir logs
 
 # run tests
-py.test --junitxml=${WORKSPACE}/logs/nosetests.xml
+coverage run --source=convert -m run_tests --junitxml=${WORKSPACE}/logs/nosetests.xml test
+coverage xml
 
 # run pylint
 touch ${WORKSPACE}/__init__.py
