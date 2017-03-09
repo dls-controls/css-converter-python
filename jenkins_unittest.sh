@@ -14,7 +14,7 @@ set +e
 mkdir logs
 
 # run tests
-coverage run --source=convert -m run_tests --junitxml=${WORKSPACE}/logs/nosetests.xml test
+coverage run --source=convert --branch -m run_tests --junitxml=${WORKSPACE}/logs/nosetests.xml test
 coverage xml
 
 # run pylint
