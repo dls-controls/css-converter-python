@@ -8,6 +8,9 @@ res/converter.jar
 *.pyc
 # pytest cache
 .cache
+# python coverage
+.coverage
+coverage.xml
 # vim ctags file
 tags
 # datafile directories
