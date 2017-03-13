@@ -16,19 +16,24 @@ GROUPINGCONTAINER = "org.csstudio.opibuilder.widgets.groupingContainer"
 
 def simplify_rules(widget):
     """ If the pv_name field is empty and there is exactly one PV used in
-        rules, substitute that PV into the pv_name field.
+        rules, substitute that PV into the pv_name field.  Reference that PV
+        in the rule using $(pv_name).
+
+        If there is more than one PV defined in a rule, don't do anything.
     """
-    pvs = widget.findall('./rules/rule/pv')
-    if len(pvs) == 1:
-        pv = widget.find('./pv_name')
-        if pv is None:
-            pv = ET.Element('pv_name')
-            pv.text = pvs[0].text
-            pvs[0].text = '$(pv_name)'
-            widget.append(pv)
-        elif pv.text is None:
-            pv.text = pvs[0].text
-            pvs[0].text = '$(pv_name)'
+    # Find all pv elements defined in a rule.
+    rule_pvs = widget.findall('./rules/rule/pv')
+    if len(rule_pvs) == 1:  # Exactly one PV defined in a rule.
+        # Find the control PV for the widget.
+        control_pv = widget.find('./pv_name')
+        if control_pv is None:  # No control PV defined.
+            new_control_pv = ET.Element('pv_name')
+            new_control_pv.text = rule_pvs[0].text
+            rule_pvs[0].text = '$(pv_name)'
+            widget.append(new_control_pv)
+        elif control_pv.text is None:  # Control PV name empty.
+            control_pv.text = rule_pvs[0].text
+            rule_pvs[0].text = '$(pv_name)'
 
 
 def parse(filepath):
