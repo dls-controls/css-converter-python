@@ -6,6 +6,7 @@ import shutil
 import colourtweak
 import files
 import fonttweak
+import rules
 import groups
 import layers
 import mmux
@@ -171,6 +172,7 @@ class Module(object):
                         groups.parse(target)
                     colourtweak.parse(target)
                     fonttweak.parse(target)
+                    rules.parse(target)
                     if utils.grep(target, mmux.MENU_MUX_ID):
                         mmux.parse(target)
             else:
