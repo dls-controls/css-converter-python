@@ -11,6 +11,9 @@ import xml.etree.ElementTree as ET
 import utils
 
 
+GROUPINGCONTAINER = "org.csstudio.opibuilder.widgets.groupingContainer"
+
+
 def simplify_rules(widget):
     """ If the pv_name field is empty and there is exactly one PV used in
         rules, substitute that PV into the pv_name field.
@@ -35,8 +38,10 @@ def parse(filepath):
             root = tree.getroot()
 
             for widget in root.findall(".//widget"):
-                if widget.find('./rules'):
-                    simplify_rules(widget)
+                # Grouping containers do not have a PV Name field.
+                if widget.attrib['typeId'] != GROUPINGCONTAINER:
+                    if widget.find('./rules'):
+                        simplify_rules(widget)
 
             # write the new tree out to the same file
             utils.make_writeable(filepath)
