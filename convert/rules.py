@@ -8,7 +8,7 @@ import logging as log
 import os
 import xml.etree.ElementTree as ET
 
-from utils import make_writeable
+import utils
 
 
 def simplify_rules(widget):
@@ -39,7 +39,7 @@ def parse(filepath):
                     simplify_rules(widget)
 
             # write the new tree out to the same file
-            make_writeable(filepath)
+            utils.make_writeable(filepath)
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
         else:
             log.warn("Skipping %s, file not found", filepath)
@@ -56,10 +56,4 @@ def build_filelist(basepath):
             iterator over relative filepaths
     """
     log.info("Building rules list.")
-    files = []
-    for dirpath, dirnames, filenames in os.walk(basepath):
-        for filename in filenames:
-            if filename.endswith(".opi"):
-                files.append(os.path.join(dirpath, filename))
-
-    return files
+    return utils.find_opi_files(basepath)

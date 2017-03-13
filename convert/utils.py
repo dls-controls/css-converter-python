@@ -102,3 +102,13 @@ def grep(filename, string):
                 return True
 
     return False
+
+
+def find_opi_files(basepath):
+    files = []
+    for dirpath, dirnames, filenames in os.walk(basepath):
+        for filename in filenames:
+            if filename.endswith(".opi"):
+                files.append(os.path.join(dirpath, filename))
+
+    return files

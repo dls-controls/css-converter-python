@@ -47,10 +47,4 @@ def build_filelist(basepath):
             iterator over relative filepaths
     """
     log.info("Building fonttweak list.")
-    files = []
-    for dirpath, dirnames, filenames in os.walk(basepath):
-        for filename in filenames:
-            if filename.endswith(".opi"):
-                files.append(os.path.join(dirpath, filename))
-
-    return files
+    return utils.find_opi_files(basepath)
