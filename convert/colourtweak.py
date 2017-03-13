@@ -287,8 +287,7 @@ def parse(filepath):
 
 
 def build_filelist(basepath):
-    """ Execute a grep on the basepath to find all files that contain a menumux
-        control
+    """ Find all OPI files.
 
         Arguments:
             basepath - root of search
