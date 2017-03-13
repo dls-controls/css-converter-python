@@ -15,19 +15,15 @@ def simplify_rules(widget):
     """ If the pv_name field is empty and there is exactly one PV used in
         rules, substitute that PV into the pv_name field.
     """
-    print('Simplifying {}'.format(widget.findall('./rules')))
     pvs = widget.findall('./rules/rule/pv')
     if len(pvs) == 1:
         pv = widget.find('./pv_name')
-        print('pv {}'.format(pv))
         if pv is None:
-            print('new pv {}'.format(pvs[0].text))
             pv = ET.Element('pv_name')
             pv.text = pvs[0].text
             pvs[0].text = '$(pv_name)'
             widget.append(pv)
-        elif pv.text == '':
-            print('correcting pv to {}'.format(pvs[0].text))
+        elif pv.text is None:
             pv.text = pvs[0].text
             pvs[0].text = '$(pv_name)'
 
@@ -59,7 +55,7 @@ def build_filelist(basepath):
         Returns:
             iterator over relative filepaths
     """
-    log.info("Building colourtweak list.")
+    log.info("Building rules list.")
     files = []
     for dirpath, dirnames, filenames in os.walk(basepath):
         for filename in filenames:
