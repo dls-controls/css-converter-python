@@ -12,6 +12,9 @@ import utils
 
 
 GROUPINGCONTAINER = "org.csstudio.opibuilder.widgets.groupingContainer"
+LABEL = "org.csstudio.opibuilder.widgets.Label"
+
+WIDGETS_WITHOUT_CONTROL_PV = [GROUPINGCONTAINER, LABEL]
 
 
 def simplify_rules(widget):
@@ -43,8 +46,8 @@ def parse(filepath):
             root = tree.getroot()
 
             for widget in root.findall(".//widget"):
-                # Grouping containers do not have a PV Name field.
-                if widget.attrib['typeId'] != GROUPINGCONTAINER:
+                # Some widgets do not have a PV Name field.
+                if widget.attrib['typeId'] not in WIDGETS_WITHOUT_CONTROL_PV:
                     if widget.find('./rules'):
                         simplify_rules(widget)
 
