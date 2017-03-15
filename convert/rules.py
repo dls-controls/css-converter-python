@@ -12,9 +12,10 @@ import utils
 
 
 GROUPINGCONTAINER = "org.csstudio.opibuilder.widgets.groupingContainer"
+LINKINGCONTAINER = "org.csstudio.opibuilder.widgets.linkingContainer"
 LABEL = "org.csstudio.opibuilder.widgets.Label"
 
-WIDGETS_WITHOUT_CONTROL_PV = [GROUPINGCONTAINER, LABEL]
+WIDGETS_WITHOUT_CONTROL_PV = [GROUPINGCONTAINER, LINKINGCONTAINER, LABEL]
 
 
 def simplify_rules(widget):
