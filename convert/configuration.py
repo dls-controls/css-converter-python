@@ -48,7 +48,7 @@ class ModuleConfig(object):
                 elif key == 'extra_deps':
                     dependencies = config.split_value_list(value)
                     cfg_section[key] = config.parse_dependency_list(
-                        dependencies, config_parser)
+                        dependencies)
                 elif key == 'has_opi':
                     cfg_section[key] = config_parser.getboolean(name, key)
                 else:
