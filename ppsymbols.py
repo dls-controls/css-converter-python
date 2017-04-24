@@ -64,10 +64,13 @@ def edit_symbol_node(node, filename):
     node.set('typeId', SYMBOL_ID)
     node.find('name').text = 'DLS symbol'
 
+    # Use PV name from rule in control PV for tooltip etc.
+    # Reference that PV in rule to avoid duplication.
     pv_name = node.find('.//pv').text
     pv_element = et.Element('pv_name')
     pv_element.text = pv_name
     node.append(pv_element)
+    node.find('.//pv').text = '$(pv_name)'
 
     rule_element = node.find('.//rule')
     rule_element.set('prop_id', 'image_index')
