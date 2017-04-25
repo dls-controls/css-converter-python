@@ -49,7 +49,7 @@ def parse(filepath):
             for widget in root.findall(".//widget"):
                 # Some widgets do not have a PV Name field.
                 if widget.attrib['typeId'] not in WIDGETS_WITHOUT_CONTROL_PV:
-                    if widget.find('./rules'):
+                    if widget.find('./rules') is not None:
                         simplify_rules(widget)
 
             # write the new tree out to the same file
