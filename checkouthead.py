@@ -24,12 +24,33 @@ TRUNK = 'diamond/trunk'
 GIT_ROOT = 'ssh://dascgitolite@dasc-git.diamond.ac.uk/controls'
 
 
+def drop_version_file(mirror_location):
+    # Drop VERSION file into configure directory
+    configure_dir = os.path.join(mirror_location, 'configure')
+    try:
+        os.mkdir(configure_dir)
+    except OSError:
+        # configure directory is in VCS
+        pass
+
+    with open(os.path.join(configure_dir, 'VERSION'), 'w') as f:
+        f.write(version)
+        f.write('\n')
+
+    current_dir = os.curdir
+    try:
+        os.chdir(mirror_location)
+        subprocess.call(['make'])
+    finally:
+        os.chdir(current_dir)
+
+
 def checkout_module(name, version, path, mirror_root, git):
     mirror_location = os.path.join(mirror_root, path[1:])
     try:
-        os.makedirs(mirror_location)
+        os.makedirs(os.path.dirname(mirror_location))
     except OSError:
-        log.info('%s already present at %s; skipping', name, mirror_location)
+        log.info('%s already present at %s; skipping', name, os.path.dirname(mirror_location))
         return
 
     module_type = css_utils.AREA_IOC if 'ioc' in path else css_utils.AREA_SUPPORT
@@ -44,28 +65,10 @@ def checkout_module(name, version, path, mirror_root, git):
         # call returns '1' if the SVN checkout 'fails'
         if ret_val != 0:
             log.error("SVN checkout of %s/%s failed. Module may have moved to Git", module_type, module_name)
+            raise ValueError("SVN checkout of {}/{} failed.".format(module_type, module_name))
 
-    log.info('Checkout %s to %s', vcs_location, mirror_location)
-
-    # Drop VERSION file into configure directory
-    configure_dir = os.path.join(mirror_location, 'configure')
-    try:
-        os.mkdir(configure_dir)
-    except OSError:
-        # configure directory is in SVN
-        pass
-
-    with open(os.path.join(configure_dir, 'VERSION'), 'w') as f:
-        f.write(version)
-        f.write('\n')
-
-    if ret_val == 0:
-        current_dir = os.curdir
-        try:
-            os.chdir(mirror_location)
-            subprocess.call(['make'])
-        finally:
-            os.chdir(current_dir)
+    log.info('VCS checkout  %s to %s', vcs_location, mirror_location)
+    drop_version_file(mirror_location)
 
 
 def checkout_coords(coords, cfg, include_deps=True, extra_deps=None, force=False):
